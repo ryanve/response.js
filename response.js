@@ -8,17 +8,109 @@ available as object properties, making them useful tools in OOP-minded custom de
 @author Ryan Van Etten/2011
 @license Dual MIT/BSD license
 @link http://responsejs.com
-@version 0.2.5
+@version 0.2.6
+
+Unlike previous versions, Response.js 0.2.6 does NOT setup any default attributes. Devs 
+can setup attributes by using Response.create directly or by passing args in a JSON object 
+stored in a data attribute on the body tag.
+
+EXAMPLE: custom setup via JSON in data attribute (recommended method)
+    <body data-responsejs='{ 
+        "create": [ 
+            { "mode": "src", "prefix": "src", "breakpoints": [1281,1025,961,641,481,320,0] },
+            { "mode": "markup", "prefix": "r", "breakpoints": [1281,1025,961,641,481,320,0] }
+        ]}'
+    ><!--note: use jsonlint.com to make sure JSON is valid.-->
+
+EXAMPLE: custom setup via JavaScript (after the lib is loaded):
+    Response.create([{
+        mode: "markup", // either "markup" or "src"
+        prefix: "r",    // the prefix for your custom data attributes
+        breakpoints: [1281,1025,961,641,481,320,0] // array of (min) breakpoints
+    },
+    {
+        mode: "src", // either "markup" or "src"
+        prefix: "src",    // the prefix for your custom data attributes
+        breakpoints: [1281,1025,961,641,481,320,0] // array of (min) breakpoints
+    }]);
 ___________________________________________________________________________________**/
 
-window.Response = (function($, window, undefined) {
+window.Response = (function( $, window ) {
 
-    "use strict"; // for error diagnosis
+    "use strict"; // invoke strict mode
     
-    var Response = {}, // start w/ empty object
-        // cache selectors as vars:
-        $window = $(window),
-        $document = $(document);  
+    var Response = {}           // declare object
+      , $window = $(window)     // cache selector
+      , $document = $(document) // cache selector
+      
+      , customData = $('body').data('responsejs')
+      
+      , defaultBreakpoints = {
+            width: [1281, 1025, 961, 641, 481, 320, 0],
+            devicePixelRatio: [2, 1.5, 1]
+        }
+        
+      , sortNums = function( arr ) {
+            if ( !$.isArray(arr) ) { return false; } // Quit if arr is not an array.
+            arr.sort( function( a, b ) {return (b - a) } ); // Sort highest to lowest.
+            return $.map( arr, function( v ) { if ( typeof v === 'number' ) { return v; } } ); // Remove non-numeric vals.
+        }
+    
+      , getDefaults = function( prop ) {
+            return ( prop !== 'device-pixel-ratio' ) ? defaultBreakpoints.width : defaultBreakpoints.devicePixelRatio;
+        }
+        
+      , applyActive = function( selector, value, mode ) {
+            if ( !selector || !value ) { return false; }
+            return mode === 'src' ? selector.attr( 'src', value ) : selector.html(value);
+        }
+        
+      , swapEach = function( mode, selector, keys, okey, bools ) {
+            $.each(selector, function() {
+                var $this = $(this) // cache selector
+                    , ovalue = $this.data(okey)
+                    , values = Response.access( $this, keys )
+                    , value = Response.decide ( bools, values, ovalue )
+                ;
+                applyActive( $this, value, mode ); // apply current value
+            });
+        }
+        
+        // Backwards compatible function for accepting args both as strings (0.2.5) and as an object (0.2.6+)
+      , prepareArgs = function( a, b, c, d ) {
+            var mode = a.mode || a
+              , prefix = a.prefix || b
+              , prop = a.mode ? a.prop : c
+              , breakpoints = a.mode ? a.breakpoints : d
+            ;
+            if ( !mode || !prefix ) { return false; }                    // Quit if required args are missing.
+            var prop = prop || 'width'                                   // Tests are based on 'width' by default.
+              , breakpoints = sortNums(breakpoints) || getDefaults(prop) // Format user breakpoints or use defaults.
+              , prefix = prefix.toLowerCase()                            // Data attribute keys cannot use uppercase.
+              , okey = 'o' + prefix                                      // Create key for fallback value. (o is for original.)
+              , keys = Response.affix( prefix, breakpoints )             // Generate data-* keys.
+            ;
+            return { keys: keys, okey: okey, mode: mode, breakpoints: breakpoints };
+        }
+        
+        //
+      , doCreate = function( Args ) {
+            // The input (Args) should be an object output from prepareArgs().
+            var keys = Args.keys
+              , okey = Args.okey
+              , mode = Args.mode
+              , breakpoints = Args.breakpoints
+            ;
+            $document.ready(function() {
+                var selector = Response.target(keys);                // Target elements containing Response data attributes.
+                Response.store(selector, okey, mode);                // Store fallback value to data key.
+                $window.resize(function() {                          // Actions inside this happen on ready and resize.
+                    var bools = Response.mapBool(breakpoints, Response.band); // Test each breakpoint.
+                    swapEach( mode, selector, keys, okey, bools );   // Send args to Response.swap and perform swap.
+                }).resize();// Trigger resize handlers.
+            });// Close ready function.
+        }
+    ;// var
             
     /********
     Response.action()
@@ -39,35 +131,28 @@ window.Response = (function($, window, undefined) {
     *****/    
 
     Response.action = function ( action ) {
-        // Quit if action is not a function or array.
-        if ( typeof action !== 'function' && !$.isArray(action) ) { return false; }
-        // If action is a function, execute it on ready and resize.
-        if ( typeof action === 'function' ) { $(function () { action(); $window.resize( action ); }); } 
-        // Else, we know action is an array, so iterate. Execute functions on ready and resize.
-        else { $.each(action, function() {                                                        
-            if ( typeof this === 'function' ) { this(); $window.resize( this ); }
+        // If action is a function, execute it on ready and resize:
+        if ( $.isFunction(action) ) { $(function () { action(); $window.resize( action ); }); } 
+        // If action is an array, iterate, and execute valid functions on ready and resize:
+        else if ( $.isArray(action) ) { $.each(action, function() {                                                        
+            if ( $.isFunction(this) ) { this(); $window.resize( this ); }
         }); }
+        else { return false; } // Quit if action is not a function or array.
         return action;
     };// Response.action
         
     /********
     Response.band()
     @since 0.1.1
-    Response.band() tests width-based media queries via .matchMedia (or faux media 
-    queries via window width) to check if a min/max-width breakpoint range is active. 
+    Response.band() tests if a min/max-width breakpoint range is active. 
     The args (min, max) should be numbers in pixels. The return is boolean.
     EXAMPLE w/ min only:    Response.band(481)   // true @ 481px wide and up. 
     EXAMPLE w/ min and max: Response.band(0,480) // true @ 0-480px wide. 
     *****/
     
     Response.band = function ( min, max ) {
-        var min = min || 0    // default min: 0
-          , max = max || 9999 // default max: 9999px
-          , bool = ( window.matchMedia ) ? // Use matchMedia if supported. Fallback to window width.
-               ( ( window.matchMedia('(min-width: ' + min + 'px) and (max-width: ' + max + 'px)').matches ? true : false ) ) :
-               ( ( $window.width() >= min && $window.width() <= max ) ? true : false )
-        ;       
-        return bool;
+        var min = min || 0, max = max || 9999; // Default min/max (px).
+        return ( $window.width() >= min && $window.width() <= max ) ? true : false;
     };// Response.band
 
     /********
@@ -108,22 +193,16 @@ window.Response = (function($, window, undefined) {
     
     
     /********
-    Response.mins()
+    Response.mapBool()
     @since 0.1.9
     ##needs desc
     // output is an array of booleans
     *****/
     
-    Response.mins = function ( array, prop ) {
-        // Quit if array is not an array.
-        if ( !$.isArray(array) ) { return false; }
-        // prop 'band' or undefined => map thru Response.band:
-        else if ( !prop || prop === 'band' ) { return $.map( array, function( min ) { return Response.band(min) } ); } 
-        // prop 'dpr'  => map thru Response.dpr:
-        else if ( prop === 'dpr' ) { return $.map( array, function( min ) { return Response.dpr(min) } ); }
-        else { return false; }
-    };// Response.mins
-
+    Response.mapBool = function ( array, boolTest ) {
+        if ( !$.isArray(array) ) { return false; } // Quit if array is not an array.
+        return $.map( array, function( v ) { return boolTest(v); } );
+    };// Response.
     
     /********
     Response.store()
@@ -134,9 +213,9 @@ window.Response = (function($, window, undefined) {
     Response.store = function ( selector, key, mode ) {
         if ( !selector || !key || !mode ) { return false; } // Quit if any of the args missing.
         return $.each(selector, function() { 
-        var $this = $(this); 
-        var value = ( mode === 'src' ) ? $this.attr('src') : $this.html(); 
-        $this.data( key, value ); 
+            var $this = $(this); // These two var statements need to be separate.
+            var value = mode === 'src' ? $this.attr('src') : $this.html(); 
+            $this.data( key, value );
         });
     };// Response.store
 
@@ -147,9 +226,8 @@ window.Response = (function($, window, undefined) {
     *****/
     
     Response.target = function( keys ) {
-        var target = $.map( keys, function(key) { return '[data-' + key + ']'; } )
-          , target = $( target.join() );
-        return target;
+        var target = $.map( keys, function( key ) { return '[data-' + key + ']'; } );
+        return $( target.join() );
     };// Response.target
     
     /********
@@ -172,8 +250,7 @@ window.Response = (function($, window, undefined) {
     
     Response.access = function( selector, keys ) {
         if ( !$.isArray(keys) ) { return false; } // Quit if keys is not an array.
-        var values = $.map( keys, function(key) { return selector.data(key) || ''; } );
-        return values;
+        return $.map( keys, function(key) { return selector.data(key) || ''; } ); // Return array of values.
     };// Response.access
     
     
@@ -195,52 +272,6 @@ window.Response = (function($, window, undefined) {
 
     
     /********
-    Response.send()
-    @since 0.1.9
-    ##needs desc
-    *****/
-    
-    Response.send = function( selector, value, mode ) {
-        if ( !selector || !value ) { return false; }
-        var send = ( mode === 'src' ) ? selector.attr( 'src', value ) : selector.html(value);
-        return send;
-    }; // Response.send
-    
-    
-    /********
-    Response.swap()
-    @since 0.1.9
-    ##needs desc
-    *****/
-    Response.swap = function( mode, selector, keys, okey, bools ) {
-        $.each(selector, function() {    
-            var $this = $(this) // cache selector
-                , ovalue = $this.data(okey)
-                , values = Response.access( $this, keys )
-                , value = Response.decide ( bools, values, ovalue )
-            ;
-            Response.send( $this, value, mode ); // apply swap
-        });
-    };// Response.swap
-
-
-    
-    /********
-    Response.format()
-    @since 0.2.1
-    ##needs desc
-     // Sort breakpoint array from highest to lowest.
-     // Remove non-numeric breakpoints.
-    *****/
-    Response.format = function( array, sort ) {
-        if ( !$.isArray(array) ) { return false; } // Quit if array is not an array.
-        var sort = sort || 'desc'; // Default sort order = descending = highest to lowest.
-        ( sort === 'asc' ) ? array.sort( function( a, b ) {return (a - b) } ) : array.sort( function( a, b ) {return (b - a) } );
-        return $.map( array, function(item) { if ( typeof item === 'number' ) { return item; } } ) // Remove non-numeric array items.
-    };// Response.format
-    
-    
-    /********
     Response.affix()
     @since 0.2.1
     ##needs desc
@@ -251,7 +282,8 @@ window.Response = (function($, window, undefined) {
         var suffix = suffix || '';
         return $.map( array, function(value) { return prefix + value + suffix; } ) // Affix each value and return array.
     };// Response.affix
-    
+
+        
     /********
     Response.create()
     @since 0.1.9
@@ -268,7 +300,7 @@ window.Response = (function($, window, undefined) {
     
             REQUIRED ARGS
             mode:        The mode can be 'markup' or 'src'
-  	  
+          
             prefix:      The prefix should be a lowercase string. Shorter is better. 
                          For example, setting the prefix to 'my' would create enable attributes of the form: 
                              <p data-my481="" data-my641="" ...>
@@ -279,43 +311,26 @@ window.Response = (function($, window, undefined) {
             breakpoints: Use this to set custom *min* breakpoints.
                          Defaults to [1281, 1025, 961, 641, 481, 320, 0]
                          This should be an array of numbers (not strings)
-						 The array can be in any order. (It gets sorted.)						 
+                         The array can be in any order. (It gets sorted.)                         
                          There is no limit to the number of breakpoints. Less is (slightly) faster.
-						 
+                         
             prop:        This is the property that the min tests are based on.
                          Can be either 'width' or 'dpr' (dpr = device-pixel-ratio)
                          Defaults to 'width'
     
     *****/
-    Response.create = function( mode, prefix, breakpoints, prop ) {
-        if ( !mode || !prefix ) { return false; }                  // Quit if required args are missing.
-        var prop = prop || 'width'                                 // Tests are based on 'width' by default.
-          , defaults = ( prop === 'dpr' ) ? [2, 1.5, 1] : [1281, 1025, 961, 641, 481, 320, 0] // 'dpr' defaults : 'width' defaults
-          , breakpoints = Response.format(breakpoints) || defaults // Format breakpoints. Use defaults if none are set.+
-          , prefix = prefix.toLowerCase()                          // Force lowercase. (Custom data attribute keys cannot use uppercase.)
-          , okey = 'o' + prefix                                    // Create key for fallback value. (o stands for original.)
-          , keys = Response.affix( prefix, breakpoints )           // Generate data-* keys.
-        ;
-        $document.ready(function() {
-            var selector = Response.target(keys);                  // Target elements containing Response data attributes.
-            Response.store(selector, okey, mode);                  // Store fallback value to data key.
-            $window.resize(function() {                            // Start resize function. (These actions trigger on ready and resize.)
-                var mins = Response.mins(breakpoints);             // Test each breakpoint. (Response.mins returns an array of booleans.)
-                Response.swap( mode, selector, keys, okey, mins ); // Send args to Response.swap and perform swap.
-            }).resize();// Trigger resize handlers.
-        });// Close ready function.
+    //Response.create = function( mode, prefix, breakpoints, prop ) {
+    Response.create = function( a, b, c, d ) {
+         return $.isArray(a) ? $.map( a, function(eitherType) { doCreate( prepareArgs(eitherType) ); } ) : doCreate( prepareArgs(a, b, c, d) );
     };// Response.create
 
+    // If body tag contains custom data (data-responsejs), parse it as JSON.
+    // If there's a "create" prop in the object, pass it to Response.create().
+    if ( customData ) {
+        var custom = $.parseJSON(customData); 
+        if ( custom.create ) { Response.create( custom.create ); }
+    }
+    
     return Response;
     
 }(jQuery, window)); // jQuery no conflict wrapper ## add Response as property of global window object
-
-
-/********
-Response :: Customize your build
-## NEEDS DESC
-Use these defaults or create your own.
-(see the Response.create source for documentation on how to use)
-*****/
-Response.create('markup', 'r'); // Create markup mode functionalty for (default) data-r* attributes.
-Response.create('src', 'src');  // Create src mode functionalty set for (default) data-src* attributes.
