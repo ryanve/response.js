@@ -1,4 +1,14 @@
-# CHANGELOG | [source](https://github.com/ryanve/response.js/blob/master/response.js) 
+# CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
+
+## 0.2.6 (2011-10-24)
+- Some methods (ones mainly for internal operations) were localized for efficiency:
+  - Response.format -> local var sortNums
+  - Response.send -> local var applyActive
+  - Response.swap -> local var swapEach
+- The Response.create method was reworked to accomodate the ability to pass args via an object (or an array of objects) so that devs can better understand its use and so that it would be more efficient at creating multiple attribute sets (it now only triggers the ready event once). The original string args still work, but going forward, objects will be preferred.
+- The default attribute setups were eliminated in favor of letter devs choose their own setup options (breakpoints etc.) They should now do either via Response.create or by passing the custom setup options in a JSON object stored in a data attribute on the body tag. The latter method is preferrable because it requires no scripting.
+- Response.mins was renamed/changed to Response.mapBool (which is more general and thus suited for a method).
+- Minor performance tweaks were made (mainly combining var statements).
 
 
 ## 0.2.5 (2011-09-20)
