@@ -2,9 +2,11 @@
 
 
 ## 0.2.5 (2011-09-20)
+
 - Moved default Response.create() lines outside the object. 
     
 ## 0.2.4 (2011-09-19)
+
     - Further streamlined code need to run .dpr 
     - confirmed Opera support for devicePixelRatio 
       - see: [opera.com/docs/specs/presto28/#changes](//:opera.com/docs/specs/presto28/#changes)
@@ -13,9 +15,11 @@
     - omitting Moderizr.mq as second fallback (not needed) 
     
 ## 0.2.3 (2011-09-19)
+
     - Streamlined code need to run .dpr to by combinating arrays and local vars.
     
 ## 0.2.2 (2011-09-19)
+
     - Changed .dpr to use local vars to reduce long text in media queries.
     
 ## 0.2.1 (2011-09-19)
