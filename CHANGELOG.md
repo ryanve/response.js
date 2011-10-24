@@ -8,7 +8,8 @@
   - Response.send REPLACED w/ local var applyActive
   - Response.swap REPLACED w/ local var swapEach
 - Response.mins REPLACED w/ Response.mapBool (which is more general and thus better suited as a method).
-- Minor performance tweaks were made (mainly combining var statements).
+- Response.band was made more efficient by eliminating the check for .matchMedia. (Checking the window width always works.)
+- Minor performance tweaks were made.
 
 ## 0.2.5 (2011-09-20)
 
