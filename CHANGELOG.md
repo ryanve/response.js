@@ -1,15 +1,15 @@
-# Response.js - [responsejs.com](http://responsejs.com)
+# Change Log - [Response.js](http://responsejs.com)
 
-  === response.js change log ===
-	0.2.5 - (2011-09-20)
-	- Moved default Response.create() lines outside the object. 
+
+# 0.2.5 (2011-09-20)
+- Moved default Response.create() lines outside the object. 
 	
-	0.2.4 (2011-09-19)
-	- Further streamlined code need to run .dpr 
-	      - confirmed Opera support for devicePixelRatio 
-		    @link opera.com/docs/specs/presto28/#changes
-		  - confirmed Android support for devicePixelRatio 
-		    @link developer.android.com/reference/android/webkit/WebView.html 
+# 0.2.4 (2011-09-19)
+- Further streamlined code need to run .dpr 
+    - confirmed Opera support for devicePixelRatio 
+      @link [opera.com/docs/specs/presto28/#changes](//:opera.com/docs/specs/presto28/#changes)
+    - confirmed Android support for devicePixelRatio 
+      @link [developer.android.com/reference/android/webkit/WebView.html](//:developer.android.com/reference/android/webkit/WebView.html) 
 		  - omitting Moderizr.mq as second fallback (not needed) 
 	
     0.2.3 (2011-09-19)
