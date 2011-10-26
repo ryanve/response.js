@@ -8,9 +8,10 @@ available as object properties, making them useful tools in OOP-minded custom de
 @author Ryan Van Etten/2011
 @license Dual MIT/BSD license
 @link http://responsejs.com
-@version 0.2.6
+@version 0.2.7
+@deps jQuery (1.4.3+)
 
-Unlike previous versions, Response.js 0.2.6 does NOT setup any default attributes. Devs 
+Since version 0.2.6, Response does NOT setup any default attributes. Devs 
 can setup attributes by using Response.create directly or by passing args in a JSON object 
 stored in a data attribute on the body tag.
 
@@ -35,7 +36,7 @@ EXAMPLE: custom setup via JavaScript (after the lib is loaded):
     }]);
 ___________________________________________________________________________________**/
 
-window.Response = (function( $, window ) {
+window.Response = (function($, window, undefined) {
 
     "use strict"; // invoke strict mode
     
@@ -43,74 +44,112 @@ window.Response = (function( $, window ) {
       , $window = $(window)     // cache selector
       , $document = $(document) // cache selector
       
-      , customData = $('body').data('responsejs')
+      , customData = $('body').data('responsejs') // Read data-responsejs attr.
       
+        // Custom breakpoints override these defaults. Custom breakpoints can be entered
+        // in any order. They get sorted highest to lowest by sortNums, but the defaults 
+        // here are presorted so that we can skip the need to sort when using the defaults.
       , defaultBreakpoints = {
-            width: [1281, 1025, 961, 641, 481, 320, 0],
-            devicePixelRatio: [2, 1.5, 1]
+            width: [1281, 1025, 961, 641, 481, 320, 0], // recommended (ideal for 960 grids)
+            devicePixelRatio: [2, 1.5, 1]                  // common ratios 
+        } // Drop trailing decimal zeros. If 1.0 is used, the target attr is still data-pre1 (not data-pre1.0)
+          // @link stackoverflow.com/questions/7907180/retain-precision-during-numeric-sort
+        
+        // Store property identifiers as local object (mainly for maintainability).
+      , propHandles = {
+            width: 'width',
+            dpr: 'device-pixel-ratio'
         }
         
-      , sortNums = function( arr ) {
-            if ( !$.isArray(arr) ) { return false; } // Quit if arr is not an array.
-            arr.sort( function( a, b ) {return (b - a) } ); // Sort highest to lowest.
-            return $.map( arr, function( v ) { if ( typeof v === 'number' ) { return v; } } ); // Remove non-numeric vals.
+        // Error handling. (Throws exception.)
+        // Devs can use Ctrl+F to find @errors
+      , doError = function(msg) { 
+            throw 'Error in use of Response.' + msg; 
+        }
+        
+      , isNumber = function(anyType) {
+            return typeof anyType === 'number'; // boolean
         }
     
-      , getDefaults = function( prop ) {
-            return ( prop !== 'device-pixel-ratio' ) ? defaultBreakpoints.width : defaultBreakpoints.devicePixelRatio;
+        // Sort an array of numbers from highest to lowest. Array should be all numeric. If not, throw exception.
+      , sortNums = function(arr) {
+            if ( !$.isArray(arr) ) { return undefined; } // Return undefined if arr is not an array.
+            var L = arr.length, arr = $.map(arr, function(v) {if (isNumber(v)) {return v;}}); // Remove non-numbers.
+            if ( arr.length !== L ) { doError('create @breakpoints'); } // Throw error if arr had non-numeric values.
+            return arr.sort( function(a, b) {return (b - a); } ); // Sort highest to lowest.
         }
         
-      , applyActive = function( selector, value, mode ) {
-            if ( !selector || !value ) { return false; }
+        // Get (breakpoint) defaults.
+      , getDefaults = function(prop) {
+            return prop !== propHandles.dpr ? defaultBreakpoints.width : defaultBreakpoints.devicePixelRatio;
+        }
+
+        // Techically custom data attribute keys can contain uppercase in HTML, but, b/c the DOM lowercases them, they need 
+        // to be lowercase regardless when we target them in jQuery. So here we're forcing them to lowercase from the start. 
+        // We're removing all punctuation except for dashes, underscores, and periods. While some other chars may be valid, 
+        // they may cause issues when when we try to target them. (Periods are escaped later in Response.target)
+        // Rules @link dev.w3.org/html5/spec/Overview.html#custom-data-attribute
+      , sanitizeKey = function( key ) {
+            return key.toLowerCase().replace( /[^a-z0-9\-\_\.]/g, '' ); // Lowercase alphanumerics, dashes, underscores, and periods.
+        }
+      
+        // Apply the method that performs the actual swap.
+      , applyActive = function(selector, value, mode) {
+            // I think we can remove this check b/c this is local now, and if a user's args are bad, we'll know before this:
+            // if ( !selector || !value ) { doError('create @applyActive'); }
             return mode === 'src' ? selector.attr( 'src', value ) : selector.html(value);
         }
         
-      , swapEach = function( mode, selector, keys, okey, bools ) {
+        // Iterate through selected elems to determine and apply active value.
+      , swapEach = function(mode, selector, keys, okey, bools) {
             $.each(selector, function() {
                 var $this = $(this) // cache selector
-                    , ovalue = $this.data(okey)
-                    , values = Response.access( $this, keys )
+                    , ovalue = $this.data(okey) // orig (no-js) value
+                    , values = Response.access( $this, keys ) // array
                     , value = Response.decide ( bools, values, ovalue )
                 ;
-                applyActive( $this, value, mode ); // apply current value
+                applyActive( $this, value, mode ); // apply active value
             });
         }
         
         // Backwards compatible function for accepting args both as strings (0.2.5) and as an object (0.2.6+)
-      , prepareArgs = function( a, b, c, d ) {
+      , doCreate = function(a, b, c, d) {
+      
+            // Since 0.2.6 we only need the first arg (it should be an object).
+            // Pre 0.2.5, we used strings a, b, c, d. So handle both scenarios:
             var mode = a.mode || a
               , prefix = a.prefix || b
               , prop = a.mode ? a.prop : c
               , breakpoints = a.mode ? a.breakpoints : d
             ;
-            if ( !mode || !prefix ) { return false; }                    // Quit if required args are missing.
-            var prop = prop || 'width'                                   // Tests are based on 'width' by default.
-              , breakpoints = sortNums(breakpoints) || getDefaults(prop) // Format user breakpoints or use defaults.
-              , prefix = prefix.toLowerCase()                            // Data attribute keys cannot use uppercase.
-              , okey = 'o' + prefix                                      // Create key for fallback value. (o is for original.)
-              , keys = Response.affix( prefix, breakpoints )             // Generate data-* keys.
+            if ( !mode || !prefix ) { doError('create @mode OR @prefix'); } // Throw error if req'd args are wrong.
+            var prop = prop || 'width'                                      // Base tests on 'width' by default.
+               // Breakpoints unspecified? Use defaults. Specified? Sort them *if* in an array. Otherwise => error.
+                , breakpoints = !breakpoints ? getDefaults(prop) : sortNums(breakpoints) || doError('create @breakpoints')
+              , okey = 'o' + sanitizeKey(prefix)                            // Create key for fallback (orig) value.
+              , keys = $.map( breakpoints, function(n) { return sanitizeKey(prefix + n); } ) // Generate data-* keys.
             ;
-            return { keys: keys, okey: okey, mode: mode, breakpoints: breakpoints };
-        }
-        
-        //
-      , doCreate = function( Args ) {
-            // The input (Args) should be an object output from prepareArgs().
-            var keys = Args.keys
-              , okey = Args.okey
-              , mode = Args.mode
-              , breakpoints = Args.breakpoints
-            ;
-            $document.ready(function() {
-                var selector = Response.target(keys);                // Target elements containing Response data attributes.
-                Response.store(selector, okey, mode);                // Store fallback value to data key.
-                $window.resize(function() {                          // Actions inside this happen on ready and resize.
-                    var bools = Response.mapBool(breakpoints, Response.band); // Test each breakpoint.
-                    swapEach( mode, selector, keys, okey, bools );   // Send args to Response.swap and perform swap.
-                }).resize();// Trigger resize handlers.
+            $document.ready(function() {                                 // Ready? Yea.
+                var selector = Response.target(keys);                    // Target elems containing Response data atts.
+                Response.store(selector, okey, mode);                    // Store fallback (no-js) value to data key.
+                if ( prop === propHandles.width ) {                      // Check if prop is width. (Most likely.)
+                    var test = Response.band;                            // Store test as local outside of resize function.
+                    $window.resize(function() {                          // Actions inside this happen on ready and resize.
+                        var bools = Response.mapBool(breakpoints, test); // Use Response.band to test each breakpoint.
+                        swapEach(mode, selector, keys, okey, bools);     // Perform swap.
+                    }).resize();// Trigger resize handlers.
+                }
+                else if ( prop === propHandles.dpr ) {                   // Check if prop is device-pixel-ratio. 
+                        var bools = Response.mapBool(breakpoints, Response.dpr); // Use Response.dpr to test each breakpoint.
+                        swapEach(mode, selector, keys, okey, bools);     // Perform swap.
+                }
+                else { doError('create @prop') }
             });// Close ready function.
-        }
+        }// doCreate
+        
     ;// var
+    
+    // Response.sanitize = { key: sanitizeKey }; // May add something like this as a method in a later version.
             
     /********
     Response.action()
@@ -130,17 +169,31 @@ window.Response = (function( $, window ) {
             function myfunction2() { // do stuff 2 }
     *****/    
 
-    Response.action = function ( action ) {
-        // If action is a function, execute it on ready and resize:
-        if ( $.isFunction(action) ) { $(function () { action(); $window.resize( action ); }); } 
-        // If action is an array, iterate, and execute valid functions on ready and resize:
-        else if ( $.isArray(action) ) { $.each(action, function() {                                                        
-            if ( $.isFunction(this) ) { this(); $window.resize( this ); }
-        }); }
-        else { return false; } // Quit if action is not a function or array.
+    Response.action = function (action) {
+        var isFunction = $.isFunction(action); // Cache boolean. (We need it twice here.)
+        if ( !isFunction && !$.isArray(action) ) { doError('action'); } // Quit if arg is wrong type.
+        // If action is a function, execute it asap and on resize:
+        if ( isFunction ) { $(function () { action(); $window.resize( action ); }); }
+        // Otherwise action must be an array => execute valid functions asap and on resize:
+        else { $.each(action, function() { if ( $.isFunction(this) ) { this(); $window.resize( this ); } }); }
         return action;
     };// Response.action
-        
+
+    
+    /********
+    Response.affix()
+    @since 0.2.1
+    ##needs desc
+     (Was) used to create/concatenate data-* keys.
+     but no longer needed in 0.2.7. Depreciate it or keep it? Hmm.
+    *****/
+    Response.affix = function(prefix, array, suffix) {
+        if ( !prefix || !$.isArray(array) ) { doError('affix'); } // Quit if args are wrong.
+        var suffix = suffix || '';
+        return $.map( array, function(value) { return prefix + value + suffix; } ) // Affix each value and return array.
+    };// Response.affix
+    
+    
     /********
     Response.band()
     @since 0.1.1
@@ -150,45 +203,40 @@ window.Response = (function( $, window ) {
     EXAMPLE w/ min and max: Response.band(0,480) // true @ 0-480px wide. 
     *****/
     
-    Response.band = function ( min, max ) {
-        var min = min || 0, max = max || 9999; // Default min/max (px).
-        return ( $window.width() >= min && $window.width() <= max ) ? true : false;
+    Response.band = function (min, max) {
+        var min = min || 0 // Default min.
+          , curr = $window.width() // Current width.
+          , bool = !max ? ( curr >= min ) : // No max.
+                          ( curr >= min && curr <= max )
+        ;
+        return bool;
     };// Response.band
 
     /********
     Response.dpr(decimal) tests if a minimum device pixel ratio is active. 
     Returns true or false. The arg (decimal) must be a number (not a string). 
-    EXAMPLE: Response.dpr(1.5);
-    EXAMPLE: Response.dpr(2);
+    EXAMPLE: Response.dpr(1.5); // true when device-pixel-ratio is 1.5+
+    EXAMPLE: Response.dpr(2);   // true when device-pixel-ratio is 2+
     *****/
     
-    Response.dpr = function( decimal ) {
+    Response.dpr = function(decimal) {
         var decimal = decimal || 0; // default = 0
-        if ( typeof decimal !== 'number' ) { return false; } // Return false if decimal is not a number.      
+        if ( !isNumber(decimal) ) { doError('dpr'); } // Quit if decimal is not a number.     
         
         // Use .devicePixelRatio if supported. 
         // Supported by Webkit (Safari/Chrome/Android) and Presto 2.8+ (Opera) browsers.
-        else if ( window.devicePixelRatio ) { 
-            return ( window.devicePixelRatio >= decimal ) ? true : false ; 
-        }
+        if ( window.devicePixelRatio ) { return window.devicePixelRatio >= decimal; } // boolean
         
         // Fallback to .matchMedia as alternative.
         // Supported by Gecko (FF6+) and more listed here:
         // @link developer.mozilla.org/en/DOM/window.matchMedia
-        else { 
-            var prefixes = ['min-', '-webkit-min-', 'min--moz-'] // -o-min- omitted (Opera supported above.)
-              , open = 'all and ('
-              , prop = 'device-pixel-ratio:'
-              , mediaqueries = Response.affix( open, prefixes, prop + decimal.toString() + ')' )
-              , bool = (  window.matchMedia  ) ?
-                       (  window.matchMedia( mediaqueries[0] ).matches // generic
-                       || window.matchMedia( mediaqueries[2] ).matches // moz
-                       || window.matchMedia( mediaqueries[1] ).matches // webkit
-                       )  ? true : false :
-                      false // If neither of these methods is supported => set bool to false.
-            ;
-            return bool;
-        }//Close else
+        // -webkit-min- and -o-min- omitted (Webkit/Opera supported above.)
+        // The generic min-device-pixel-ratio is expected to be added to the W3 spec.
+        var mM = window.matchMedia, str = 'device-pixel-ratio:' + decimal + ')';
+        if ( mM ) { return mM('(min--moz-' + str ).matches || mM( '(min-' + str ).matches; }
+        
+        // If neither method is supported:
+        return false;
     };// Response.dpr
     
     
@@ -199,23 +247,27 @@ window.Response = (function( $, window ) {
     // output is an array of booleans
     *****/
     
-    Response.mapBool = function ( array, boolTest ) {
-        if ( !$.isArray(array) ) { return false; } // Quit if array is not an array.
-        return $.map( array, function( v ) { return boolTest(v); } );
+    Response.mapBool = function (array, boolTest) {
+        if ( !$.isArray(array) ) { doError('mapBool'); } // Quit if array is not an array.
+        return $.map( array, function( v ) { return boolTest(v); } ); // Array of booleans
     };// Response.
     
     /********
     Response.store()
     @since 0.1.9
-    Traverse the DOM and store ##needs desc
+    Store a data value on each elem targeted by a jQuery selector. We use this for storing an 
+    elem's orig (no-js) state. This gives us the ability to return the elem to its orig state.
+    @param selector (required) is the jQuery selector.
+    @param key (required) is the key for the value we want to store with @link api.jquery.com/data/
+    @param mode (required) should be 'src' or 'markup' (default)
     *****/
     
-    Response.store = function ( selector, key, mode ) {
-        if ( !selector || !key || !mode ) { return false; } // Quit if any of the args missing.
+    Response.store = function (selector, key, mode) {
+        if ( !selector || !key || !mode ) { doError('store'); } // Quit if any of the args missing.
         return $.each(selector, function() { 
             var $this = $(this); // These two var statements need to be separate.
             var value = mode === 'src' ? $this.attr('src') : $this.html(); 
-            $this.data( key, value );
+            $this.data(key, value);
         });
     };// Response.store
 
@@ -225,34 +277,31 @@ window.Response = (function( $, window ) {
     ##needs desc
     *****/
     
-    Response.target = function( keys ) {
-        var target = $.map( keys, function( key ) { return '[data-' + key + ']'; } );
+    Response.target = function(keys) {
+        // The .replace is needed to escape periods. @link github.com/jquery/sizzle/issues/76
+        var target = $.map( keys, function( key ) { return '[data-' + key.replace( /\./g, '\\.' ) + ']'; } );
         return $( target.join() );
     };// Response.target
     
     /********
     Response.access()
+    Access data-* values from an array of data-* keys. 
     @since 0.1.9
     @uses jQuery's .data() method.
-    Access data-* values from an array of data-* keys. 
-    The required arg is an array of data keys to access.
-    The output is an array containing each key's value.
+    @param selector (required) is the jQuery selector for elems you want to target.
+    @param keys (required) is an array of data keys whose values you want to access.
+    @return is an array of values corresponding to each key.
 
         EXAMPLE
         Imagine you have element(s) w/ multiple custom data attributes:
             <img data-custom0="value 0" data-custom1="value 1" src="example.png" alt=""/>
-        Then you'd use the line below to save each attribute's *value* to an array:
-            var myArray = Response.access( 'custom0', 'custom1'); 
-        and...:
-            myArray[0] would equal 'value 0'
-            myArray[1] would equal 'value 1'        
+        #needs example
     *****/
     
-    Response.access = function( selector, keys ) {
-        if ( !$.isArray(keys) ) { return false; } // Quit if keys is not an array.
+    Response.access = function(selector, keys) {
+        if ( !selector || !$.isArray(keys) ) { return undefined; } // Quit if keys is not an array.
         return $.map( keys, function(key) { return selector.data(key) || ''; } ); // Return array of values.
     };// Response.access
-    
     
     /********
     Response.decide()
@@ -260,28 +309,16 @@ window.Response = (function( $, window ) {
     ##needs desc
     *****/
     
-    Response.decide = function( bools, values, fallback ) {
+    Response.decide = function(bools, values, fallback) {
         // The args here are two arrays and a fallback value.
         // We use a series of if/elseif checks to zero in on the proper value.
         // ##update desc
+        if ( bools.length !== values.length ) { doError('decide @length'); } // users won't hit this, for testing only
         var value, i = 0;
         while( !bools[i] && ++i < bools.length ) {};
         while( !(value = values[i]) && ++i < values.length ) {};
         return value || fallback || '';
     }; // Response.decide
-
-    
-    /********
-    Response.affix()
-    @since 0.2.1
-    ##needs desc
-     // used to create data-* keys.
-    *****/
-    Response.affix = function( prefix, array, suffix ) {
-        if ( !prefix || !$.isArray(array) ) { return false; } // Quit if args are wrong.
-        var suffix = suffix || '';
-        return $.map( array, function(value) { return prefix + value + suffix; } ) // Affix each value and return array.
-    };// Response.affix
 
         
     /********
@@ -320,8 +357,9 @@ window.Response = (function( $, window ) {
     
     *****/
     //Response.create = function( mode, prefix, breakpoints, prop ) {
-    Response.create = function( a, b, c, d ) {
-         return $.isArray(a) ? $.map( a, function(eitherType) { doCreate( prepareArgs(eitherType) ); } ) : doCreate( prepareArgs(a, b, c, d) );
+    Response.create = function(a, b, c, d) {
+        if ( !a ) { doError('create @arg1'); }
+        return $.isArray(a) ? $.map( a, function(ukn) { doCreate( ukn ); } ) : doCreate(a, b, c, d);
     };// Response.create
 
     // If body tag contains custom data (data-responsejs), parse it as JSON.
@@ -330,7 +368,7 @@ window.Response = (function( $, window ) {
         var custom = $.parseJSON(customData); 
         if ( custom.create ) { Response.create( custom.create ); }
     }
-    
+
     return Response;
     
 }(jQuery, window)); // jQuery no conflict wrapper ## add Response as property of global window object
