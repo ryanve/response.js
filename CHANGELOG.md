@@ -1,7 +1,11 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## 0.2.7 (2011-10-26)
+- Error handling was improved. Now, most of the public methods will throw an exception to the console if the args sent to them are incorrect. The exception says the name of the method that caused the problem and when possible the name of the arg preceded by an @ sign.
+- Some issues with device-pixel-ratio [decimals](http://stackoverflow.com/questions/7907180/retain-precision-during-numeric-sort) and were resolved. Response.target was updated with the ability to target data keys containing decimal points. [They needed to be escaped.](https://github.com/jquery/sizzle/issues/76) Response.create now properly supports device-pixel-ratio based attributes. Response.dpr was further optimized.
+
 ## 0.2.6 (2011-10-24)
-- The default attribute setups were eliminated in favor of letter devs choose their own setup options (breakpoints etc.) either via Response.create or by passing the custom setup options in a JSON object stored in a data attribute on the body tag. The latter method is preferrable because it requires no scripting.
+- The default attribute setups were eliminated in favor of letting devs choose their own setup options (breakpoints etc.) either via Response.create or by passing the custom setup options in a JSON object stored in a data attribute on the body tag. The latter method is preferrable because it requires no scripting.
 - The Response.create method was reworked to accomodate the ability to pass args via an object (or an array of objects) so that devs can better understand its use and so that it would be more efficient at creating multiple attribute sets (it now only triggers the ready event once). The original string args still work, but going forward, objects will be preferred.
 - Some methods (ones mainly for internal operations) were localized for efficiency:
   - Response.format REPLACED w/ local var sortNums
@@ -18,11 +22,11 @@
 ## 0.2.4 (2011-09-19)
 
 - Further streamlined code need to run .dpr 
-- confirmed Opera support for devicePixelRatio 
+- Confirmed Opera support for window.devicePixelRatio 
   - see: [opera.com/docs/specs/presto28/#changes](http://opera.com/docs/specs/presto28/#changes)
-- confirmed Android support for devicePixelRatio 
+- Confirmed Android support for devicePixelRatio 
   - see: [developer.android.com/reference/android/webkit/WebView.html](http://developer.android.com/reference/android/webkit/WebView.html) 
-- omitting Moderizr.mq as second fallback (not needed) 
+- Omitting Moderizr.mq as second fallback (not needed) 
     
 ## 0.2.3 (2011-09-19)
 
