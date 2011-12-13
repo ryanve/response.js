@@ -7,7 +7,7 @@
  * @author Ryan Van Etten/2011
  * @license Dual MIT/BSD license
  * @link http://responsejs.com
- * @version 0.2.7 fork1
+ * @version 0.2.7
  * @requires jQuery 1.4.3+
  */
 
