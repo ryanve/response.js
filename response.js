@@ -1,40 +1,15 @@
-/**___________________________________________________________________________________
-
-RESPONSE is a lightweight, jQuery plugin, that gives designers/devs tools for producing 
-performance-optimized, mobile-first responsive websites. It provides easy-to-use action 
-hooks for dynamically swapping code blocks based on screen sizes and  semantic methods 
-for progressively serving images/media via HTML5 data attributes. Response's methods are 
-available as object properties, making them useful tools in OOP-minded custom development.
-@author Ryan Van Etten/2011
-@license Dual MIT/BSD license
-@link http://responsejs.com
-@version 0.2.7
-@deps jQuery (1.4.3+)
-
-Since version 0.2.6, Response does NOT setup any default attributes. Devs 
-can setup attributes by using Response.create directly or by passing args in a JSON object 
-stored in a data attribute on the body tag.
-
-EXAMPLE: custom setup via JSON in data attribute (recommended method)
-    <body data-responsejs='{ 
-        "create": [ 
-            { "mode": "src", "prefix": "src", "breakpoints": [1281,1025,961,641,481,320,0] },
-            { "mode": "markup", "prefix": "r", "breakpoints": [1281,1025,961,641,481,320,0] }
-        ]}'
-    ><!--note: use jsonlint.com to make sure JSON is valid.-->
-
-EXAMPLE: custom setup via JavaScript (after the lib is loaded):
-    Response.create([{
-        mode: "markup", // either "markup" or "src"
-        prefix: "r",    // the prefix for your custom data attributes
-        breakpoints: [1281,1025,961,641,481,320,0] // array of (min) breakpoints
-    },
-    {
-        mode: "src", // either "markup" or "src"
-        prefix: "src",    // the prefix for your custom data attributes
-        breakpoints: [1281,1025,961,641,481,320,0] // array of (min) breakpoints
-    }]);
-___________________________________________________________________________________**/
+/*!
+ * RESPONSE is a lightweight, jQuery plugin, that gives designers/devs tools for producing 
+ * performance-optimized, mobile-first responsive websites. It provides easy-to-use action 
+ * hooks for dynamically swapping code blocks based on screen sizes and  semantic methods 
+ * for progressively serving images/media via HTML5 data attributes. Response's methods are 
+ * available as object properties, making them useful tools in OOP-minded custom development.
+ * @author Ryan Van Etten/2011
+ * @license Dual MIT/BSD license
+ * @link http://responsejs.com
+ * @version 0.2.7 fork1
+ * @requires jQuery 1.4.3+
+ */
 
 window.Response = (function($, window, undefined) {
 
@@ -143,7 +118,9 @@ window.Response = (function($, window, undefined) {
                         var bools = Response.mapBool(breakpoints, Response.dpr); // Use Response.dpr to test each breakpoint.
                         swapEach(mode, selector, keys, okey, bools);     // Perform swap.
                 }
-                else { doError('create @prop') }
+                else { 
+                    doError('create @prop'); 
+                }
             });// Close ready function.
         }// doCreate
         
@@ -183,9 +160,10 @@ window.Response = (function($, window, undefined) {
     /********
     Response.affix()
     @since 0.2.1
-    ##needs desc
-     (Was) used to create/concatenate data-* keys.
-     but no longer needed in 0.2.7. Depreciate it or keep it? Hmm.
+    @depreciated
+    Was used to create/concatenate data-* keys.
+    No longer needed in 0.2.7. To be removed in later version.
+    https://github.com/ryanve/response.js/issues/1
     *****/
     Response.affix = function(prefix, array, suffix) {
         if ( !prefix || !$.isArray(array) ) { doError('affix'); } // Quit if args are wrong.
