@@ -7,7 +7,7 @@
  * @author Ryan Van Etten/2011
  * @license Dual MIT/BSD license
  * @link http://responsejs.com
- * @version 0.2.7
+ * @version 0.2.8
  * @requires jQuery 1.4.3+
  */
 
@@ -67,6 +67,13 @@ window.Response = (function($, window, undefined) {
       , sanitizeKey = function( key ) {
             return key.toLowerCase().replace( /[^a-z0-9\-\_\.]/g, '' ); // Lowercase alphanumerics, dashes, underscores, and periods.
         }
+        
+        // Local boolean function for handling range comparisons @since 0.2.8
+		// Returns true if curr equals min or max, or is any number in between.
+      , inORout = function (curr, min, max) {
+			var min = min || 0; // Default min.
+			return !max ? ( curr >= min ) : ( curr >= min && curr <= max );
+		}
       
         // Apply the method that performs the actual swap.
       , applyActive = function(selector, value, mode) {
@@ -155,21 +162,6 @@ window.Response = (function($, window, undefined) {
         else { $.each(action, function() { if ( $.isFunction(this) ) { this(); $window.resize( this ); } }); }
         return action;
     };// Response.action
-
-    
-    /********
-    Response.affix()
-    @since 0.2.1
-    @depreciated
-    Was used to create/concatenate data-* keys.
-    No longer needed in 0.2.7. To be removed in later version.
-    https://github.com/ryanve/response.js/issues/1
-    *****/
-    Response.affix = function(prefix, array, suffix) {
-        if ( !prefix || !$.isArray(array) ) { doError('affix'); } // Quit if args are wrong.
-        var suffix = suffix || '';
-        return $.map( array, function(value) { return prefix + value + suffix; } ) // Affix each value and return array.
-    };// Response.affix
     
     
     /********
@@ -182,12 +174,7 @@ window.Response = (function($, window, undefined) {
     *****/
     
     Response.band = function (min, max) {
-        var min = min || 0 // Default min.
-          , curr = $window.width() // Current width.
-          , bool = !max ? ( curr >= min ) : // No max.
-                          ( curr >= min && curr <= max )
-        ;
-        return bool;
+    	return inORout($window.width(), min, max);
     };// Response.band
 
     /********
@@ -290,13 +277,16 @@ window.Response = (function($, window, undefined) {
     Response.decide = function(bools, values, fallback) {
         // The args here are two arrays and a fallback value.
         // We use a series of if/elseif checks to zero in on the proper value.
-        // ##update desc
-        if ( bools.length !== values.length ) { doError('decide @length'); } // users won't hit this, for testing only
-        var value, i = 0;
-        while( !bools[i] && ++i < bools.length ) {};
-        while( !(value = values[i]) && ++i < values.length ) {};
+        var value
+          , i = 0
+          , bL = bools.length
+          , vL = values.length
+        ;
+        if ( bL !== vL ) { doError('decide @length'); } // users won't hit this, for testing only
+        while( !bools[i] && ++i < bL ) {};
+        while( !(value = values[i]) && ++i < vL ) {};
         return value || fallback || '';
-    }; // Response.decide
+    };// Response.decide
 
         
     /********
