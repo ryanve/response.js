@@ -371,4 +371,4 @@ window.Response = (function($, window, document, undefined) {
     
     return Response; // Bam!
     
-}(jQuery, window, document)); // no conflict wrap // self-invoking function // @link vimeo.com/12529436
+}(jQuery, window, window.document)); // no conflict wrap // self-invoking function // @link vimeo.com/12529436
