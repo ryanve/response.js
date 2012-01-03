@@ -271,8 +271,7 @@ window.Response = (function($, window, document, undefined) {
      * @since   0.1.9
      * @return  array of booleans
      */
-    // This probably does not need to be a public method.
-    // Candidate for depreciation *before anyone starts using it*.
+    // INTERNAL USE ONLY. To be depreciated in 0.3.0
     Response.mapBool = function (arr, boolTest) { 
         return mapBool(arr, boolTest); 
     };
@@ -290,9 +289,8 @@ window.Response = (function($, window, document, undefined) {
     Response.store = function (selector, key, mode) {
         if ( !selector || !key ) { doError('store'); } // Quit if req'd args are missing.
         return $.each(selector, function() { 
-            var $this = $(this) // These two var statements need to be separate.
-            , value = 'src' === mode ? $this.attr('src') : $this.html();
-            $this.data(key, value);
+            var value = 'src' === mode ? $(this).attr('src') : $(this).html();
+            $.data(this, key, value);
         });
     };
 
@@ -328,7 +326,7 @@ window.Response = (function($, window, document, undefined) {
      * @since 0.1.9
      * stackoverflow.com/questions/7424757/loop-arrays-to-set-value-vals0-vals1-vals2-in-jquery
      */
-     
+    // INTERNAL USE ONLY for now. Subject to change.
     Response.decide = function(bools, values, fallback) {
         // The args here are two arrays and a fallback value.
         // We use a series of if/elseif checks to zero in on the proper value.
@@ -360,7 +358,7 @@ window.Response = (function($, window, document, undefined) {
     // This needs to be in a ready func in order to make it work when Response
     // is loaded in the head, b/c we can't read the data attr until it's there.
     $document.ready(function() {
-        var customData = $('body').data('responsejs') // Read data-responsejs attr.
+        var customData = $('body').data('responsejs'); // Read data-responsejs attr.
         if ( customData ) {
             var custom = $.parseJSON(customData); 
             if (custom.create) {
