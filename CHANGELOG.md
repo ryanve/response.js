@@ -1,5 +1,13 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## [0.2.9](https://github.com/ryanve/response.js/commit/6d483eee4eb0e60b96d3b251d8f3bad168fc0fda#response.js) (2011-01-02)
+- [Fixed issue reading data-responsejs attribute](https://github.com/ryanve/response.js/issues/3).
+- Added new boolean methods: 
+  - `Response.wave` tests viewport `height` ranges (vertical equivalent to [Response.band](http://responsejs.com/#band))
+  - `Response.device.wave` tests `device-height` ranges 
+  - `Response.device.band` tests `device-width` ranges 
+- Breakpoints can now be based on any of the props—in addition to `'width'` and `'device-pixel-ratio'` the [Response.create](http://responsejs.com/#create) `prop` parameter now accepts `'height'`, `'device-width'`, and `'device-height'`.
+
 ## [0.2.8](https://github.com/ryanve/response.js/commit/088c80427ada40f9a6d38b44f7502c14a9f0bc70#response.js) (2011-12-17)
 - Added local function for handling range comparison in preparation for new methods in 0.2.9.
 - `Response.decide` loop optimized.
