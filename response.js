@@ -13,7 +13,7 @@
     // (function(R){  /* R works as alias for Response in here */  }(Response));
     // If you have a naming conflict with another window.Response then it can be 
     // avoided be changing the first line to window.MyCustomName. You can change 
-	// the event namespace in the very last line from 'Response' to 'MyCustomName'
+    // the event namespace in the very last line from 'Response' to 'MyCustomName'
 	
     'use strict'; // invoke strict mode
               
@@ -227,16 +227,28 @@
         }
         
         /**
-         * .dataset()
+         * .dataset()          Cross browser implementation of HTML5 dataset
+         * 
+         *                     The chainable syntax can be exposed to jQuery elements 
+         *                     by calling Response.chain()
+         * 
+         * Chainable form:  $('div').dataset(key)               // get (from first matched element)
+         *                  $('div').dataset([key])             // get and render (See Response.render)
+         *                  $('div').dataset(key, value)        // set (sets all matched elems)
+         *                  $('div').dataset({k1:val, k2:val})  // set multiple attrs at once (on all matched elems)
+         *                  $('div').deletes(keys)              // delete attrs (space-separated string)
+         * 
+         * Non-chainable:   Response.dataset(elem, key)               // get (elem can be native or jQuery elem)
+         *                  Response.dataset(elem, [key])             // get and render (See Response.render)
+         *                  Response.dataset(elem, key, value)        // set
+         *                  Response.dataset(elem, {k1:val, k2:val})  // set multiple attrs at once
+         *                  Response.deletes(elem, keys)              // delete attrs (space-separated string)
          * 
          *
          * @since 0.3.0
          */
         
       , datasetChainable = function(key, value) {
-      
-            // stackoverflow.com/questions/9119823/safest-way-to-detect-native-dom-element
-            // `this` must be a native element or selector containing them:
       
             var numOfArgs = arguments.length
               , elem = getNative(this)
@@ -248,7 +260,7 @@
             if ( numOfArgs ) {
                 
                 if ( isArray(key) ) {
-                    render = true;
+                    renderData = true;
                     key = key[0];
                 }
                 
@@ -269,11 +281,6 @@
                     }
                     
                     else {//SET for group of selected elems
-                        //sweep(this, datasetChainable, arguments);
-                        //n = -1
-                        //while( i++ < numOfElems ) {
-                        //    i in this && datasetChainable.apply(this[i], arguments);
-                        //}
                         while( n-- ) {// n starts as # of elems in selector and stops at 0
                             n in this && datasetChainable.apply(this[n], arguments);
                         }
@@ -300,16 +307,10 @@
                return elem.dataset; // DOMStringMap
             }
                         
-            ret = {};               // Plain object for fallback output.
-            
             // Fallback to manually reading all the attributes:
-            // adapted from data @link github.com/ded/bonzo
-            // ... but not 100% working here
-            //ret = {};
-            //$.each(elem.attributes, function(i, v) {
-            //    (name = (''+v.name).match(regexDataPrefix)) && (ret[camelize(name[1])] = v.value);
-            //}); 
-
+            
+            ret = {};      // Plain object for fallback output.
+            
             /* In jQuery 1.7 this works, but not Zepto 0.8:
             $.map( $(elem).data(), function(attValue, attName) {
                 if ( elem.hasAttribute(datatize(attName)) ) {
@@ -332,6 +333,7 @@
 
             // Fallback that works everywhere. Adapated from:
             // stackoverflow.com/questions/4187032/get-list-of-data-attributes-using-javascript-jquery
+            
             $.each(elem.attributes, function(i, attr) {
                 if (regexDataPrefix.test(attr.nodeName)) {
                     var key = camelize(attr.nodeName);
@@ -370,8 +372,9 @@
         }//deletesChainable
         
         /**
-         * Response.dataset()
-         *
+         * Response.dataset()        See datasetChainable above
+         *                           This is the non-chainable version. It grabs the thisArg
+         *                           and calls the chainable version
          *
          * @since 0.3.0
          */
@@ -382,10 +385,21 @@
         }
         
         /**
-         * Response.deletes()
+         * Response.deletes(elem, keys)           Delete HTML5 data attributes (remove them from them DOM)
          * 
-         *
          * @since 0.3.0
+         *                             Where native DOM dataset is supported you can do: `delete elem.dataset.foo`
+         * 
+         * @param   object   elem     is a native element or jQuery object e.g. document.body or $('body')
+         * 
+         * @param   string   keys     one or more space-separated data attribute keys (names) to delete (removed
+         *                            from the DOM) Should be camelCased or lowercase.
+         * 
+         * @example  Response.deletes(document.body, 'casaBlanca movie'); // Removes data-casa-blanca and data-movie
+         *                                                                // from the <body> element.
+         * 
+         * @example  Response.deletes($(div), 'casaBlanca movie')         // Removes data-casa-blanca and data-movie
+         *                                                                // from all divs.
          */
          
       , deletes = function(elem, keys) {
@@ -394,6 +408,7 @@
         
         // Local version of jQuery.grep b/c Zepto ain't got no grep.
         // Filter out array values that don't pass the callback:
+        
       , grep = function(elems, callback, inverse) {
             var i, ret = [], len = elems.length;
             for (i = 0; i < len; i++) {
@@ -421,7 +436,7 @@
                 $doc.ready(actionFunc);
                 $window.resize(actionFunc);
             });
-            return Response; // chainable
+            return this; // chainable
         }//action
 
       , deviceW = window.screen.width                // These don't change so we can just set them.
@@ -465,11 +480,14 @@
             return 0 < difference ? difference : 0;
         }
         
+        // Cross-browser versions of window.scrollX and window.scrollY
         // Compatibiliy notes @link developer.mozilla.org/en/DOM/window.scrollY
         // Performance tests @link jsperf.com/scrollx-cross-browser-compatible
+        // Using native here b/c Zepto doesn't support .scrollLeft() /scrollTop()
+        // In jQuery you can do $(window).scrollLeft() and $(window).scrollTop()
         
-      , scrollX = function(){ return window.pageXOffset || docElem.scrollLeft; } //native equiv to $(window).scrollLeft()
-      , scrollY = function(){ return window.pageYOffset || docElem.scrollTop; }  //native equiv to $(window).scrollTop()
+      , scrollX = function(){ return window.pageXOffset || docElem.scrollLeft; } // Response.scrollX()
+      , scrollY = function(){ return window.pageYOffset || docElem.scrollTop; }  // Response.scrollY()
             
         /**
          * area methods inX/inY/inViewport
@@ -496,17 +514,17 @@
         // outside the viewport are 'on the verge' of being scrolled to.
             
       , inX = function(elem, verge) {
-                    elem = selectOnce(elem); // Make sure elem is selector. elem.length is 0 if selector is empty.
-                    return elem.length && axis(elem.offset().left, elem.width(), scrollX(), viewportW(), verge);
+            elem = selectOnce(elem); // Make sure elem is selector. elem.length is 0 if selector is empty.
+            return elem.length && axis(elem.offset().left, elem.width(), scrollX(), viewportW(), verge);
         }
                 
       , inY = function(elem, verge) {
-                    elem = selectOnce(elem); // Make sure elem is selector. elem.length is 0 if selector is empty.
-                    return elem.length && axis(elem.offset().top, elem.height(), scrollY(), viewportH(), verge);
+            elem = selectOnce(elem); // Make sure elem is selector. elem.length is 0 if selector is empty.
+            return elem.length && axis(elem.offset().top, elem.height(), scrollY(), viewportH(), verge);
         }
                 
       , inViewport = function(elem, verge) {
-              // If there's no overflow then the entire axis in is view. Responsive sites typically only
+            // If there's no overflow then the entire axis in is view. Responsive sites typically only
             // overflow in one direction, so one of these should pass quickly from the overflow check:
             return (!overflowX() || inX(elem, verge)) && (!overflowY() || inY(elem, verge));
         }
@@ -572,18 +590,18 @@
         }//device
 
         /**
-         * Response.media                  A normalized version of window.matchMedia that uses either the 
-         *                                 standard version or the the Microsoft version. Response.media's 
-         *                                 syntax is exactly like window.matchMedia's syntax.
+         * Response.media                 A normalized version of window.matchMedia that uses either the 
+         *                                standard version or the the Microsoft version. Response.media's 
+         *                                syntax is exactly like window.matchMedia's syntax.
          *
-         *                                 Response.media is natively supported in Chrome 9+/FF6+/Safari 5.1+/IE10 PP3+
-         *                                 See @link developer.mozilla.org/en/DOM/window.matchMedia
-         *                                 and @link msdn.microsoft.com/en-us/library/windows/apps/hh453838.aspx
-         *                                 and @link caniuse.com/matchmedia
+         *                                Response.media is natively supported in Chrome 9+/FF6+/Safari 5.1+/IE10 PP3+
+         *                                See @link developer.mozilla.org/en/DOM/window.matchMedia
+         *                                and @link msdn.microsoft.com/en-us/library/windows/apps/hh453838.aspx
+         *                                and @link caniuse.com/matchmedia
          
-         *                                 Response.media only works where there is support for either window.matchMedia or 
-         *                                 window.msMatchMedia. Either check first to make sure it works (e.g. !!Response.media)
-         *                                 OR make it work everywhere w/ the polyfill @link github.com/paulirish/matchMedia.js/
+         *                                Response.media only works where there is support for either window.matchMedia
+         *                                or window.msMatchMedia. Either check first to make sure it works e.g. check
+         *                                ( !!Response.media ). OR polyfill w/ @link github.com/paulirish/matchMedia.js/
          *
          * @param    string   mediaQuery
          *
@@ -596,8 +614,8 @@
          * @example  var is320up = Response.media ? Response.media("(min-width:320px)").matches : false;
          *
          * Note: See Response.band / Response.wave / Response.device.band / Response.device.wave / Response.dpr
-         *       b/c they offer a terser syntax and are 100% reliable for their specific tasks.
-         *       For other queries use this, or, if you are using Modernizr, use Modernizr.mq instead b/c it 
+         *       They offer a terser syntax and are 100% reliable for their specific tasks.
+         *       For other queries use this, or if you are using Modernizr, use Modernizr.mq instead b/c it 
          *       has better (but not full) support.
          * 
          */
@@ -606,17 +624,17 @@
  
         /**
          * Response.dpr(decimal)         Tests if a minimum device pixel ratio is active. 
-		 *                               Or (version added in 0.3.0) returns the device-pixel-ratio
-		 *
-		 *
+         *                               Or (version added in 0.3.0) returns the device-pixel-ratio
+	 *
+	 *
          * @param    number    decimal   is the integer or float to test.
          *
          * @return   boolean|number
          * @example  Response.dpr();     // get the device-pixel-ratio (or 0 if undetectable)
          * @example  Response.dpr(1.5);  // true when device-pixel-ratio is 1.5+
          * @example  Response.dpr(2);    // true when device-pixel-ratio is 2+
-		 * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
-		 *
+	 * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
+	 *
          */
     
       , dpr = function(decimal) {
@@ -640,7 +658,7 @@
             
             // Fallback to .matchMedia/.msMatchMedia. Supported by Gecko (FF6+) and more:
             // @link developer.mozilla.org/en/DOM/window.matchMedia
-            // -webkit-min- and -o-min- omitted (Webkit/Opera supported by dPR)
+            // -webkit-min- and -o-min- omitted (Webkit/Opera supported above)
             // The generic min-device-pixel-ratio is expected to be added to the W3 spec.
             // Return false if neither method is available.
             
@@ -678,8 +696,9 @@
             //  If we at some point we need to differentiate <track> we'll use 4, but for now
             //  it's grouped with the other non-image empty content elems that use src.
             //  hasAttribute is not supported in IE7 so using 'string' === typeof elem.getAttribute('src')
+            
             return 4 > modeID ? modeID : 'string' === typeof elem.getAttribute('src') ? 5 : -5; // integer
-        }
+        }//detectMode
         
         /**
          * Response.store()
@@ -729,7 +748,6 @@
             // @link github.com/jquery/sizzle/issues/76
             keys = isArray(keys) ? keys : 'string' === typeof keys ? keys.split(regexSpace) : [];
             return $( map(keys, function(k) { return '[' + datatize(k).replace(regexPeriods, '\\.') + ']'; }).join() );
-            //return $(doc.querySelectorAll(map(keys, function(k) { return '[' + datatize(k).replace( /\./g, '\\.' ) + ']'; }).join()));
         }
     
         /**
@@ -749,14 +767,13 @@
             //    ret[i] = dataset($elem, keys[i]);
             //}
             //return ret;
-            return map(keys, datasetChainable, $elem); //if thisArg supported
+            return map(keys, datasetChainable, $elem); // $elem becomes thisArg
         }
          
-        /**
-         * Elemset
-         *
-         * 
-         * 
+        /*
+         * Elemset                      Prototype object for element sets used in Response.create
+         *                              Each element in the set inherits this as well, so some of the 
+         *                              methods apply to the set, while others apply to single elements.
          */
          
       , Elemset = (function() {
@@ -792,7 +809,7 @@
             
             return {
                 e: 0                      // object    the native element
-              , $: docElem                // object    jQuery selector in sets. Defaults to native docElem for Response()
+              , $: 0                      // object    jQuery selector in sets.
               , mode: 0                   // integer   defined per element
               , breakpoints: 0            // array     validated @ configure()
               , prefix: 0                 // string    validated @ configure()
@@ -825,7 +842,7 @@
                     }
                     isArray(arr) || doError('create @breakpoints');
                     prefilteredLength = arr.length;
-                    // Filter out non numerics, duplicates, and sort lowset to highest:
+                    // Filter out non numerics and sort lowest to highest:
                     arr = grep(arr, isFinite).sort(function(a, b){ return (a - b); });
                     return prefilteredLength === arr.length ? arr : false; // Length of the new array must match.
                 }
@@ -839,6 +856,7 @@
                 }
                 
               , memoize: function(breakpoint) {
+              	    // Prevents repeating tests:
                     if ( 'boolean' !== typeof memoizeCache[breakpoint] ) {
                         memoizeCache[breakpoint] = this.method(breakpoint);
                     }
@@ -872,7 +890,7 @@
                     return context; // chainable
                 }
             
-              , target: function() {                 // Stuff that needs to happen on ready:
+              , target: function() {                 // Stuff that can't happen until the DOM is ready:
                     this.$ = target(this.keys);      // Cache jQuery selector for the set.
                     store(this.$, initContentKey);   // Store original (no-js) value to data key.
                     this.keys.push(initContentKey);  // Add key onto end of keys array. (# keys now equals # breakpoints + 1)
@@ -933,15 +951,12 @@
         
     ;//var @ top
     
-    //Elemset.prototype = Element;
-    
-        /**
-         * Response()
-         *
-         *
-         */
- 
- /*
+    /**
+     * Response()
+     * At some point might use Response() as a wrapper for chainable methods, like
+     * so we could do stuff like Response(nativeElem).dataset(key, value)
+     */
+    /*
     function Response(elems) {
         //var Rfn = {dataset: datasetChainable, deletes: deletesChainable};
         //Rfn.prototype = Element;
@@ -958,15 +973,15 @@
     /**
      * Response.create()              Create their own Response attribute sets, with custom 
      *                                breakpoints and data-* names.
-     * @since   0.1.9
+     * @since    0.1.9
      *
-     * @param   object|array   args   is an options object or an array of options objects.
+     * @param    object|array   args   is an options object or an array of options objects.
      *
-     * @link    http://responsejs.com/#create
+     * @link     http://responsejs.com/#create
      *
-     * @example Ideally this method is only called once:
-     *          To create a single set,  use the form:  Response.create(object);
-     *          To create multiple sets, use the form:  Response.create([object1, object2]); 
+     * @example  Ideally this method is only called once:
+     *           To create a single set,  use the form:  Response.create(object);
+     *           To create multiple sets, use the form:  Response.create([object1, object2]); 
      */
      
     function create(args) {
@@ -1147,7 +1162,7 @@
     
     return Response;  // Bam!
     
-}( 'Response', (this.jQuery||this.Zepto), this, this.document ));
+}( 'Response', this.jQuery||this.Zepto, this, this.document ));
 
 // In the global context, this === window. Watch @link vimeo.com/12529436
 // The args here are passed into the function that starts all the way at the top.
