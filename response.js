@@ -14,7 +14,7 @@
     // If you have a naming conflict with another window.Response then it can be 
     // avoided be changing the first line to window.MyCustomName. You can change 
     // the event namespace in the very last line from 'Response' to 'MyCustomName'
-	
+    
     'use strict'; // invoke strict mode
               
     // Combine local vars/funcs into one statement:    
@@ -54,19 +54,13 @@
         // github.com/madrobby/zepto/issues/349#issuecomment-3793000
         
       , selectOnce = $ !== window.jQuery ? $ : function(ukn) { return ukn instanceof $ ? ukn : $(ukn); }
-
-      /* moved to getNative
-      , isElement = function(ukn) {
-            //Test if ukn is a native Element object.
-            //stackoverflow.com/questions/9119823/safest-way-to-detect-native-dom-element
-            return !!ukn && 1 === ukn.nodeType; 
-        }
-      */
         
-      , getNative = function(elem) {
+      , getNative = function(e) {
             // stackoverflow.com/questions/9119823/safest-way-to-detect-native-dom-element
-            // Must be a native element or selector containing them:
-            return elem && 1 === elem.nodeType ? elem : elem[0] && 1 === elem[0].nodeType ? elem[0] : doError('dataset @elem');
+            // The isElement test used is like that of v.is.ele(o) from github.com/ded/valentine
+            // See @link jsperf.com/get-native
+            // Must be a native element or selector containing them to pass:
+            return e && e.nodeType && e.nodeType === 1 ? e : e[0] && e[0].nodeType && e[0].nodeType === 1 ? e[0] : false;
         }
             
         /** 
@@ -161,7 +155,7 @@
          * Rules @link dev.w3.org/html5/spec/Overview.html#custom-data-attribute
          * jQuery selectors @link api.jquery.com/category/selectors/ 
          */
-		 
+         
       , sanitize = function(key) {//Allow lowercase alphanumerics, dashes, underscores, and periods.
             return 'string' === typeof key ? key.toLowerCase().replace(regexFunkyPunc, '') : false;
         }
@@ -251,7 +245,7 @@
       , datasetChainable = function(key, value) {
       
             var numOfArgs = arguments.length
-              , elem = getNative(this)
+              , elem = getNative(this) || doError('dataset @elem')
               , ret
               , renderData = false
               , n
@@ -625,16 +619,16 @@
         /**
          * Response.dpr(decimal)         Tests if a minimum device pixel ratio is active. 
          *                               Or (version added in 0.3.0) returns the device-pixel-ratio
-	 *
-	 *
+     *
+     *
          * @param    number    decimal   is the integer or float to test.
          *
          * @return   boolean|number
          * @example  Response.dpr();     // get the device-pixel-ratio (or 0 if undetectable)
          * @example  Response.dpr(1.5);  // true when device-pixel-ratio is 1.5+
          * @example  Response.dpr(2);    // true when device-pixel-ratio is 2+
-	 * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
-	 *
+     * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
+     *
          */
     
       , dpr = function(decimal) {
@@ -856,7 +850,7 @@
                 }
                 
               , memoize: function(breakpoint) {
-              	    // Prevents repeating tests:
+                      // Prevents repeating tests:
                     if ( 'boolean' !== typeof memoizeCache[breakpoint] ) {
                         memoizeCache[breakpoint] = this.method(breakpoint);
                     }
