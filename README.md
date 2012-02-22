@@ -177,3 +177,12 @@ Tip: use [jsonlint.com](http://jslint.com/) to make sure JSON is valid.
         breakpoints: [1281,1025,961,641,481,320,0] // array of (min) breakpoints
     }])
 ```
+
+Since version 0.3.0:
+
+img|input|source|embed|track elements always behave in src mode.
+
+iframe|audio|video elements behave in src mode only when the src attribute is present. Otherwise they 
+use markup mode.
+
+All other elements behave in markup mode. 
