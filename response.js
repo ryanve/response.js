@@ -374,8 +374,9 @@
          */
          
       , dataset = function(elem, key, value) {
-            return 2 < arguments.length ? datasetChainable.call(elem, key, value) : datasetChainable.call(elem, key);
-            //OR return datasetChainable.apply(elem, arrPrototype.slice.call(arguments).slice(1) );
+            // return 2 < arguments.length ? datasetChainable.call(elem, key, value) : datasetChainable.call(elem, key);
+            // Gotta be like this to account for when the entire dataset is requested like dataset(elem)
+            return datasetChainable.apply(elem, [].slice.call(arguments).slice(1) );
         }
         
         /**
