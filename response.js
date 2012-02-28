@@ -800,7 +800,7 @@
          *                              methods apply to the set, while others apply to single elements.
          */
          
-      , Elemset = (function(undef) {
+      , Elemset = (function() {
 
             var memoizeCache = []
             
@@ -846,8 +846,8 @@
               , verge: undef              // integer   defaults to Math.min(deviceMax, 500)
               , newValue: 0
               , currValue: 1
-              , aka: undef
-              , lazy: undef
+              , aka: 0
+              , lazy: 0
           
               /* combined into valid8
               , cut function(arr, maxNum, invert) {
@@ -937,7 +937,7 @@
                     
                     // Cache jQuery selector for the set. If there are aliases, flatten them into one 
                     // array with this.keys before creating the selector string.
-                    this.$ = $(selectify([].concat.apply(this.keys, this.aka)));
+                    this.$ = $(selectify([].concat.apply(this.keys, this.aka||[])));
                     store(this.$, initContentKey);   // Store original (no-js) value to data key.
                     this.keys.push(initContentKey);  // Add key onto end of keys array. (# keys now equals # breakpoints + 1)
                     return this; // chainable
