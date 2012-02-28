@@ -3,10 +3,10 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011
  * @license   MIT
- * @version   0.3.0
+ * @version   0.3.1
  * @requires  jQuery 1.7+ or Zepto 0.8+
  */
-
+    
 ;window.Response = (function(namespace, $, window, doc, undef) {
     
     // If you want to alias Response to a shorter name in your scripts you can do:
@@ -20,7 +20,6 @@
     // Combine local vars/funcs into one statement:    
     
     var Response
-    //, arrPrototype = []                     // Array.prototype
       , docElem = doc.documentElement         // <html> element.
       , $doc = $(doc)                         // Cache selector.
       , $window = $(window)                   // Cache selector.
@@ -46,9 +45,6 @@
             testElem.setAttribute('data-a-b', namespace);
             return !!(testElem.dataset && testElem.dataset.aB === namespace);
         }(doc.createElement(namespace))) // Use namespace as dummy string.
-        
-        //, navUA = window.navigator.userAgent
-        //, isWebkitOrGecko = /webkit\/|gecko\//i.test(navUA)
 
         // Select elem only if not already selected.
         // github.com/madrobby/zepto/issues/349#issuecomment-3793000
@@ -103,35 +99,91 @@
               , i = -1
               , len = arr.length;
             while ( i++ < len ) {
-                i in arr && ( r[i] = callback.call(scope, arr[i]) );
+                i in arr && (r[i] = callback.call(scope, arr[i]));
             }
             return r;
         }
             
-        // Adapted from the native forEach / Valentine (v.each) / jQuery.each. Optimized for use here. Callbacks
-        // the form (index, value) as args. Scope (thisArg) not supported. Works on arrays/selectors. It's like
-        // Array.prototype.forEach() but w/o support for the thisArg, and is a faster locally.
+        // Adapted from the native forEach / Valentine (v.each) / Optimized for use here. Callbacks
+        // the form (index, value) as args. Scope (thisArg) not supported. Works on arrays/selectors.
+        // It's like [].forEach.call(arr, callback) but slightly faster and w/o support for the thisArg.
         // jsperf.com/each-loops
         // github.com/ded/valentine
         // developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
         
-      , each = function (arr, callback) {
+        // renamed to forEach locally to avoid confusion with $.each and also
+        // reversed callback args to be same as native forEach rather than $.each
+      , forEach = function (arr, callback) {
             var i = -1
               , len = arr.length;
             while ( i++ < len ) {
-                i in arr && callback(i, arr[i]);
+                i in arr && callback(arr[i], i, arr);
             }
+            return arr; // chainable
         }
         
-    //   not needed    
-    // , indexOf = nativ ? function (a, el, start) { return a.indexOf(el); } : function(a, el) { return $.inArray(el, a); }
+      , affix = function(arr, prefix, suffix) {
+            // Return array that is a copy of arr with the prefix/suffix added to each value.
+            var r = []
+              , i = arr.length;
+            prefix = prefix || '';
+            suffix = suffix || '';
+            while ( i && i-- ) {
+                i in arr && (r[i] = prefix + arr[i] + suffix);
+            }
+            return r;
+        }
+    
+        /**
+         * Response.sift                 Filter out array values that don't pass a callback,
+         *                               or (if no callback provided) filter out falsey values.
+         *                               When the callback param is provided, this method is
+         *                               equivalent to jQuery.grep including the option to 
+         *                               invert the output.
+         *
+         * @since   0.3.1
+         *
+         * @param   array      arr
+         * @param   callback   callback   (optional)
+         * @param   boolean    invert     (optional)
+         *
+         * @example Response.sift([5, 0, 'seven'], isFinite)    // [5, 0]
+         * @example Response.sift([5, 0, '', undefined, null])  // [5]
+         *
+         * @return  array
+         *
+         */
+         
+      , sift = function(arr, callback, invert) {
+            var i = -1
+              , ret = []
+              , len = arr.length
+            ;
+            if (callback) {
+                invert = !!invert; // ensure boolean
+                while ( i++ < len ) {// Filter out values that don't pass callback:
+                    invert === !callback(arr[i], i) && ret.push(arr[i]);
+                }
+            }
+            else {
+                while ( i++ < len ) {// Filter out all falsey values:
+                    arr[i] && ret.push(arr[i]);
+                }
+            }
+            return ret;
+        }
 
-      , regexFunkyPunc = /[^a-z0-9\-\_\.]/gi
+      , regexFunkyPunc = /[^a-z0-9_\-\.]/gi
       , regexCamels = /([a-z])([A-Z])/g
       , regexDashB4 = /-(.)/g
       , regexDataPrefix = /^data-(.+)$/
       , regexSpace = /\s+/
-      , regexPeriods = /\./g
+      , regexSelectorOperators = /([^a-z0-9_\-])/gi
+    //, regexPeriods = /\./g
+
+      , escape = function (str) {
+            return str.replace(regexSelectorOperators, '\\$1');
+        }
       
       , camelize = function (str) {// Remove data- prefix and convert remaining dashed string to camelCase.
             // Converts data-pulp-fiction to pulpFiction
@@ -148,6 +200,11 @@
             return 'data-' + (str ? str.replace(regexDataPrefix, '$1').replace(regexCamels, '$1-$2').toLowerCase() : str);
         }
 
+      , ssvToArr = function(ukn) {
+            // Convert space separated values to array:
+            return 'string' === typeof(ukn) ? ukn.split(regexSpace) : ukn;
+        }
+
         /*
          * Techically data attributes names can contain uppercase in HTML, but, The DOM lowercases attributes, so they must 
          * be lowercase regardless when we target them in jQuery. Force them lowercase here to prevent issues. Removing all
@@ -155,11 +212,10 @@
          * Rules @link dev.w3.org/html5/spec/Overview.html#custom-data-attribute
          * jQuery selectors @link api.jquery.com/category/selectors/ 
          */
-         
+    
       , sanitize = function(key) {//Allow lowercase alphanumerics, dashes, underscores, and periods.
-            return 'string' === typeof key ? key.toLowerCase().replace(regexFunkyPunc, '') : false;
+            return 'string' === typeof key ? key.toLowerCase().replace(regexFunkyPunc, '') : '';
         }
-        
 
         /**
          * Response.render                Converts stringified primitives back to JavaScript.
@@ -197,7 +253,6 @@
  
       , merge = function(base, adds, overwrite) {
             $.each(adds, function(k, v) {
-                //base[k] = v || (!overwrite ? base[k] : v);
                 base[k]= v || overwrite ? v : base[k];
             });
             return base;
@@ -257,7 +312,7 @@
                     renderData = true;
                     key = key[0];
                 }
-                
+    
                 if ( 'string' === typeof key ) {
                 
                     // key || doError('dataset @key'); // Make sure key is not an empty string.
@@ -312,18 +367,6 @@
                 }
             });
             */
-            
-            /* same goes for this, works in  jQuery 1.7 but not Zepto 0.8:
-            var allData = $(elem).data(); // This gives an object containing all the data attached to elem in the
-                                     // DOM *and* in the data cache. To normalize with the native elem.dataset return 
-                                     // we need to convert the data to strings and filter the object so it only includes 
-                                     // the the data in the DOM (the data attributes).
-            for ( n in allData ) {// n is the attribute name
-                if ( allData.hasOwnProperty(n) && elem.hasAttribute(datatize(n)) ) {
-                    ret[n] = allData[n].toString(); 
-                }
-            }
-            */
 
             // Fallback that works everywhere. Adapated from:
             // stackoverflow.com/questions/4187032/get-list-of-data-attributes-using-javascript-jquery
@@ -351,14 +394,8 @@
             // could make this take a little less code using sending the space-separated string 
             // straight to removeAttr but Zepto's removeAttr doesn't support space-separated keys
               if ( 'string' === typeof keys ) {
-                /* this works in both jQuery and Zepto:
-                each(selectOnce(this), function(i, el) {
-                    each(keys.split(regexSpace), function(i, key) {
-                        el.removeAttribute(datatize(key));
-                    });
-                });  this is better and still works in both: */
                 var $elems = selectOnce(this);
-                each(keys.split(regexSpace), function(i, key) {
+                forEach(ssvToArr(keys), function(key) {
                     key && $elems.removeAttr(datatize(key)); 
                 });
             }
@@ -399,20 +436,7 @@
          
       , deletes = function(elem, keys) {
             return deletesChainable.call(elem, keys);
-        }
-        
-        // Local version of jQuery.grep b/c Zepto ain't got no grep.
-        // Filter out array values that don't pass the callback:
-        
-      , grep = function(elems, callback, inverse) {
-            var i, ret = [], len = elems.length;
-            for (i = 0; i < len; i++) {
-                if ( !inverse !== !callback(elems[i], i) ) {//do like this to make sure both are boolean
-                    ret.push(elems[i]);
-                }
-            }
-            return ret;
-        }
+        }        
         
         /**
          * Response.action           A hook for calling functions on both the ready and resize events.
@@ -620,16 +644,16 @@
         /**
          * Response.dpr(decimal)         Tests if a minimum device pixel ratio is active. 
          *                               Or (version added in 0.3.0) returns the device-pixel-ratio
-     *
-     *
+         *
+         *
          * @param    number    decimal   is the integer or float to test.
          *
          * @return   boolean|number
          * @example  Response.dpr();     // get the device-pixel-ratio (or 0 if undetectable)
          * @example  Response.dpr(1.5);  // true when device-pixel-ratio is 1.5+
          * @example  Response.dpr(2);    // true when device-pixel-ratio is 2+
-     * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
-     *
+         * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
+         *
          */
     
       , dpr = function(decimal) {
@@ -712,7 +736,7 @@
     
       , store = function ($elems, key, overwrite) {
             ($elems && key) || doError('store');
-            each($elems, function(i, el) {
+            forEach($elems, function(el) {
                 if ( overwrite || !dataset(el, key) ) {// Check mode and store appropriate value:
                     // If detectMode(el) is positive then we know getAttribute will return a string.
                     dataset(el, key, (0 < detectMode(el) ? el.getAttribute('src') : $(el).html()||'' ));
@@ -729,40 +753,45 @@
             }*/
             return Response;
         }
-
+        
+      , selectify = function(keys) {
+            // The .replace is needed to escape periods. 
+            // @link github.com/jquery/sizzle/issues/76
+            //return map(keys, function(k) {
+            //   return '[' + datatize(k).replace(regexPeriods, '\\.') + ']'; 
+            //}).join();
+            return affix(map(map(keys, escape), datatize), '[', ']').join();
+        }
+        
         /**
          * Response.target()           Get the corresponding data attributes for an array of data keys.
          * @since    0.1.9
          * @param    array     keys    is the array of data keys whose attributes you want to select.
          * @return   object            jQuery selector
          * @example  Response.target(['a', 'b', 'c'])  //  $('[data-a],[data-b],[data-c]')
+         * @example  Response.target('a b c'])         //  $('[data-a],[data-b],[data-c]')
          */
     
       , target = function(keys) {
-            // The .replace is needed to escape periods. 
-            // @link github.com/jquery/sizzle/issues/76
-            keys = isArray(keys) ? keys : 'string' === typeof keys ? keys.split(regexSpace) : [];
-            return $( map(keys, function(k) { return '[' + datatize(k).replace(regexPeriods, '\\.') + ']'; }).join() );
+            return $(selectify(ssvToArr(keys)));
         }
     
         /**
-         * Response.access()        Access data-* values for element from an array of data-* keys. 
-         * @since 0.1.9
-         * @param    selector       is the jQuery selector for elems you want to target.
-         * @param    keys           is an array of data keys whose values you want to access.
-         * @return   array          is the array of values that correspond to each key (with
-         *                          falsey values converted to an empty string).
+         * Response.access()               Access data-* values for element from an array of data-* keys. 
+         * 
+         * @since   0.1.9                 (added support for space-separated strings in 0.3.1)
+         *
+         * @param   object         elem   is a native or jQuery element whose values to access.
+         * @param   array|string   keys   is an array or space-separated string of data keys whose 
+         *                                values you want to access.
+         *
+         * @return  array                 of dataset values corresponding to each key. Since 0.3.1 if
+         *                                the params are wrong then the return is an empty array.
          */
     
-      , access = function($elem, keys) {
-            //var i, len, ret = [];
-            ($elem && isArray(keys)) || doError('access');
-            //len = keys.length;
-            //for ( i = 0; i < len; i++ ) {
-            //    ret[i] = dataset($elem, keys[i]);
-            //}
-            //return ret;
-            return map(keys, datasetChainable, $elem); // $elem becomes thisArg
+      , access = function(elem, keys) {
+            // elem becomes thisArg for datasetChainable:
+            return elem && keys && keys.length ? map(ssvToArr(keys), datasetChainable, elem) : [];
         }
          
         /*
@@ -771,11 +800,11 @@
          *                              methods apply to the set, while others apply to single elements.
          */
          
-      , Elemset = (function() {
+      , Elemset = (function(undef) {
 
             var memoizeCache = []
             
-                 // Custom breakpoints override these defaults. Custom breakpoints can be entered in any
+                // Custom breakpoints override these defaults. Custom breakpoints can be entered in any
                 // order. They get sorted lowest to highest, but the defaults  here are presorted so
                 // that we can skip the need to sort when using the defaults. Omit trailing decimal zeros, 
                 // b/c for example if you put 1.0 as a devicePixelRatio breakpoint, then the target would 
@@ -795,6 +824,7 @@
                     width:  band    // dynamic
                   , height: wave    // dynamic
                 }
+                
                 
             ;//var
             
@@ -816,30 +846,32 @@
               , verge: undef              // integer   defaults to Math.min(deviceMax, 500)
               , newValue: 0
               , currValue: 1
+              , aka: undef
+              , lazy: undef
           
-              , cut: function(arr, maxNum) {
-                    // Remove breakpoints that are above the device's max dimension.
-                    // Do this to reduce the number of iterations needed in decideValue()
-                    // Must be done before Elemset keys are created so that the keys match.
-                    maxNum = maxNum || deviceMax;
-                    return grep(arr, function(n) { return n <= maxNum; });
-                }
-            
-              , valid8: function() {
-                    var arr = this.breakpoints 
-                      , prop = this.prop
-                      , prefilteredLength
-                    ;
-                    if (!arr) {
-                        // If no array is supplied, then get the default breakpoints for the specified prop.
-                        // Supported props: 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
-                        return defaultBreakpoints[prop] || defaultBreakpoints[prop.split('-').pop()] || doError('create @prop'); 
+              /* combined into valid8
+              , cut function(arr, maxNum, invert) {
+                    return sift(arr, function(n) { return !invert !== (n > maxNum); });
+                }*/
+    
+              , valid8: function(arr, prop) {
+                    
+                    if (this.breakpoints) {
+                        // Filter out non numerics and sort lowest to highest:
+                        arr = isArray(arr) ? sift(arr, isFinite).sort(function(a, b){ return (a - b); }) : [];
+                        arr.length || doError('create @breakpoints');
                     }
-                    isArray(arr) || doError('create @breakpoints');
-                    prefilteredLength = arr.length;
-                    // Filter out non numerics and sort lowest to highest:
-                    arr = grep(arr, isFinite).sort(function(a, b){ return (a - b); });
-                    return prefilteredLength === arr.length ? arr : false; // Length of the new array must match.
+                    
+                    else {
+                        // If no breakpoints are supplied, then get the default breakpoints for the specified prop.
+                        // Supported props: 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
+                        prop = this.prop;
+                        arr = defaultBreakpoints[prop] || defaultBreakpoints[prop.split('-').pop()] || doError('create @prop'); 
+                    }
+                    
+                    // Remove breakpoints that are above the device's max dimension.
+                    // Do this to reduce the number of iterations needed later.
+                    this.breakpoints = sift(arr, function(n) { return n <= deviceMax; });
                 }
           
               //, dataset: function() { return datasetChainable.apply(this.$, arguments); }
@@ -859,13 +891,16 @@
                 }
     
               , configure: function(options) {
-                    var context = this;
+                    var i 
+                      , prefix
+                      , context = this
+                      , aliases
+                      , aliasKeys
+                    ;
                     
                     merge(context, options, true); // Merge properties from options object into this object.
                     
                     context.verge = isFinite(context.verge) ? context.verge : Math.min(deviceMax, 500);
-                    
-                    context.prefix = sanitize(context.prefix) || doError('create @prefix');
                     
                     context.method = propTests[context.prop] || doError('create @prop');
                     
@@ -873,33 +908,39 @@
                     // 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
                     // If its 1st character is d for device-* then the prop is NOT dynamic:
                     context.dynamic = 'd' !== context.prop[0]; // true only for 'width' and 'height'
-                    
+                                        
+                    prefix = context.prefix ? sift(map(ssvToArr(context.prefix), sanitize)) : ['min-' + context.prop + '-'];
+                    aliases = 1 < prefix.length ? prefix.slice(1) : 0;
+                    context.prefix = prefix[0];
+                                        
                     // Sort and validate custom breakpoints if supplied. Otherwise grab the defaults.
-                    // Then cut any breakpoints that are higher than the deviceMax dimension so that
-                    // we'll have iterations later:
-                    context.breakpoints = context.cut(context.valid8());
+                    // Must be done before Elemset keys are created so that the keys match:
+                    context.valid8();
                     
                     // Use the breakpoints array to create array of data keys:
-                    context.keys = map(context.breakpoints, function(bp){ return context.prefix + bp; });
+                    context.keys = affix(context.breakpoints, context.prefix);
+                    context.aka = undef; // Reset to undef just in case a value was merged in.
+                    
+                    if (aliases) {// There may be one of more aliases:
+                        aliasKeys = [];
+                        i = aliases.length;
+                        while ( i-- ) {
+                            aliasKeys.push(affix(context.breakpoints, aliases[i]));
+                        }
+                        context.aka = aliasKeys; // context.aka is an array of arrays (one for each alias)
+                    }
                     
                     return context; // chainable
                 }
             
               , target: function() {                 // Stuff that can't happen until the DOM is ready:
-                    this.$ = target(this.keys);      // Cache jQuery selector for the set.
+                    
+                    // Cache jQuery selector for the set. If there are aliases, flatten them into one 
+                    // array with this.keys before creating the selector string.
+                    this.$ = $(selectify([].concat.apply(this.keys, this.aka)));
                     store(this.$, initContentKey);   // Store original (no-js) value to data key.
                     this.keys.push(initContentKey);  // Add key onto end of keys array. (# keys now equals # breakpoints + 1)
                     return this; // chainable
-                }
-            
-              , each: function(callback) {
-                    var arr = this.$
-                      , i = -1
-                    ;
-                    while ( i++ < arr.length ) {
-                        i in arr && callback(i, arr[i]);
-                    }
-                    return arr; // chainable
                 }
             
                 // The rest of the methods are designed for use with single elements.
@@ -917,19 +958,32 @@
                     ;
                     while( !val && i-- ) {
                         if ( this.memoize(subjects[i]) ) {
-                            val = this.values[i];                        
+                            val = this.values[i];
                         }
                     }
-                    //$('#A').append( supportsNativeDataset ); // testing
                     this.newValue = val || this.values[sL];
                     return this; // chainable
                 }
             
               , prepareData: function(elem) {
+              
                     this.e = elem;                      // native element
                     this.$ = $(elem);                   // jQuery selector
                     this.mode = detectMode(this.e);     // Detect the mode of the element.
                     this.values = access(this.$, this.keys); // Access Response data- values for the element.
+                    
+                    if (this.aka) {
+                        var i = this.aka.length;
+                        // If there are alias keys then there may be alias values. Merge the values from 
+                        // all the aliases into the values array. The merge method only merges in truthy values
+                        // and prevents falsey values from overwriting truthy ones. (See Response.merge)
+                        while ( i-- ) {// loops down and stops at index 0
+                            // Each of the this.aka arrays has the same length as the this.values
+                            // array, so no new indexes will be added, just filled if there's truthy values.
+                            this.values = merge(this.values, access(this.$, this.aka[i]))
+                        }
+                    }
+                    
                     return this.decideValue();          // chainable
                 }
             
@@ -985,7 +1039,7 @@
           , customEventOne = namespaceIt('allLoaded')
             // 0.3.0 rolls out a new lazy feature only in Webkit. It works
             // elsewhere but bogs a little in slower JavaScript engines.
-          , isWebkit = /webkit\//i.test(window.navigator.userAgent)
+            //, isWebkit = /webkit\//i.test(window.navigator.userAgent)
         ;
             
         route(args, function (options) {
@@ -1003,23 +1057,27 @@
             // Identify the lowest nonzero breakpoint. (They're already sorted low to high by now.)
             lowestNonZeroBP = breakpoints[0] || breakpoints[1] || false;
         
-            $doc.ready(function() {                  // Ready. Yea mofo.
+            $doc.ready(function(lazy) {                  // Ready. Yea mofo.
+            
+                lazy = !!elemset.lazy;
 
                 // Target elements containing this set's Response data attributes and chain into the 
                 // loop that occurs on ready. The selector is cached to elemset.$ for later use.
                 
-                elemset.target().each(function(i, v) {
+                forEach(elemset.target().$, function(el, i) {
                     
-                    elemset[i] = objectCreate(elemset).prepareData(v); // Inherit from elemset.
+                    elemset[i] = objectCreate(elemset).prepareData(el); // Inherit from elemset.
 
-                    if ( !isWebkit || inViewport(elemset[i].$, verge) ) {
-                        elemset[i].updateDOM();
-                    }
-                        
+                    //if ( !isWebkit || inViewport(elemset[i].$, verge) ) {
+                    //    elemset[i].updateDOM();
+                    //}
+                    
+                    (!lazy || inViewport(elemset[i].$, verge)) && elemset[i].updateDOM();
                 });
                 
                 function resizeHandler() {   // Only runs for dynamic props.
-                    elemset.reset().each(function(i, v) {// Reset memoize cache and then loop thru the set.
+                    elemset.reset();
+                    forEach(elemset.$, function(el, i) {// Reset memoize cache and then loop thru the set.
                         elemset[i].decideValue().updateDOM(); // Grab elem object from cache and update all.
                     }).trigger(customEventOne);
                 }
@@ -1038,13 +1096,11 @@
                 // event. Once everything in the set has been swapped once, the scroll handler is deactivated
                 // through the use of a custom event.
                     
-                if ( !isWebkit ) { return; }
+                if ( !lazy ) { return; }
                     
                 function scrollHandler() {
-                    elemset.each(function(i, v) {
-                        if ( inViewport(elemset[i].$, verge) ) {
-                            elemset[i].updateDOM();
-                        }
+                    forEach(elemset.$, function(el, i) {
+                        inViewport(elemset[i].$, verge) && elemset[i].updateDOM();
                     });
                 }
                     
@@ -1085,7 +1141,7 @@
             $.fn.deletes = deletesChainable;
                 
             // Expose .inX() .inY() .inViewport() to jQuery as filter methods:
-            each(['inX', 'inY', 'inViewport'], function(i, methodName) {
+            forEach(['inX', 'inY', 'inViewport'], function(methodName) {
                 $.fn[methodName] = function(verge, invert) {
                     
                     /*  We could to this...
@@ -1096,7 +1152,7 @@
                     
                     but... This is faster and minifies smaller:   */
                     
-                    return $(grep(this, function(el) {
+                    return $(sift(this, function(el) {
                         return !invert === Response[methodName](el, verge); 
                     }));
                     
@@ -1138,8 +1194,13 @@
       , render: render
       , decide: function(){doError('decide: method depreciated');}
       , chain: chain
+      , camelize: camelize
+      , datatize: datatize
+      , map: map
+      , each: forEach
+      , sift: sift
+      , affix: affix
     };//Response
-    
     
     /**
      * Initialize
