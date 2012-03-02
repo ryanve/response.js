@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.4.0
+ * @version   0.4.1
  * @requires  jQuery 1.7+ or Zepto 0.8+
  */
     
@@ -20,7 +20,7 @@
     // Combine local vars/funcs into one statement:    
 
     var Response
-      , docElem = doc.documentElement         // <html> element.
+      , docElem = doc.documentElement         // <html>
       , $doc = $(doc)                         // Cache selector.
       , $window = $(window)                   // Cache selector.
 
@@ -116,7 +116,7 @@
             // The isElement test used is like that of v.is.ele(o) from github.com/ded/valentine
             // See @link jsperf.com/get-native
             // Must be a native element or selector containing them to pass:
-            return e && e.nodeType && e.nodeType === 1 ? e : e[0] && e[0].nodeType && e[0].nodeType === 1 ? e[0] : false;
+            return !e ? false : e.nodeType === 1 ? e : e[0] && e[0].nodeType === 1 ? e[0] : false;
         }
 
         /** 
@@ -491,15 +491,27 @@
             return !max ? curr >= min : curr >= min && curr <= max;
         }
 
+      , overflow = function(dim) {// dim is 'Width' or 'Height'
+            // Local handler for the overflowX and overflowY methods
+            // docElem and body are defined up top
+            // See: responsejs.com/labs/dimensions/
+            var html = docElem // store this local so we only have to traverse scope once
+              , offsetDim = 'offset' + dim       // offsetWidth / Height
+              , scrollDim = 'scroll' + dim       // scrollWidth / Height 
+              , viewportL = html['client' + dim] // clientWidth / Height
+              , documentL = Math.max(viewportL, html[offsetDim], html[scrollDim], doc.body[scrollDim])
+              , difference = documentL - viewportL;
+            return 0 < difference ? difference : 0;
+        }
+        
         /** 
          * Response.overflowX       Get the number of pixels that the document width exceeds viewport width.
          *
          * @return  integer   pixel amount that horizontal content overflows viewport (or 0 if there's no overflow).
          */
-
+         
       , overflowX = function() {
-            var difference = $doc.width() - viewportW();
-            return 0 < difference ? difference : 0;
+            return overflow('Width');
         }
 
         /** 
@@ -507,20 +519,24 @@
          *
          * @return  integer   pixel amount that vertical content overflows the viewport (or 0 if there's no overflow).
          */
-
+         
       , overflowY = function() {
-            var difference = $doc.height() - viewportH();
-            return 0 < difference ? difference : 0;
+            return overflow('Height');
         }
 
+    	// Response.scrollX() and Response.scrollY()
         // Cross-browser versions of window.scrollX and window.scrollY
         // Compatibiliy notes @link developer.mozilla.org/en/DOM/window.scrollY
         // Performance tests @link jsperf.com/scrollx-cross-browser-compatible
         // Using native here b/c Zepto doesn't support .scrollLeft() /scrollTop()
         // In jQuery you can do $(window).scrollLeft() and $(window).scrollTop()
 
-      , scrollX = function(){ return window.pageXOffset || docElem.scrollLeft; } // Response.scrollX()
-      , scrollY = function(){ return window.pageYOffset || docElem.scrollTop; }  // Response.scrollY()
+      , scrollX = function(){
+			return window.pageXOffset || docElem.scrollLeft; 
+		}
+      , scrollY = function(){ 
+			return window.pageYOffset || docElem.scrollTop; 
+		}
 
         /**
          * area methods inX/inY/inViewport
