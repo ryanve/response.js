@@ -3,16 +3,14 @@
 ## [0.3.1](https://github.com/ryanve/response.js/commit/b6614cb95da16caf087cf1b76a1023f7f5c94e58#response.js) (2012-02-27)
 **Aliased prefixes**: Version 0.3.1 makes it possible to alias multiple prefixes in a space-separated string. Aliasing multiple prefixes has much better performance than creating two sets for the same prop, but the latter is also supported for back compatibility. Since 0.3.1, if the prefix param is omitted it will default to "min-[prop]-" For example if the prop is `"width"` then the prefix would default to `"min-width-"` which would create functionality for `data-min-width-0`, `data-min-width-320`, etc. based on the breakpoints. 
 
-Aliasing is the recommended way to backsupport the separate prefixes for each mode needed in 0.2.x versions while still gaining the performance benefit of the mode autodection introduced in 0.3.0. It also gives devs greater flexibility in naming their prefixes because the prefix name can be changed without breaking existing code. Alias prefixes can be used interchangably. For HTML readablity, future docs will recommend the default prefixing. A JSON setup that supports the default, "r", and "src" prefixes would look like this:
+Aliasing is the recommended way to backsupport the separate prefixes previously needed for separate modes while still gaining the performance benefit of the mode autodection introduced in 0.3.0. It also gives devs greater flexibility in naming their prefixes because the prefix name can be changed without breaking existing code. Alias prefixes can be used interchangably. For HTML readablity, future docs will recommend the default prefixing. A JSON setup that supports the default, "r", and "src" prefixes would look like this:
 
 ```html
- <body data-responsejs='{ 
-        "create": [
-            { "prop": "width"
-            , "prefix": "min-width- r src"
-            , "breakpoints": [1281,1025,961,641,481,320,0] }
-        ]}'
-    >
+<body data-responsejs='{ 
+    "create": {  "prop": "width"
+               , "prefix": "min-width- r src"
+               , "breakpoints": [1281,1025,961,641,481,320,0]  }
+}'>
 ```
 
 ## [0.3.0](https://github.com/ryanve/response.js/commit/411447f71123289266532aa7b941ec68360e6f12#response.js) (2012-02-14)
