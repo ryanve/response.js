@@ -1,11 +1,14 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
-## [0.4.0](https://github.com/ryanve/response.js/commit/b6614cb95da16caf087cf1b76a1023f7f5c94e58#response.js) (2012-02-27)
+## [0.4.1](https://github.com/ryanve/response.js/commit/c06f9c9c7275ef1d154613fe33ed95146d174558) (2012-03-02)
+- Minor [tweak](https://github.com/ryanve/response.js/commit/c06f9c9c7275ef1d154613fe33ed95146d174558) improves performance of the overflowX/overflowY methods.
+
+## [0.4.0](https://github.com/ryanve/response.js/commit/b6614cb95da16caf087cf1b76a1023f7f5c94e58) (2012-02-27)
  
 - **Methods**: The string utilities camelize and datatize (both part of the dataset API) were added to the public API. The optimized iterators introduced in 0.3.0 were also added to the public API. (See map/each/sift/affix in the [readme](https://github.com/ryanve/response.js/blob/master/README.md))
 - **Lazyloading**: The lazyloading module introduced in 0.3.0 is now fully available as on opt-in feature for sets. In `Response.create` options objects devs can specify `lazy: true` (or `"lazy": true` in the JSON setup). 
 
-## [0.3.1](https://github.com/ryanve/response.js/commit/b6614cb95da16caf087cf1b76a1023f7f5c94e58#response.js) (2012-02-27)
+## [0.3.1](https://github.com/ryanve/response.js/commit/b6614cb95da16caf087cf1b76a1023f7f5c94e58) (2012-02-27)
 **Aliased prefixes**: Version 0.3.1 makes it possible to alias multiple prefixes in a space-separated string. Aliasing multiple prefixes has much better performance than creating two sets for the same prop, but the latter is also supported for back compatibility. Since 0.3.1, if the prefix param is omitted it will default to "min-[prop]-" For example if the prop is `"width"` then the prefix would default to `"min-width-"` which would create functionality for `data-min-width-0`, `data-min-width-320`, etc. based on the breakpoints. 
 
 Aliasing is the recommended way to backsupport the separate prefixes previously needed for separate modes while still gaining the performance benefit of the mode autodection introduced in 0.3.0. It also gives devs greater flexibility in naming their prefixes because the prefix name can be changed without breaking existing code. Alias prefixes can be used interchangably. For HTML readablity, future docs will recommend the default prefixing. A JSON setup that supports the default, "r", and "src" prefixes would look like this:
@@ -18,7 +21,7 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 }'>
 ```
 
-## [0.3.0](https://github.com/ryanve/response.js/commit/411447f71123289266532aa7b941ec68360e6f12#response.js) (2012-02-14)
+## [0.3.0](https://github.com/ryanve/response.js/commit/411447f71123289266532aa7b941ec68360e6f12) (2012-02-14)
 - [**Zepto**](https://github.com/madrobby/zepto): Response is now fully compatible with [Zepto](https://github.com/madrobby/zepto). To do this, functions that relied on jQuery methods lacking Zepto equivalents such as [$.grep](http://api.jquery.com/jQuery.grep/) / [$.parseJSON](http://api.jquery.com/jQuery.parseJSON/) / [$.data](http://api.jquery.com/jQuery.data/) needed to be converted. Our code now mostly uses native methods to accomplish these tasks. This has a two-fold effect: the underlying code now is a bit longer but it *runs* way faster—win.
 - [**HTML5 dataset**](https://github.com/ryanve/response.js/blob/master/README.md): In adapting more methods into native code `Response.dataset` was born. Using syntax just like [jQuery.data](http://api.jquery.com/jQuery.data/), `Response.dataset(elem, key, value)` provides a blazing fast cross-browser implementation of the native dataset API and this is now used for all data attribute storage and access within Response. (See examples in the [readme](https://github.com/ryanve/response.js/blob/master/README.md).)
 - [**Mode autodetection**](https://twitter.com/#!/ResponseJS/status/158784160754966529): In previous versions it was necessary to specify [markup or src](http://responsejs.com/#modes) mode in their attribute set definitions. In 0.3.0 the appropriated mode is autodetected! This is done by checking the [tagName](https://developer.mozilla.org/en/DOM/element.tagName) against elements that support the `src` attribute per [the spec](dev.w3.org/html5/spec-author-view/index.html#attributes-1). The mode parameter is now ignored in lieu of this autodetection. This is great because it means that devs only need to set up one set for each prop where in previous versions they'd have needed two (but it stills work either way for backwards support).
@@ -30,7 +33,7 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 - **Chainable** forms of Response's dataset / deletes / inX / inY / inViewport methods are available as an opt-in. They are disabled by default. Calling `Response.chain()` exposes them to `$.fn` and makes them available in the jQuery chain. (See usage in [readme](https://github.com/ryanve/response.js/blob/master/README.md).)
 - [**Dimensions methods**](https://github.com/ryanve/response.js/blob/master/README.md) were added to the main API.
 - **Local Iterators**: In an effort to further improve performance, local iteration functions optimized for their needed usage in Response using native loops are now used in place of `$.map` / `$.each` / `$.grep`
-- **Dropped**: Legacy versions of `Response.create` took string params. This was never in the docs. Since 0.3.0 the `Response.create` [param](http://responsejs.com/#create) must be an object (or an array of objects). The `Response.decide` method used internally was depreciated/removed in 0.3.0.
+- **Dropped**: The legacy version of `Response.create` in 0.2.5 took string params. This was never in the docs so it seems safe to drop support for this. Therefore in 0.3+ the `Response.create` [param](http://responsejs.com/#create) must be an object (or an array of objects). The `Response.decide` method used internally was depreciated/removed in 0.3.0.
 
 ## [0.2.9](https://github.com/ryanve/response.js/commit/6d483eee4eb0e60b96d3b251d8f3bad168fc0fda#response.js) (2012-01-02)
 - [Fixed issue reading data-responsejs attribute](https://github.com/ryanve/response.js/issues/3).
@@ -40,16 +43,16 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
   - `Response.device.band` tests `device-width` ranges 
 - Breakpoints can now be based on any of the props—in addition to `'width'` and `'device-pixel-ratio'` the [Response.create](http://responsejs.com/#create) `prop` parameter now accepts `'height'`, `'device-width'`, and `'device-height'`.
 
-## [0.2.8](https://github.com/ryanve/response.js/commit/088c80427ada40f9a6d38b44f7502c14a9f0bc70#response.js) (2011-12-17)
+## [0.2.8](https://github.com/ryanve/response.js/commit/088c80427ada40f9a6d38b44f7502c14a9f0bc70) (2011-12-17)
 - Added local function for handling range comparison in preparation for new methods in 0.2.9.
 - `Response.decide` loop optimized.
 - Removed depreciated [Response.affix](https://github.com/ryanve/response.js/issues/1) method.
 
-## [0.2.7](https://github.com/ryanve/response.js/commit/0885b9c17fd85c85f23753720ca3f27f33bdc4cd#response.js) (2011-10-26)
+## [0.2.7](https://github.com/ryanve/response.js/commit/0885b9c17fd85c85f23753720ca3f27f33bdc4cd) (2011-10-26)
 - Error handling was improved. Now, most of the public methods will throw an exception to the console if the args sent to them are incorrect. The exception says the name of the method that caused the problem and when possible the name of the arg preceded by an @ sign.
 - Some issues with device-pixel-ratio [decimals](http://stackoverflow.com/questions/7907180/retain-precision-during-numeric-sort) and were resolved. Response.target was updated with the ability to target data keys containing decimal points. [They needed to be escaped.](https://github.com/jquery/sizzle/issues/76) Response.create now properly supports device-pixel-ratio based attributes. Response.dpr was further optimized.
 
-## [0.2.6](https://github.com/ryanve/response.js/commit/28feb9d5608149c175a57d99383007bd90366b4a#response.js) (2011-10-24)
+## [0.2.6](https://github.com/ryanve/response.js/commit/28feb9d5608149c175a57d99383007bd90366b4a) (2011-10-24)
 - The default attribute setups were eliminated in favor of letting devs choose their own setup options (breakpoints etc.) either via Response.create or by passing the custom setup options in a JSON object stored in a data attribute on the body tag. The latter method is preferrable because it requires no scripting.
 - The Response.create method was reworked to accomodate the ability to pass args via an object (or an array of objects) so that devs can better understand its use and so that it would be more efficient at creating multiple attribute sets (it now only triggers the ready event once). The original string args still work, but going forward, objects will be preferred.
 - Some methods (ones mainly for internal operations) were localized for efficiency:
@@ -60,7 +63,7 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 - Response.band was made more efficient by eliminating the check for .matchMedia. (Checking the window width always works.)
 - Minor performance tweaks were made.
 
-## [0.2.5](https://github.com/ryanve/response.js/commit/a8790261b4c850aff2dd9be3a7512fa5118d6a01#response.js) (2011-09-20)
+## [0.2.5](https://github.com/ryanve/response.js/commit/a8790261b4c850aff2dd9be3a7512fa5118d6a01) (2011-09-20)
 
 - Moved default Response.create() lines outside the object. 
 - Created GitHub repo.
