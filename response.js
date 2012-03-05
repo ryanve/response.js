@@ -6,7 +6,7 @@
  * @version   0.4.1
  * @requires  jQuery 1.7+ or Zepto 0.8+
  */
-    
+
 ;window.Response = (function(namespace, $, window, doc, undef) {
 
     // If you want to alias Response to a shorter name in your scripts you can do:
@@ -158,7 +158,9 @@
               , i = -1
               , len = arr.length;
             while ( i++ < len ) {
-                i in arr && (r[i] = callback.call(scope, arr[i]));
+                if (i in arr) {
+                    r[i] = callback.call(scope, arr[i]);
+                }
             }
             return r;
         }
@@ -178,7 +180,9 @@
             var i
               , len = arr.length;
             for (i = 0; i < len; i++) {
-                i in arr && callback(arr[i], i, arr);
+                if (i in arr) {
+                    callback(arr[i], i, arr);
+                }
             }
             return arr; // chainable
         }
@@ -191,7 +195,9 @@
             prefix = prefix || '';
             suffix = suffix || '';
             while ( i && i-- ) {
-                i in arr && (r[i] = prefix + arr[i] + suffix);
+                if (i in arr) {
+                    r[i] = prefix + arr[i] + suffix;
+                }
             }
             return r;
         }
@@ -224,12 +230,16 @@
             if (callback) {
                 invert = !!invert; // ensure boolean
                 while ( i++ < len ) {// Filter out values that don't pass callback:
-                    invert === !callback(arr[i], i) && ret.push(arr[i]);
+                    if (invert === !callback(arr[i], i)) {
+                        ret.push(arr[i]);
+                    }
                 }
             }
             else {
                 while ( i++ < len ) {// Filter out all falsey values:
-                    arr[i] && ret.push(arr[i]);
+                    if (arr[i]) {
+                        ret.push(arr[i]);
+                    }
                 }
             }
             return ret;
@@ -412,7 +422,9 @@
               if ( 'string' === typeof keys ) {
                 var $elems = selectOnce(this);
                 forEach(ssvToArr(keys), function(key) {
-                    key && $elems.removeAttr(datatize(key)); 
+                    if (key) {
+                        $elems.removeAttr(datatize(key)); 
+                    }
                 });
             }
             return this;
@@ -524,7 +536,7 @@
             return overflow('Height');
         }
 
-    	// Response.scrollX() and Response.scrollY()
+        // Response.scrollX() and Response.scrollY()
         // Cross-browser versions of window.scrollX and window.scrollY
         // Compatibiliy notes @link developer.mozilla.org/en/DOM/window.scrollY
         // Performance tests @link jsperf.com/scrollx-cross-browser-compatible
@@ -532,11 +544,11 @@
         // In jQuery you can do $(window).scrollLeft() and $(window).scrollTop()
 
       , scrollX = function(){
-			return window.pageXOffset || docElem.scrollLeft; 
-		}
+            return window.pageXOffset || docElem.scrollLeft; 
+        }
       , scrollY = function(){ 
-			return window.pageYOffset || docElem.scrollTop; 
-		}
+            return window.pageYOffset || docElem.scrollTop; 
+        }
 
         /**
          * area methods inX/inY/inViewport
@@ -793,7 +805,9 @@
             var r = []
               , i = keys.length;
             while ( i && i-- ) {
-                i in keys && (r[i] = '[' + datatize(keys[i].replace(regexSelectorOps, '\\$1')) + ']');
+                if (i in keys) {
+                    r[i] = '[' + datatize(keys[i].replace(regexSelectorOps, '\\$1')) + ']';
+                }
             }
             return r.join();
         }
@@ -1133,7 +1147,9 @@
 
                 function scrollHandler() {
                     forEach(elemset.$, function(el, i) {
-                        inViewport(elemset[i].$, verge) && elemset[i].updateDOM();
+                        if (inViewport(elemset[i].$, verge)) {
+                            elemset[i].updateDOM();
+                        }
                     });
                 }
 
