@@ -1,5 +1,20 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## [0.3.1](https://github.com/ryanve/response.js/commit/b6614cb95da16caf087cf1b76a1023f7f5c94e58#response.js) (2012-02-27)
+**Aliased prefixes**: Version 0.3.1 makes it possible to alias multiple prefixes in a space-separated string. Aliasing multiple prefixes has much better performance than creating two sets for the same prop, but the latter is also supported for back compatibility. Since 0.3.1, if the prefix param is omitted it will default to "min-[prop]-" For example if the prop is `"width"` then the prefix would default to `"min-width-"` which would create functionality for `data-min-width-0`, `data-min-width-320`, etc. based on the breakpoints. 
+
+Aliasing is the recommended way to backsupport the separate prefixes for each mode needed in 0.2.x versions while still gaining the performance benefit of the mode autodection introduced in 0.3.0. It also gives devs greater flexibility in naming their prefixes because the prefix name can be changed without breaking existing code. Alias prefixes can be used interchangably. For HTML readablity, future docs will recommend the default prefixing. A JSON setup that supports the default, "r", and "src" prefixes would look like this:
+
+```html
+ <body data-responsejs='{ 
+        "create": [
+            { "prop": "width"
+            , "prefix": "min-width- r src"
+            , "breakpoints": [1281,1025,961,641,481,320,0] }
+        ]}'
+    >
+```
+
 ## [0.3.0](https://github.com/ryanve/response.js/commit/411447f71123289266532aa7b941ec68360e6f12#response.js) (2012-02-14)
 - [Zepto](https://github.com/madrobby/zepto): [Response](https://github.com/ryanve/response.js) is now fully compatible with [Zepto](https://github.com/madrobby/zepto): To do this, functions that relied on jQuery methods lacking Zepto equivalents such as [$.grep](http://api.jquery.com/jQuery.grep/) / [$.parseJSON](http://api.jquery.com/jQuery.parseJSON/) / [$.data](http://api.jquery.com/jQuery.data/) needed to be converted. Our code now for the most part uses native methods to accomplish these tasks. This has a two-fold effect: the underlying code now is a bit longer but it *runs* way faster—win.
 - [HTML5 dataset](https://github.com/ryanve/response.js/blob/master/README.md): In adapting more methods into native code `Response.dataset` was born. Using syntax just like [jQuery.data](http://api.jquery.com/jQuery.data/), `Response.dataset(elem, key, value)` provides a blazing fast cross-browser implementation of the native dataset API and this is now used for all data attribute storage and access within Response. (See examples in the [readme](https://github.com/ryanve/response.js/blob/master/README.md).)
@@ -7,6 +22,7 @@
   - `img`|`input`|`source`|`embed`|`track` always behave in src mode.
   - `iframe`|`audio`|`video` behave in src mode *only* if a `src` attribute is present.
   - Otherwise elements behave in [markup mode](http://responsejs.com/#modes). 
+- OO: The code that powers the attribute sets now employs an object-based approach. Using prototypal/differential inheritance, attribute sets now inherit from an internal base object called `Elemset`. Each individual element within the set also inherits from the same object. Whoa—slick. The makes the code powers the sets easier to maintain and at the same time improves their efficiency.
 - Lazyloading: Attribute sets are now capable of lazyloading. In 0.3.0 this feature is at an experimental phase and is only rolled out for Webkit browsers—where the JavaScript engine is lightning fast. The effect of this is that content stored in Response data attributes is not loaded until it is near the active viewport. This has potential for enormous performance savings. In creating this feature, three area-based methods were introduced: [inX/inY/inViewport](https://github.com/ryanve/response.js/blob/master/README.md).
 - Chainable forms of Response's dataset / deletes / inX / inY / inViewport methods are available as an opt-in. They are disabled by default. Calling `Response.chain()` exposes them to `$.fn` and makes them available in the jQuery chain. (See usage in [readme](https://github.com/ryanve/response.js/blob/master/README.md).)
 - [Dimensions methods](https://github.com/ryanve/response.js/blob/master/README.md) were added to the main API.
