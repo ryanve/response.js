@@ -1,5 +1,10 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## [0.4.2](https://github.com/ryanve/response.js/commit/82e8f5b148b6b411438014dbd5b638625d9d73b7) (2012-03-08)
+- Fixed 2 important bugs: 
+  - [error @breakpoints from custom breakpoints handler](https://github.com/ryanve/response.js/commit/64d3fd9b953809cbbe773769c76b1bcf488635cb)
+  - [escaping in special characters in selector strings](https://github.com/ryanve/response.js/commit/82e8f5b148b6b411438014dbd5b638625d9d73b7)
+
 ## [0.4.1](https://github.com/ryanve/response.js/commit/c06f9c9c7275ef1d154613fe33ed95146d174558) (2012-03-02)
 - Minor [tweak](https://github.com/ryanve/response.js/commit/c06f9c9c7275ef1d154613fe33ed95146d174558) improves performance of the overflowX/overflowY methods.
 
