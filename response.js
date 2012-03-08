@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.4.1
+ * @version   0.4.2
  * @requires  jQuery 1.7+ or Zepto 0.8+
  */
 
@@ -805,8 +805,8 @@
             var r = []
               , i = keys.length;
             while ( i && i-- ) {
-                if (i in keys) {
-                    r[i] = '[' + datatize(keys[i].replace(regexSelectorOps, '\\$1')) + ']';
+                if (keys[i]) {
+                    r[i] = '[' + datatize(keys[i].replace(regexSelectorOps, '\\\\$1')) + ']';
                 }
             }
             return r.join();
