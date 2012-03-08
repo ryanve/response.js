@@ -903,8 +903,10 @@
                 }*/
     
               , valid8: function(arr, prop) {
+                  
+                    arr = this.breakpoints;
                     
-                    if (this.breakpoints) {
+                    if (arr) {
                         // Filter out non numerics and sort lowest to highest:
                         arr = isArray(arr) ? sift(arr, isFinite).sort(function(a, b){ return (a - b); }) : [];
                         arr.length || doError('create @breakpoints');
