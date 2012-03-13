@@ -17,14 +17,17 @@ Response.chain()  // Expose chainable versions of inX/inY/inViewport/dataset/del
 
 Response.viewportW() // return viewport width
 Response.viewportH() // return viewport height
-Response.deviceW     // device width  property
-Response.deviceH     // device height property
-Response.deviceMax   // calculated Math.max(deviceW, deviceH)
-Response.deviceMin   // calculated Math.min(deviceW, deviceH)
 Response.overflowX() // # of horizontal pixels that doc overflows viewport (or 0 if no overflow)
 Response.overflowY() // # of vertical pixels that doc overflows viewport (or 0 if no overflow)
 Response.scrollX()   // cross-broswer equiv to native window.scrollX   // ~ jQuery(window).scrollLeft()
 Response.scrollY()   // cross-broswer equiv to native window.scrollY   // ~ jQuery(window).scrollTop()
+
+// Read: github.com/ryanve/response.js/issues/4
+Response.deviceW     // device width  property
+Response.deviceH     // device height property
+Response.deviceMax   // calculated Math.max(deviceW, deviceH)
+Response.deviceMin   // calculated Math.min(deviceW, deviceH)
+
 
 ```
 
