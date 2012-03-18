@@ -2,7 +2,7 @@
 
 [Response JS](http://responsejs.com) is a lightweight jQuery or Zepto plugin that gives web designers tools for building performance-optimized, mobile-first responsive websites. It provides semantic ways to dynamically swap code blocks based on breakpoints and serve images (or other media) progressively via HTML5 data attributes.
 
-## API (v 0.4.0)
+## API (v 0.5.0)
 
 ```javascript
 
@@ -22,11 +22,11 @@ Response.overflowY() // # of vertical pixels that doc overflows viewport (or 0 i
 Response.scrollX()   // cross-broswer equiv to native window.scrollX   // ~ jQuery(window).scrollLeft()
 Response.scrollY()   // cross-broswer equiv to native window.scrollY   // ~ jQuery(window).scrollTop()
 
+Response.deviceW()     // device width  property
+Response.deviceH()     // device height property
+Response.deviceMax()   // calculated Math.max(deviceW, deviceH)
+Response.deviceMin()   // calculated Math.min(deviceW, deviceH)
 // Read: github.com/ryanve/response.js/issues/4
-Response.deviceW     // device width  property
-Response.deviceH     // device height property
-Response.deviceMax   // calculated Math.max(deviceW, deviceH)
-Response.deviceMin   // calculated Math.min(deviceW, deviceH)
 
 
 ```
@@ -143,7 +143,11 @@ $('div').inY()
 
 ```javascript
 
+Response.ready(callback)  // call callback when DOM is ready
+Response.resize(callback)  // bind callback the resize event
 Response.action(callback)  // bind callback (or array of callbacks) to ready and resize events.
+Response.crossover(callback) // bind callback to dynamic attribute sets' breakpoint crossovers
+
 
 ```
 
@@ -160,6 +164,15 @@ Response.route(ukn) // handler for accepting args as singles or arrays
 Response.sift(arr)  // create a copy of arr with falsey values removed
 Response.sift(arr, callback) // cross-browser equivalent to arr.filter(callback)
 Response.sift(arr, callback, invert) // equivalent to jQuery.grep
+```
+
+### Extending
+
+```javascript
+
+Response.addTest(propName, testFn)
+
+
 ```
 
 ### [Response.create](http://responsejs.com/#create)
@@ -193,3 +206,5 @@ Response's main feature is breakpoint-based data attribute sets. (Basically all 
 use markup mode. All other elements behave in markup mode. 
 
 @since 0.3.1 it's possible to alias multiple prefixes in a space-separated string. Aliasing multiple prefixes has better performance than creating two sets for the same prop, but the latter is also supported for back compatibility. Since 0.3.1 if the prefix param the prefix will default to "min-[prop]-" For example if the prop is "width" then the prefix would default to "min-width-" which would create functionality for data-min-width-0, data-min-width-320, etc. based on your breakpoints.
+
+See additional notes in the [change log](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md).
