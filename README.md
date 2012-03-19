@@ -87,7 +87,7 @@ Response.inViewport($('p.example'))  // true if any part of <p class=example> is
 Response.inViewport(this)      // true if any part of `this` elem is in viewport (exact)
 Response.inViewport(this, 100) // true if any part of `this` elem is in viewport (or w/in 100px of it)
 
-// Most responsive sites only overflow in one direction (vertical scroll, not horizontal). When there's 
+// Most responsive sites only overflow in 1 direction (vertical scroll, not horizontal). When there's 
 // no horiz.overflow, the inX method is always true, and it'd be slightly faster to simply test .inY
 Response.inViewport(this) === Response.inX(this) && Response.inY(this) // always true
 
