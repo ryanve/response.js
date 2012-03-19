@@ -201,26 +201,23 @@ See additional notes in the [change log](https://github.com/ryanve/response.js/b
 
 ### Extending
 
-@since 0.5.0 devs can define custom prop tests for use in attribute sets. 
-
+@since 0.5.0 devs can use `Response.addTest(prop, testFn)` to define custom props/tests to use in attribute sets. 
 
 ```javascript
 
 // @param   string    prop           a custom prop name (or an existing prop to override)
 // @param   callback  testFn         boolean callback to test min breakpoints for the prop
-Response.addTest(prop, testFn)
+// @example
 
-// contrived @example
 Response.addTest('viewport-area', function(min) {
     return min >= Response.viewportW() * Response.viewportH();
 });
 
-// then you could create sets like 
 Response.create({
-    prop: 'device-area' // custom prop name
+    prop: 'viewport-area' // custom prop name
   , breakpoints: [100000, 1000000, 10000000] // custom breakpoints
   , dynamic: true // set this to true if prop needs to be tested on resize
 });
 
 ```
-Props that 
+
