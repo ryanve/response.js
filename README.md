@@ -164,9 +164,9 @@ $('div').inY()
 
 ```javascript
 
-Response.ready(callback)  // call callback when DOM is ready
-Response.resize(callback)  // bind callback the resize event
-Response.action(callback)  // bind callback (or array of callbacks) to ready and resize events.
+Response.ready(callback)   // fire callback when DOM is ready
+Response.resize(callback)  // bind callback the to resize event
+Response.action(callback)  // bind callback (or array of callbacks) to ready *and* resize
 Response.crossover(callback [, prop]) // bind callback to dynamic attribute sets' breakpoint crossovers
 
 Response.action(function() {
