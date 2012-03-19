@@ -4,6 +4,7 @@
 - [Jeesh](http://ender.no.de/#jeesh) compatibility added. (0.5.0 requires jQuery, Zepto, **or** Jeesh.)
 - [Consistency](https://github.com/ryanve/response.js/issues/4): The 4 device dimension getters (deviceW / deviceH / deviceMax / deviceMax) were converted from properties to methods in order to be [consistent](https://github.com/ryanve/response.js/issues/4) with the rest of the dimensions API => they now require parens, e.g. `Response.deviceW()`
 - **Events**: Ready, resize, and crossover events added to the API. (See Events in the [readme](https://github.com/ryanve/response.js/blob/master/README.md))
+- **Extending**: Added ability to add custom props/tests via `Response.addTest(prop, testFn)` (See Extending in the [readme](https://github.com/ryanve/response.js/blob/master/README.md))
 - Improved performance of inX / inY / inViewport methods. 
 
 ## [0.4.2](https://github.com/ryanve/response.js/commit/82e8f5b148b6b411438014dbd5b638625d9d73b7) (2012-03-08)
