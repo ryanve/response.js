@@ -148,7 +148,6 @@ Response.resize(callback)  // bind callback the resize event
 Response.action(callback)  // bind callback (or array of callbacks) to ready and resize events.
 Response.crossover(callback) // bind callback to dynamic attribute sets' breakpoint crossovers
 
-
 ```
 
 ### Objects/Arrays
@@ -164,15 +163,6 @@ Response.route(ukn) // handler for accepting args as singles or arrays
 Response.sift(arr)  // create a copy of arr with falsey values removed
 Response.sift(arr, callback) // cross-browser equivalent to arr.filter(callback)
 Response.sift(arr, callback, invert) // equivalent to jQuery.grep
-```
-
-### Extending
-
-```javascript
-
-Response.addTest(propName, testFn)
-
-
 ```
 
 ### [Response.create](http://responsejs.com/#create)
@@ -208,3 +198,29 @@ use markup mode. All other elements behave in markup mode.
 @since 0.3.1 it's possible to alias multiple prefixes in a space-separated string. Aliasing multiple prefixes has better performance than creating two sets for the same prop, but the latter is also supported for back compatibility. Since 0.3.1 if the prefix param the prefix will default to "min-[prop]-" For example if the prop is "width" then the prefix would default to "min-width-" which would create functionality for data-min-width-0, data-min-width-320, etc. based on your breakpoints.
 
 See additional notes in the [change log](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md).
+
+### Extending
+
+@since 0.5.0 devs can define custom prop tests for use in attribute sets. 
+
+
+```javascript
+
+// @param   string    prop           a custom prop name (or an existing prop to override)
+// @param   callback  testFn         boolean callback to test min breakpoints for the prop
+Response.addTest(prop, testFn)
+
+// contrived @example
+Response.addTest('viewport-area', function(min) {
+    return min >= Response.viewportW() * Response.viewportH();
+});
+
+// then you could create sets like 
+Response.create({
+    prop: 'device-area' // custom prop name
+  , breakpoints: [100000, 1000000, 10000000] // custom breakpoints
+  , dynamic: true // set this to true if prop needs to be tested on resize
+});
+
+```
+Props that 
