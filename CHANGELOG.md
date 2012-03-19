@@ -1,5 +1,11 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## [0.5.0](https://github.com/ryanve/response.js/commit/0f7a4d98cc28ac733ca53b2ecf0c3d8c494162bd) (2012-03-18)
+- [Jeesh](http://ender.no.de/#jeesh) compatibility added. (0.5.0 requires jQuery, Zepto, **or** Jeesh.)
+- [Consistency](https://github.com/ryanve/response.js/issues/4): The 4 device dimension getters (deviceW / deviceH / deviceMax / deviceMax) were converted from properties to methods in order to be [consistent](https://github.com/ryanve/response.js/issues/4) with the rest of the dimensions API => they now require parens, e.g. `Response.deviceW()`
+- **Events**: Ready, resize, and crossover events added to the API. (See Events in the [readme](https://github.com/ryanve/response.js/blob/master/README.md))
+- Improved performance of inX / inY / inViewport methods. 
+
 ## [0.4.2](https://github.com/ryanve/response.js/commit/82e8f5b148b6b411438014dbd5b638625d9d73b7) (2012-03-08)
 - Fixed 2 important bugs: 
   - [error @breakpoints from custom breakpoints handler](https://github.com/ryanve/response.js/commit/64d3fd9b953809cbbe773769c76b1bcf488635cb)
