@@ -182,7 +182,7 @@ Response.crossover(function() {
 
 ```javascript
 
-Response.affix(arr, prefix, suffix) // create a copy of arr with prefix and/or suffix added to each value
+Response.affix(arr, prefix, suffix) // create copy of arr w prefix and/or suffix added to each value
 Response.each(arr, callback) // iterator arrays/array-like objs (~like Array.prototype.forEach)
 Response.map(arr, callback, thisArg) // iterator for arrays/array-like objs (like Array.prototype.map)
 Response.merge(base, adds) // merge adds into base (either can be array or object)
