@@ -138,11 +138,11 @@ Response.dataset(document.body, ["movie"])     // returns true
 ```javascript
 
 Response.render(str)   // convert stringified primitives to correct value e.g. "true" to true 
-Response.camelize(str)
-Response.datatize(str)
+Response.camelize(str) // convert 'pulp-fiction' or 'data-pulp-fiction' to pulpFiction
+Response.datatize(str) // convert 'pulpFiction' to 'data-pulp-fiction'
 Response.target(keys)  // convert keys like "a b c" or ["a","b","c"] to $("[data-a],[data-b],[data-c]")
 Response.access(keys)  // access an array of dataset values that correspond to an array of dataset keys
-Response.store()
+Response.store($elems, key [, overwrite]) // store initial content of each elem to data key (docs in source)
 ```
 
 ### Filters
