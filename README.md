@@ -6,19 +6,18 @@
 
 ### Breakpoint Sets
 
-Response's most powerful feature is its breakpoint-based data attribute sets. Devs can choose custom breakpoints and create only the data attributes they need. By default no sets are setup. Devs should setup their sets by using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes).
+Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes).
 
-#### JavaScript setup:
 ```javascript
     Response.create({
         prop: "width"  // "width" "device-width" "height" "device-height" or "device-pixel-ration"
-      , prefix: "min-width- r src"  // the prefix(es) for your custom data attributes
+      , prefix: "min-width- r src"  // the prefix(es) for your data attributes (aliases are optional)
       , breakpoints: [1281,1025,961,641,481,320,0] // min breakpoints (defaults for width/device-width)
       , lazy: true // optional param - data attr contents lazyload rather than whole page at once
     });
 ```
+**OR**
 
-#### OR JSON setup:
 ```html
     <body data-responsejs='{ 
         "create": [
@@ -29,6 +28,15 @@ Response's most powerful feature is its breakpoint-based data attribute sets. De
         ]}'
     >
 ```
+**to write markup like:**
+
+```html
+
+   <div data-min-width-481="markup @ 481px+" data-min-width-961="markup @ 961px+">
+       default markup for 480px- or no-js
+   </div>
+```
+
 
 ### Dimensions
 
@@ -77,9 +85,9 @@ Response.inViewport(elem [, verge])  // true if any part of elem is in the viewp
 // examples
 Response.inViewport($('p.example'))  // true if any part of <p class=example> is in viewport (exact)
 Response.inViewport(this)      // true if any part of `this` elem is in viewport (exact)
-Response.inViewport(this, 100) // true if any part of `this` elem is in viewport (or is within 100px of it)
+Response.inViewport(this, 100) // true if any part of `this` elem is in viewport (or is w/in 100px of it)
 
-// Most responsive sites only overflow in one direction (vertical scroll but not horizontal). When there's 
+// Most responsive sites only overflow in one direction (vertical scroll, not horizontal). When there's 
 // no horiz.overflow, the inX method is always true, and it'd be slightly faster to simply test .inY
 Response.inViewport(this) === Response.inX(this) && Response.inY(this) // always true
 
@@ -117,7 +125,7 @@ $('div').deletes(keys)                // delete attrs (space-separated string)
 
 $('body').dataset("pulpFiction", 5)            // sets <body data-pulp-fiction="5">
 $('div').dataset("pulpFiction", 5)             // sets <div data-pulp-fiction="5"> on all matched divs
-$('div').deletes("pulpFiction")                // deletes (removes) data-pulp-fiction on all matched divs.
+$('div').deletes("pulpFiction")                // remove data-pulp-fiction from all matched divs
 $('body').dataset({pulpFiction:5, movie:true}) // sets <body data-pulp-fiction="5" data-movie="true">
 $('body').dataset("pulpFiction")               // returns "5"
 $('body').dataset(["pulpFiction"])             // returns 5
