@@ -1,14 +1,33 @@
 # [Response](http://responsejs.com)
 
-[Response JS](http://responsejs.com) is a lightweight jQuery or Zepto plugin that gives web designers tools for building performance-optimized, mobile-first responsive websites. It provides semantic ways to dynamically swap code blocks based on breakpoints and serve images (or other media) progressively via HTML5 data attributes.
+[Response JS](http://responsejs.com) is a lightweight jQuery or Zepto plugin that gives web designers tools for building performance-optimized, mobile-first responsive websites. It provides semantic ways to dynamically swap code blocks based on breakpoints and serve images (or other media) progressively via HTML5 data attributes (see Breakpoint Sets).
 
 ## API (v 0.5.0)
 
+### Breakpoint Sets
+
+Response's most powerful feature is its breakpoint-based data attribute sets. Devs can choose custom breakpoints and create only the data attributes they need. By default no sets are setup. Devs should setup their sets by using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes).
+
+#### JavaScript setup:
 ```javascript
+    Response.create({
+        prop: "width"  // "width" "device-width" "height" "device-height" or "device-pixel-ration"
+      , prefix: "min-width- r src"  // the prefix(es) for your custom data attributes
+      , breakpoints: [1281,1025,961,641,481,320,0] // min breakpoints (defaults for width/device-width)
+      , lazy: true // optional param - data attr contents lazyload rather than whole page at once
+    });
+```
 
-Response.create(options)  // Create breakpoint-based attribute sets (See details @ bottom of page)
-Response.chain()  // Expose chainable versions of inX/inY/inViewport/dataset/deletes methods to jQuery
-
+#### OR JSON setup:
+```html
+    <body data-responsejs='{ 
+        "create": [
+            { "prop": "width"
+            , "prefix": "min-width- r src"
+            , "lazy": true
+            , "breakpoints": [1281,1025,961,641,481,320,0] }
+        ]}'
+    >
 ```
 
 ### Dimensions
@@ -27,8 +46,6 @@ Response.deviceH()     // device height property
 Response.deviceMax()   // calculated Math.max(deviceW, deviceH)
 Response.deviceMin()   // calculated Math.min(deviceW, deviceH)
 // Read: github.com/ryanve/response.js/issues/4
-
-
 ```
 
 ### Booleans
@@ -68,7 +85,6 @@ Response.inViewport(this) === Response.inX(this) && Response.inY(this) // always
 
 // media queries
 Response.media(mediaQuery).matches // uses window.matchMedia || window.msMatchMedia
-
 ```
 
 ### HTML5 Dataset
@@ -107,9 +123,8 @@ $('body').dataset("pulpFiction")               // returns "5"
 $('body').dataset(["pulpFiction"])             // returns 5
 Response.dataset(document.body, "movie")       // returns "true"
 Response.dataset(document.body, ["movie"])     // returns true
-
-
 ```
+
 ### Data Utils
 
 ```javascript
@@ -120,7 +135,6 @@ Response.datatize(str)
 Response.target(keys)  // convert keys like "a b c" or ["a","b","c"] to $("[data-a],[data-b],[data-c]")
 Response.access(keys)  // access an array of dataset values that correspond to an array of dataset keys
 Response.store()
-
 ```
 
 ### Filters
@@ -136,7 +150,6 @@ $('div').inViewport().addClass('im-in-the-viewport-bro')
 
 $('div').inX()
 $('div').inY()
-
 ```
 
 ### Events
@@ -146,8 +159,15 @@ $('div').inY()
 Response.ready(callback)  // call callback when DOM is ready
 Response.resize(callback)  // bind callback the resize event
 Response.action(callback)  // bind callback (or array of callbacks) to ready and resize events.
-Response.crossover(callback) // bind callback to dynamic attribute sets' breakpoint crossovers
+Response.crossover(callback [, prop]) // bind callback to dynamic attribute sets' breakpoint crossovers
 
+Response.action(function() {
+    // do stuff on ready and resize
+});
+
+Response.crossover(function() {
+    // do stuff each time viewport crosses width breakpoints
+}, 'width');
 ```
 
 ### Objects/Arrays
@@ -165,48 +185,19 @@ Response.sift(arr, callback) // cross-browser equivalent to arr.filter(callback)
 Response.sift(arr, callback, invert) // equivalent to jQuery.grep
 ```
 
-### [Response.create](http://responsejs.com/#create)
-
-Response's main feature is breakpoint-based data attribute sets. (Basically all of the above methods play a part in the making of the sets.) Devs can choose custom breakpoints and create only the data attributes they need. By default no sets are setup. Devs should setup their sets by using `Response.create()` directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects.
-
-#### JavaScript setup:
-```javascript
-    Response.create({
-        prop: "width"  // "width" "device-width" "height" "device-height" or "device-pixel-ration"
-      , prefix: "min-width- r src"  // the prefix(es) for your custom data attributes
-      , breakpoints: [1281,1025,961,641,481,320,0] // min breakpoints (defaults for width/device-width)
-      , lazy: true // optional param - data attr contents lazyload rather than whole page at once
-    });
-```
-
-#### OR JSON setup:
-```html
-    <body data-responsejs='{ 
-        "create": [
-            { "prop": "width"
-            , "prefix": "min-width- r src"
-            , "lazy": true
-            , "breakpoints": [1281,1025,961,641,481,320,0] }
-        ]}'
-    >
-```
-@since 0.2.9 supported props are: `"width"` `"height"` `"device-width"` `"device-height"` and `"device-pixel-ratio"`
-
-@since 0.3.0, the mode parameter is ignored because the appropriate mode is auto-detected. This means that you only need to set up one set for each prop where pre-0.3.0 you would have needed two. `img`|`input`|`source`|`embed`|`track` elements always behave in src mode. `iframe`|`audio`|`video` elements behave in src mode only when the src attribute is present and otherwise they 
-use markup mode. All other elements behave in markup mode. 
-
-@since 0.3.1 it's possible to alias multiple prefixes in a space-separated string. Aliasing multiple prefixes has better performance than creating two sets for the same prop, but the latter is also supported for back compatibility. Since 0.3.1 if the prefix param the prefix will default to "min-[prop]-" For example if the prop is "width" then the prefix would default to "min-width-" which would create functionality for data-min-width-0, data-min-width-320, etc. based on your breakpoints.
-
-See additional notes in the [change log](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md).
-
 ### Extending
 
-@since 0.5.0 devs can use `Response.addTest(prop, testFn)` to define custom props/tests to use in attribute sets. 
+```javascript
+
+Response.chain()  // Expose chainable versions of inX/inY/inViewport/dataset/deletes methods to $.fn
+```
 
 ```javascript
 
+// Response.addTest(prop, testFn)
 // @param   string    prop           a custom prop name (or an existing prop to override)
 // @param   callback  testFn         boolean callback to test min breakpoints for the prop
+// @since   0.5.0
 // @example
 
 Response.addTest('viewport-area', function(min) {
@@ -218,6 +209,5 @@ Response.create({
   , breakpoints: [100000, 1000000, 10000000] // custom breakpoints
   , dynamic: true // set this to true if prop needs to be tested on resize
 });
-
 ```
 
