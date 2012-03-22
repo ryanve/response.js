@@ -1,5 +1,9 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## [0.5.1](https://github.com/ryanve/response.js/commit/cbcbd6022c659937abd2e08b8b9c7e8009b18c4d) (2012-03-21)
+- `Response.addTest()` now can be chained like `Response.addTest().addTest().addTest()` 
+- **CSS**: For styling purposes `.responsejs` now gets added to the `html` tag when Response has been successfully loaded. `.no-responsejs` is removed if it is present.
+
 ## [0.5.0](https://github.com/ryanve/response.js/commit/0f7a4d98cc28ac733ca53b2ecf0c3d8c494162bd) (2012-03-18)
 - [Jeesh](http://ender.no.de/#jeesh) compatibility added. (0.5.0 requires jQuery, Zepto, **or** Jeesh.)
 - [Consistency](https://github.com/ryanve/response.js/issues/4): The 4 device dimension getters (deviceW / deviceH / deviceMax / deviceMax) were converted from properties to methods in order to be [consistent](https://github.com/ryanve/response.js/issues/4) with the rest of the dimensions API => they now require parens, e.g. `Response.deviceW()`
