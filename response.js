@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.5.0
+ * @version   0.5.1
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- Zepto 0.8+ (zeptojs.com)
@@ -402,7 +402,9 @@
 
                 else {//SET for group of selected elems
                     while( n-- ) {// n starts as # of elems in selector and stops at 0
-                        n in this && datasetChainable.apply(this[n], arguments);
+                        if (n in this) {
+                            datasetChainable.apply(this[n], arguments);
+                        }
                     }
                 }
             }
@@ -796,6 +798,7 @@
         if (typeof prop === 'string' && typeof fn === 'function') {
             propTests[prop] = fn;
         }
+        return Response;
     }
         
         /*
@@ -1270,6 +1273,8 @@
                 create(customData.create); 
             }
         }
+        // Remove .no-responsejs class from html tag (if it's there) and add .responsejs
+        docElem.className = docElem.className.replace(/(^|\s)(no-)?responsejs(\s|$)/, '$1$3') + ' responsejs ';
     });
 
     return Response;  // Bam!
