@@ -6,7 +6,7 @@
 
 ### Breakpoint Sets
 
-Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes).
+Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes). [Examples are in the wiki too.](https://github.com/ryanve/response.js/wiki/breakpoint-sets:-create)
 
 ```javascript
     Response.create({
@@ -205,14 +205,12 @@ Response.chain()  // Expose chainable versions of inX/inY/inViewport/dataset/del
 // Response.addTest(prop, testFn)
 // @param   string    prop           a custom prop name (or an existing prop to override)
 // @param   callback  testFn         boolean callback to test min breakpoints for the prop
-// @since   0.5.0
+// @since   0.5.0 (chainable since 0.5.1)
 // @example
 
 Response.addTest('viewport-area', function(min) {
     return min >= Response.viewportW() * Response.viewportH();
-});
-
-Response.create({
+}).create({
     prop: 'viewport-area' // custom prop name
   , breakpoints: [100000, 1000000, 10000000] // custom breakpoints
   , dynamic: true // set this to true if prop needs to be tested on resize
