@@ -6,7 +6,7 @@
 
 ### Breakpoint Sets
 
-Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes). [Examples are in the wiki too.](https://github.com/ryanve/response.js/wiki/breakpoint-sets:-create)
+Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes). [Examples are in the wiki too.](https://github.com/ryanve/response.js/wiki/how-to-create-breakpoint-sets)
 
 ```javascript
     Response.create({
