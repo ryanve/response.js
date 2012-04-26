@@ -3,13 +3,13 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.5.1
+ * @version   0.5.2
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- Zepto 0.8+ (zeptojs.com)
  */
 
-;this.Response = (function( window, undef ) {// this === window in the global scope
+;this.Response = (function( window ) {// this === window in the global scope
 
     // Combine local vars/funcs into one statement:    
 
@@ -23,9 +23,8 @@
       , ready = $.domReady || $
       , $win = $(window)                  // cache selector
       , slice = [].slice                  // jsperf.com/arrayify-slice/2
-      , screen = window.screen            // local for better minification and scope traversal
-      , max = Math.max                    // local for better minification and scope traversal
-      , isFinite = window.isFinite        // local for better minification and scope traversal
+      , screen = window.screen            // local for better minification
+      , max = Math.max                    // local for better minification
           
         // these are defined later
       , Elemset, band, wave, device = {}
@@ -62,9 +61,9 @@
             return {}; 
         }
     
-        // Use isArray when available. With inspiration from
+        // Use native isArray when available. With inspiration from
         // github.com/ded/valentine and github.com/documentcloud/underscore
-      , isArray = Array.isArray || function(ukn) {
+      , isArray = Array.isArray || $.isArray || function(ukn) {
             return ukn instanceof Array; 
         }
         
@@ -98,7 +97,7 @@
         return docElem.clientWidth; 
     }
     
-    function viewportH() { 
+    function viewportH() {
         return docElem.clientHeight; 
     }
     
@@ -265,7 +264,7 @@
         return (!s || typeof s === 'string' ? s              // unchanged
                         : 'true' === s      ? true           // convert "true" to true
                         : 'false' === s     ? false          // convert "false" to false
-                        : 'undefined' === s ? undef          // convert "undefined" to undefined
+                        : 'undefined' === s ? n              // convert "undefined" to undefined
                         : 'null' === s      ? null           // convert "null" to null
                         : isFinite((n = parseFloat(s))) ? n  // convert "1000" to 1000
                         : s                                  // unchanged
@@ -514,7 +513,7 @@
 
     /** 
      * Response.overflowX()      Get the number of pixels that the document width exceeds viewport width.
-     *
+     * may be @depreciated in near future @link github.com/ryanve/response.js/issues/6
      * @return  integer   pixel amount that horizontal content overflows viewport (or 0 if there's no overflow).
      */
          
@@ -526,7 +525,7 @@
 
     /** 
      * Response.overflowY()       Get the number of pixels that the document height exceeds viewport height.
-     *
+     * may be @depreciated in near future @link github.com/ryanve/response.js/issues/6
      * @return  integer   pixel amount that vertical content overflows the viewport (or 0 if there's no overflow).
      */
      
@@ -837,7 +836,7 @@
           , dynamic: 0                // boolean   defined @ configure()
           , values: []                // array     available values
           , fn: 0                     // callback  the test fn, defined @ configure()
-          , verge: undef              // integer   defaults to Math.min(screenMax, 500)
+          , verge: null               // integer   defaults to Math.min(screenMax, 500)
           , newValue: 0
           , currValue: 1
           , aka: 0
@@ -946,7 +945,7 @@
 
                 // Use the breakpoints array to create array of data keys:
                 context.keys = affix(context.breakpoints, context.prefix);
-                context.aka = undef; // Reset to undef just in case a value was merged in.
+                context.aka = false; // Reset to false just in case a value was merged in.
 
                 if (aliases) {// There may be one of more aliases:
                     aliasKeys = [];
@@ -1228,7 +1227,7 @@
       , store: store
       , access: access
       , target: target
-      , overflowX: overflowX
+      , overflowX: overflowX // github.com/ryanve/response.js/issues/6
       , overflowY: overflowY
       , object: objectCreate
       , crossover: crossover
