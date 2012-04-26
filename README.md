@@ -44,8 +44,6 @@ Response's most powerful feature is its breakpoint sets. They allow the ability 
 
 Response.viewportW() // return viewport width
 Response.viewportH() // return viewport height
-Response.overflowX() // # of horizontal pixels that doc overflows viewport (or 0 if no overflow)
-Response.overflowY() // # of vertical pixels that doc overflows viewport (or 0 if no overflow)
 Response.scrollX()   // cross-broswer equiv to native window.scrollX   // ~ jQuery(window).scrollLeft()
 Response.scrollY()   // cross-broswer equiv to native window.scrollY   // ~ jQuery(window).scrollTop()
 
