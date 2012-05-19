@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.5.2
+ * @version   0.5.3
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- Zepto 0.8+ (zeptojs.com)
@@ -261,7 +261,7 @@
 
     function render(s) {
         var n;
-        return (!s || typeof s === 'string' ? s              // unchanged
+        return (!s || typeof s !== 'string' ? s              // unchanged
                         : 'true' === s      ? true           // convert "true" to true
                         : 'false' === s     ? false          // convert "false" to false
                         : 'undefined' === s ? n              // convert "undefined" to undefined
