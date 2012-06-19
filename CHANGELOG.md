@@ -1,5 +1,11 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## [0.5.3](https://github.com/ryanve/response.js/commit/dc2b203e8e3e5ae0ba45a1f615e1b09dfd9c16cd) (2012-05-19)
+- Fixed incorrect comparison operator in `Response.render()`
+
+## [0.5.2](https://github.com/ryanve/response.js/commit/fa85d8a6c7a77fcd9ab1ed8fc65a604a5260a2ef) (2012-04-25)
+- minor optimizations
+
 ## [0.5.1](https://github.com/ryanve/response.js/commit/cbcbd6022c659937abd2e08b8b9c7e8009b18c4d) (2012-03-21)
 - `Response.addTest()` now can be chained like `Response.addTest().addTest().addTest()` 
 - **CSS**: For styling purposes `.responsejs` now gets added to the `html` tag when Response has been successfully loaded. `.no-responsejs` is removed if it is present.

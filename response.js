@@ -3,46 +3,52 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.5.3
+ * @version   0.6.0
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- Zepto 0.8+ (zeptojs.com)
  */
 
-;this.Response = (function( window ) {// this === window in the global scope
+(function(factory) {
+    // This is the place to add AMD or node logic.
+    // github.com/ryanve/response.js/pull/9
+    // @example `define(['jquery'], factory)`
+    // Otherwise we expose to the root:
+    this['Response'] = factory();
+}(function($) {
+
+    $ = $ || this.jQuery || this.Zepto || this.ender;
 
     // Combine local vars/funcs into one statement:    
 
-    var Response
-      , namespace = 'Response'            // used for event namespacing
-      , initContentKey = 'i' + namespace  // key for storing initial (no-js) content
-      , doc = window.document             // document root
-      , docElem = doc.documentElement     // <html>
-
-      , $ = window.jQuery || window.Zepto || window.ender
+    var root = this
+      , Response
+      , name = 'Response'
+      , old = root[name]
+      , initContentKey = 'i' + name  // key for storing initial content
+      , win = window
+      , doc = document
+      , docElem = doc.documentElement
       , ready = $.domReady || $
-      , $win = $(window)                  // cache selector
-      , slice = [].slice                  // jsperf.com/arrayify-slice/2
-      , screen = window.screen            // local for better minification
-      , max = Math.max                    // local for better minification
+      , $win = $(win)      // cache selector
+      , slice = [].slice   // jsperf.com/arrayify-slice/3
+      , screen = win.screen
+      , isArray = Array.isArray || function(ukn) { return ukn instanceof Array; }
           
         // these are defined later
       , Elemset, band, wave, device = {}
       , propTests = {}
+      , isCustom = {}
       , sets = { all: [] }
 
         // responsejs.com/labs/dimensions/#device
         // device dims stay the same regardless of viewport size or rotation
       , screenW = screen.width   
       , screenH = screen.height  
-      , screenMax = max(screenW, screenH)
+      , screenMax = screenW > screenH ? screenW : screenH
       , screenMin = screenW + screenH - screenMax
-      , deviceW = function() {
-            return screenW; 
-        }
-      , deviceH = function() { 
-            return screenH; 
-        }
+      , deviceW = function() { return screenW; }
+      , deviceH = function() { return screenH; }
       
         // cache expressions
       , regexFunkyPunc = /[^a-z0-9_\-\.]/gi
@@ -51,21 +57,12 @@
       , regexDataPrefix = /^data-(.+)$/
       , regexSpace = /\s+/
       , regexTrimPunc = /^[\W\s]+|[\W\s]+$|/g
-        //, regexSelectorOps = /([^a-z0-9_\-\s])/gi  // dicey => revert back to simple escape in selectify
 
         // Response.media (normalized matchMedia)
         // @example Response.media("(orientation:landscape)").matches
         // If both versions are undefined, .matches will equal undefined 
         // Also see: band / wave / device.band / device.wave / dpr
-      , media  = window.matchMedia || window.msMatchMedia || function() {
-            return {}; 
-        }
-    
-        // Use native isArray when available. With inspiration from
-        // github.com/ded/valentine and github.com/documentcloud/underscore
-      , isArray = Array.isArray || $.isArray || function(ukn) {
-            return ukn instanceof Array; 
-        }
+      , media  = win.matchMedia || win.msMatchMedia || Object
         
         // Local version of Object.create with polyfill that supports only the first arg.
         // It creates an empty object whose prototype is set to the specified proto param.
@@ -80,7 +77,7 @@
         }
 
       , namespaceIt = function(eventName, customNamespace) {// namepace defaults to 'Response'
-            customNamespace = customNamespace || namespace;
+            customNamespace = customNamespace || name;
             return eventName.replace(regexTrimPunc, '') + '.' + customNamespace.replace(regexTrimPunc, '');
         }
 
@@ -104,7 +101,7 @@
     function doError(msg) {
         // Error handling. (Throws exception.)
         // Use Ctrl+F to find specific @errors
-        throw 'Error using Response.' + (msg || '');
+        throw new TypeError(msg || name);
     }
 
     function ssvToArr(ukn) {
@@ -260,13 +257,13 @@
      */
 
     function render(s) {
-        var n;
+        var n; // < undefined
         return (!s || typeof s !== 'string' ? s              // unchanged
                         : 'true' === s      ? true           // convert "true" to true
                         : 'false' === s     ? false          // convert "false" to false
                         : 'undefined' === s ? n              // convert "undefined" to undefined
                         : 'null' === s      ? null           // convert "null" to null
-                        : isFinite((n = parseFloat(s))) ? n  // convert "1000" to 1000
+                        : (n = parseFloat(s)) === +n ? n     // convert "1000" to 1000
                         : s                                  // unchanged
         );
     }//render
@@ -511,30 +508,6 @@
         return deletesChainable.call(elem, keys);
     }
 
-    /** 
-     * Response.overflowX()      Get the number of pixels that the document width exceeds viewport width.
-     * may be @depreciated in near future @link github.com/ryanve/response.js/issues/6
-     * @return  integer   pixel amount that horizontal content overflows viewport (or 0 if there's no overflow).
-     */
-         
-    function overflowX() {
-        var html = docElem
-          , difference = max(html.offsetWidth, html.scrollWidth, doc.body.scrollWidth) - viewportW();
-        return 0 < difference ? difference : 0;
-    }
-
-    /** 
-     * Response.overflowY()       Get the number of pixels that the document height exceeds viewport height.
-     * may be @depreciated in near future @link github.com/ryanve/response.js/issues/6
-     * @return  integer   pixel amount that vertical content overflows the viewport (or 0 if there's no overflow).
-     */
-     
-    function overflowY() {
-        var html = docElem
-          , difference = max(html.offsetHeight, html.scrollHeight, doc.body.scrollHeight) - viewportH();
-        return 0 < difference ? difference : 0;
-    }
-
     // Cross-browser versions of window.scrollX and window.scrollY
     // Compatibiliy notes @link developer.mozilla.org/en/DOM/window.scrollY
     // Performance tests @link jsperf.com/scrollx-cross-browser-compatible
@@ -598,12 +571,12 @@
 
     function inX(elem, verge) {
         var r = rectangle(getNative(elem), verge);
-        return r.right >= 0 && r.left <= scrollX() + viewportW();        
+        return !!r && r.right >= 0 && r.left <= viewportW();
     }
 
     function inY(elem, verge) {
         var r = rectangle(getNative(elem), verge);
-        return r.bottom >= 0 && r.top <= scrollY() + viewportH();
+        return !!r && r.bottom >= 0 && r.top <= viewportH();
     }
 
     function inViewport(elem, verge) {
@@ -611,7 +584,7 @@
         // But just manually do both to avoid calling rectangle() and getNative() twice.
         // It actually gzips smaller this way too:
         var r = rectangle(getNative(elem), verge);
-        return r.bottom >= 0 && r.top <= scrollY() + viewportH() && r.right >= 0 && r.left <= scrollX() + viewportW();
+        return !!r && r.bottom >= 0 && r.top <= viewportH() && r.right >= 0 && r.left <= viewportW();
     }
     
     /**
@@ -631,7 +604,7 @@
 
     function dpr(decimal) {
 
-        var dPR = window.devicePixelRatio;
+        var dPR = win.devicePixelRatio;
 
         if ( !arguments.length ) {//Return exact value or kinda iterate for approx:
             return dPR || (dpr(2) ? 2 : dpr(1.5) ? 1.5 : dpr(1) ? 1 : 0);
@@ -796,6 +769,7 @@
     function addTest(prop, fn) {
         if (typeof prop === 'string' && typeof fn === 'function') {
             propTests[prop] = fn;
+            isCustom[prop] = 1;
         }
         return Response;
     }
@@ -834,6 +808,7 @@
           , prop: 'width'             // string    validated @ configure()
           , keys: []                  // array     defined @ configure()
           , dynamic: 0                // boolean   defined @ configure()
+          , custom: 0                 // boolean   see addTest()
           , values: []                // array     available values
           , fn: 0                     // callback  the test fn, defined @ configure()
           , verge: null               // integer   defaults to Math.min(screenMax, 500)
@@ -844,13 +819,15 @@
           , i: 0                      // integer   the index of the current highest active breakpoint min
           , selector: 0
     
-          , valid8: function(arr, prop, defaultBreakpoints) {
+          , valid8: function() {
               
-                arr = this.breakpoints;
+                var arr, prop, isNumeric, defaultBreakpoints;
                    
-                if (isArray(arr)) {// Custom Breakpoints:
+                if (isArray(arr = this.breakpoints)) {// Custom Breakpoints:
                     // Filter out non numerics and sort lowest to highest:
-                    arr = sift(arr, isFinite).sort(function(a, b){ return (a - b); });
+                    arr = (isNumeric = arr.length === sift(arr, isFinite).length) 
+                        ? arr.sort(function(a, b){ return (a - b); }) // sort lowest to highest
+                        : sift(arr, function(item){ return !!item || 0 === item; }); // remove null|undefined|''|NaN
                     arr.length || doError('create @breakpoints');
                 }
 
@@ -874,7 +851,7 @@
 
                 // Remove breakpoints that are above the device's max dimension,
                 // in order to reduce the number of iterations needed later.
-                this.breakpoints = sift(arr, function(n) { return n <= screenMax; });
+                this.breakpoints = isNumeric ? sift(arr, function(n) { return n <= screenMax; }) : arr;
             }
               
           , reset: function() {// Reset memoize cache -and- fire crossover events:
@@ -918,7 +895,7 @@
                   , context = this
                   , aliases
                   , aliasKeys
-                    , combinedKeys
+                  , combinedKeys
                 ;
 
                 merge(context, options, true); // Merge properties from options object into this object.
@@ -934,6 +911,8 @@
                 if (context.dynamic === 0) {
                     context.dynamic = !!('device' !== context.prop.substring(0, 6));
                 }
+                
+                context.custom = isCustom[context.prop];
 
                 prefix = context.prefix ? sift(map(ssvToArr(context.prefix), sanitize)) : ['min-' + context.prop + '-'];
                 aliases = 1 < prefix.length ? prefix.slice(1) : 0;
@@ -1045,10 +1024,8 @@
      *
      */
      
-    function resize(fn, namespace) {
-        var name = 'resize';
-        name = !namespace ? name : namespaceIt(name, namespace);
-        $win.on(name, fn);
+    function resize(fn) {
+        $win.on('resize', fn);
         return Response; // chainable
     }
     
@@ -1145,7 +1122,7 @@
                 // that it doesn't support the lowestNonZeroBP then we don't need to listen for 
                 // resize events b/c we know the device can't resize beyond that breakpoint.
 
-                if (elemset.dynamic && lowestNonZeroBP < screenMax) {
+                if (elemset.dynamic && (elemset.custom || lowestNonZeroBP < screenMax)) {
                    resize(resizeHandler, resizeName);
                 }
 
@@ -1173,37 +1150,40 @@
         });//route
         return Response; // chainable
     }//create
-        
+    
+    function noConflict(callback) {
+        root[name] = old;
+        typeof callback === 'function' && callback.call(root, Response);
+        return Response;
+    }
+
     // Handler for adding inx/inY/inViewport to $.fn (or another prototype).
-    function exposeAreaFilters(engine, proto) {
+    function exposeAreaFilters(engine, proto, force) {
         forEach(['inX', 'inY', 'inViewport'], function(methodName) {
-            proto[methodName] = function(verge, invert) {
+            (force || !proto[methodName]) && (proto[methodName] = function(verge, invert) {
                 return engine(sift(this, function(el) {
                     return el && !invert === Response[methodName](el, verge); 
                 }));
-            };
+            });
         });
     }
     
     /**
-     * Response.chain
+     * Response.chain >>>> bridge
      * @since 0.3.0
      * Expose chainable methods to jQuery.
      */
 
-    function chain(engine, proto) {
-        if (!chain.on) {
-            proto = proto || $.fn;
-            engine = engine || $;
-            
+    function bridge(host, force) {
+        if ((typeof host === 'function' && host.fn) || (!arguments.length && (host = $))) {
+
             // Expose .dataset() and .deletes() to jQuery:
-            proto.dataset = datasetChainable;
-            proto.deletes = deletesChainable;
+            if (force || !host.fn.dataset) { host.fn.dataset = datasetChainable; }
+            if (force || !host.fn.deletes) { host.fn.deletes = deletesChainable; }
             
             // Expose .inX() .inY() .inViewport()
-            exposeAreaFilters(engine, proto);
-            
-            chain.on = 1; // Prevent running more than once.
+            exposeAreaFilters(host, host.fn, force);
+
         }
         return Response; // chainable
     }
@@ -1218,7 +1198,9 @@
       , sets: function(prop) {
             return $(selectify(sets[prop] || sets.all));
         }
-      , chain: chain
+      , noConflict: noConflict
+      , chain: bridge
+      , bridge: bridge
       , create: create
       , addTest: addTest
       , datatize: datatize
@@ -1227,8 +1209,6 @@
       , store: store
       , access: access
       , target: target
-      , overflowX: overflowX // github.com/ryanve/response.js/issues/6
-      , overflowY: overflowY
       , object: objectCreate
       , crossover: crossover
       , action: action
@@ -1256,7 +1236,6 @@
       , dataset: dataset
       , viewportH: viewportH
       , viewportW: viewportW
-      // jsperf.com/object-order-lookup/2
     };// Response
 
     /**
@@ -1266,7 +1245,7 @@
     ready(function(customData) {
         customData = dataset(doc.body, 'responsejs'); // Read data-responsejs attr.            
         if ( customData ) {
-            var supportsNativeJSON = window.JSON && JSON.parse;
+            var supportsNativeJSON = win.JSON && JSON.parse;
             customData = supportsNativeJSON ? JSON.parse(customData) : $.parseJSON ? $.parseJSON(customData) : {};
             if ( customData.create ) {
                 create(customData.create); 
@@ -1276,8 +1255,6 @@
         docElem.className = docElem.className.replace(/(^|\s)(no-)?responsejs(\s|$)/, '$1$3') + ' responsejs ';
     });
 
-    return Response;  // Bam!
+    return bridge($);  // Bam!
 
-}( window )); // Watch @link vimeo.com/12529436
-
-/*jslint browser: true, white: true, plusplus: true, regexp: true, maxerr: 50, indent: 4 */
+})); // closure
