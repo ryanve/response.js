@@ -1,5 +1,11 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## [0.6.0](https://github.com/ryanve/response.js/commit/6fdc4d1596b1f58fd9ef094805e19f1c118aff52) (2012-06-19)
+- Added `Response.noConflict()`
+- Added support for [non-numeric custom breakpoints](https://github.com/ryanve/response.js/issues/10#issuecomment-6439578).
+- Removed [depreciated](https://github.com/ryanve/response.js/issues/6) `.overflowX()`/`.overflowY()` methods.
+- Reorganized closure to better accomodate [module loaders](https://github.com/ryanve/response.js/pull/9).
+
 ## [0.5.3](https://github.com/ryanve/response.js/commit/dc2b203e8e3e5ae0ba45a1f615e1b09dfd9c16cd) (2012-05-19)
 - Fixed incorrect comparison operator in `Response.render()`
 

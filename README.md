@@ -1,10 +1,10 @@
 # [Response](http://responsejs.com)
 
-[Response JS](http://responsejs.com) is a lightweight jQuery/Zepto/Ender plugin that gives web designers tools for building performance-optimized, mobile-first responsive websites. It provides semantic ways to dynamically swap code blocks based on breakpoints and serve images (or other media) progressively via HTML5 data attributes (see Breakpoint Sets).
+[Response JS](http://responsejs.com) is a [jQuery](http://jquery.com)/[Ender](http://ender.no.de)/[Zepto](http://zeptojs.com) plugin that gives web designers tools for building performance-optimized, mobile-first responsive websites. It provides semantic ways to dynamically swap code blocks based on breakpoints and serve images (or other media) progressively via HTML5 data attributes (see Breakpoint Sets).
 
 CDN: [airve.github.com/js/response/response.min.js](http://airve.github.com/js/response/response.min.js)
 
-## API (v 0.5.0)
+## API (v 0.6.0)
 
 ### Breakpoint Sets
 
@@ -113,7 +113,7 @@ Response.dataset(elem, {key1:1, key:2})  // set multiple data attrs at once
 Response.deletes(elem, keys)             // delete attrs (space-separated string)
 Response.deletes(elem, keys)        // delete (remove) one or more space-separated data attributes
 
-// Enable jQueryish chaining by calling Response.chain()
+// Enable jQueryish chaining by calling Response.bridge($)
 
 $('div').dataset(key)                 // get (from first matched element)
 $('div').dataset([key])               // get and render (See Response.render)
@@ -149,11 +149,11 @@ Response.store($elems, key [, overwrite]) // store init content of each elem to 
 
 ```javascript
 
-// Filters - ( Disabled by default. Enable them by calling Response.chain() )
+// Filters - ( Disabled by default. Enable them by calling Response.bridge($) )
 // @param  number   verge    optional
 // @param  boolean  inverse  optional   use true to invert (keep only the elems NOT in the viewport)
 
-$('div').inViewport(verge, inverse)  
+$('div').inViewport(verge, inverse)
 $('div').inViewport().addClass('im-in-the-viewport-bro')
 
 $('div').inX()
@@ -196,12 +196,6 @@ Response.sift(arr, callback, invert) // equivalent to jQuery.grep
 ### Extending
 
 ```javascript
-
-Response.chain()  // Expose chainable versions of inX/inY/inViewport/dataset/deletes methods to $.fn
-```
-
-```javascript
-
 // Response.addTest(prop, testFn)
 // @param   string    prop           a custom prop name (or an existing prop to override)
 // @param   callback  testFn         boolean callback to test min breakpoints for the prop
@@ -215,6 +209,26 @@ Response.addTest('viewport-area', function(min) {
   , breakpoints: [100000, 1000000, 10000000] // custom breakpoints
   , dynamic: true // set this to true if prop needs to be tested on resize
 });
+```
+
+### Integration
+
+```javascript
+Response.bridge($) // Integrate chainable versions of inX/inY/inViewport/dataset/deletes methods to $.fn
+```
+
+```js
+Response.noConflict(); // remove the global `Response`
+Response.noConflict(function(Response){  
+  /* Remove the global and get safe reference to `Response` in here */ 
+});
+```
+
+#### [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) usage
+
+```javascript
+// see the source for more info on this
+define(['jquery'], Response.noConflict);  // define module and destroy global
 ```
 
 ## Links
