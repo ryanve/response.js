@@ -3,6 +3,7 @@
 ## [0.6.0](https://github.com/ryanve/response.js/commit/6fdc4d1596b1f58fd9ef094805e19f1c118aff52) (2012-06-19)
 - Added `Response.noConflict()`
 - Added support for [non-numeric custom breakpoints](https://github.com/ryanve/response.js/issues/10#issuecomment-6439578).
+- Added `Response.bridge()`. `Response.chain()` is now an alias for `Response.bridge()`. Use `Response.bridge()`.
 - Removed [depreciated](https://github.com/ryanve/response.js/issues/6) `.overflowX()`/`.overflowY()` methods.
 - Reorganized closure to better accomodate [module loaders](https://github.com/ryanve/response.js/pull/9).
 
