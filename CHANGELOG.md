@@ -1,5 +1,10 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## [0.6.1](https://github.com/ryanve/response.js/commit/c4ce4b5f6b412a71ff6c66cb49ec943506f9b893) (2012-07-19)
+- Allow for empty breakpoints like `data-r961=""` to work as expected. ([See #12](https://github.com/ryanve/response.js/issues/12))
+
+https://github.com/ryanve/response.js/issues/12
+
 ## [0.6.0](https://github.com/ryanve/response.js/commit/6fdc4d1596b1f58fd9ef094805e19f1c118aff52) (2012-06-19)
 - Added `Response.noConflict()`
 - Added support for [non-numeric custom breakpoints](https://github.com/ryanve/response.js/issues/10#issuecomment-6439578).
