@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.6.0
+ * @version   0.6.1
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- Zepto 0.8+ (zeptojs.com)
@@ -959,18 +959,18 @@
                 // test callback. If none pass the test, then return the fallback value.
                 // this.breakpoints.length === this.values.length + 1  
                 // The extra member in the values array is the initContentKey value.
-                var val = 0
+                var val = null
                   , subjects = this.breakpoints
                   , sL = subjects.length
                   , i = sL
                 ;
                 // similar to lastIndexOf:
-                while( !val && i-- ) {
+                while( val == null && i-- ) {
                     if ( this.memoize(subjects[i]) ) {
                         val = this.values[i];
                     }
                 }
-                this.newValue = val || this.values[sL];
+                this.newValue = typeof val === 'string' ? val : this.values[sL];
                 return this; // chainable
             }
 
