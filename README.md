@@ -4,7 +4,7 @@
 
 CDN: [airve.github.com/js/response/response.min.js](http://airve.github.com/js/response/response.min.js)
 
-## API (v 0.6.0)
+## API (v 0.7.0)
 
 ### Breakpoint Sets
 
