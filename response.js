@@ -3,21 +3,26 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.6.1
+ * @version   0.7.0
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
- *            -or- Zepto 0.8+ (zeptojs.com)
+ *            -or- elo (github.com/ryanve/elo)
+ *            -or- zepto 0.8+ (zeptojs.com)
  */
 
-(function(factory) {
+(function ( factory ) {
     // This is the place to add AMD or node logic.
     // github.com/ryanve/response.js/pull/9
     // @example `define(['jquery'], factory)`
     // Otherwise we expose to the root:
     this['Response'] = factory();
-}(function($) {
+}(function ($) {
 
-    $ = $ || this.jQuery || this.Zepto || this.ender;
+    $ = $ || this.jQuery || this.Zepto || this.ender || this.elo;
+
+    if ( typeof $ != 'function' ) {// Exit gracefully if dependency is missing:
+        throw 'Response unable to run due to missing dep.';
+    }
 
     // Combine local vars/funcs into one statement:    
 
@@ -25,21 +30,33 @@
       , Response
       , name = 'Response'
       , old = root[name]
-      , initContentKey = 'i' + name  // key for storing initial content
+      , initContentKey = 'init' + name  // key for storing initial content
       , win = window
       , doc = document
       , docElem = doc.documentElement
       , ready = $.domReady || $
-      , $win = $(win)      // cache selector
-      , slice = [].slice   // jsperf.com/arrayify-slice/3
+      , $win = $(win) // cache selector
       , screen = win.screen
       , isArray = Array.isArray || function(ukn) { return ukn instanceof Array; }
-          
+      , owns = {}.hasOwnProperty
+      , slice = [].slice
+      , concat = [].concat
+      , nativeMap = [].map
+
+      , map = nativeMap ? function(ob, fn, scope) {
+            return nativeMap.call(ob, fn, scope);
+        } : function (ob, fn, scope) {
+            var i, l = ob.length, ret = [];
+            for (i = 0; i < l; i++) { i in ob && (ret[i] = fn.call(scope, ob[i], i, ob)); }
+            return ret;
+        }
+
         // these are defined later
       , Elemset, band, wave, device = {}
       , propTests = {}
       , isCustom = {}
       , sets = { all: [] }
+      , suid = 1
 
         // responsejs.com/labs/dimensions/#device
         // device dims stay the same regardless of viewport size or rotation
@@ -52,11 +69,10 @@
       
         // cache expressions
       , regexFunkyPunc = /[^a-z0-9_\-\.]/gi
+      , regexTrimPunc = /^[\W\s]+|[\W\s]+$|/g
       , regexCamels = /([a-z])([A-Z])/g
       , regexDashB4 = /-(.)/g
       , regexDataPrefix = /^data-(.+)$/
-      , regexSpace = /\s+/
-      , regexTrimPunc = /^[\W\s]+|[\W\s]+$|/g
 
         // Response.media (normalized matchMedia)
         // @example Response.media("(orientation:landscape)").matches
@@ -101,14 +117,198 @@
     function doError(msg) {
         // Error handling. (Throws exception.)
         // Use Ctrl+F to find specific @errors
-        throw new TypeError(msg || name);
+        throw new TypeError(msg ? name + '.' + msg : name);
+    }
+    
+    function isNumber (item) {// inlined @minification
+        return typeof item == 'number' && item === item; // second part stuffs NaN
     }
 
     function ssvToArr(ukn) {
-        // Convert space separated values to array. Always returns an array:
-        return typeof ukn === 'string' ? ukn.split(regexSpace) : isArray(ukn) ? ukn : [];
+        // Convert space separated values to array. Always returns a compact array:
+        return typeof ukn == 'string' ? sift(ukn.split(' ')) : isArray(ukn) ? sift(ukn) : [];
     }
-        
+
+    /**
+     * Response.each()
+     * @since    0.4.0
+     * Since version 0.6.2, this function omits checking `i in arr` and supports scope
+     */
+
+    function each(ob, callback, scope) {
+        if ( null == ob ) { return ob; }
+        var i = 0, len = ob.length;
+        while ( i < len ) { callback.call(scope || ob[i], ob[i], i++, ob); }
+        return ob; // chainable
+    }
+
+    // revamped affix method reintroduced in version 0.4.0:
+    // updated again in 0.6.2 to skip null|undef values
+    function affix(arr, prefix, suffix) {
+        // Return new array with prefix/suffix added to each value.
+        // null|undefined values are not included in the new array
+        var r = [], l = arr.length, i = 0, v;
+        prefix = prefix || '';
+        suffix = suffix || '';
+        while ( i < l ) {
+            v = arr[i++]; 
+            null == v || r.push(prefix + v + suffix);
+        }
+        return r;
+    }
+
+    /**
+     * @param  {Array|Object}          ob     is an array or collection to iterate over.
+     * @param  {(Function|string|*)=}  fn     is a callback or typestring - callbacks receive (v, i, ob)
+     * @param  {(Object|boolean|*)=}   scope  thisArg or invert
+     */
+    
+    /**
+     * Response.sift       Filter out array values that don't pass a callback,
+     *                     or (if no callback provided) filter out falsey values.
+     *                     Similar (but more capable that) jQuery.grep or the native [].filter
+     *
+     * @since   0.4.0      Updated in 0.6.2 to support scope and typestrings
+     * @example Response.sift([5, 0, 'seven'], isFinite)    // [5, 0]
+     * @example Response.sift([5, 0, '', undefined, null])  // [5]
+     *
+     */
+
+    function sift(ob, fn, scope) {
+
+        var l, u = 0, i = 0, v, ret = [], invert, isF = typeof fn == 'function';
+        if ( !ob ) { return ret; }
+        scope = (invert = true === scope) ? null : scope;
+
+        for ( l = ob.length; i < l; i++ ) {
+            v = ob[i]; // save reference to value in case `fn` mutates `ob[i]`
+            // Use `=== !` to ensure that the comparison is bool-to-bool
+            invert === !(isF ? fn.call(scope, v, i, ob) : fn ? typeof v === fn : v) && (ret[u++] = v);
+        }
+        return ret;
+    }
+
+    /**
+     * Response.merge
+     * @since 0.3.0
+     * Generic method for merging objects and/or arrays.
+     * Undefined values in `adds` are skipped.
+     * When `adds` is array-like, this behaves similar to jQuery.merge(base, adds)
+     * Otherwise it behaves similar to jQuery.extend(base, adds)
+     * @param   {Object|Array|Function|*}  base
+     * @param   {Object|Array|Function|*}  adds
+     */
+
+    function merge (base, adds) {
+        if ( !base || !adds) { return base; }
+        var k, l = adds.length;
+
+        if ( typeof adds != 'function' && isNumber(l) ) {
+            for ( k = 0; k < l; k++ ) {
+                void 0 === adds[k] || (base[k] = adds[k]);
+            }
+            if ( !(base.length > k) ) { 
+                base.length = k; // in case `base` was not array
+            } 
+        } else {
+            for ( k in adds ) {
+                owns.call(adds, k) && void 0 !== adds[k] && (base[k] = adds[k]);
+            }
+        }
+        return base;
+    }
+
+    /**
+     * Response.route()             Handler method for accepting args as arrays or singles, for 
+     *                              callbacks. Returns self for chaining.
+     *
+     * @since   0.3.0               (scope support added in 0.6.2)
+     *
+     * @param   {*}         item    If `item` is an array or array-like object then `callback` gets called
+     *                              on each member. Otherwise `callback` is called on the `item` itself.
+     * @param   {Function}  fn      The function to call on item(s).
+     * @param   {*=}        scope   thisArg (defaults to current item)
+     */
+
+    function route(item, fn, scope) {
+        // If item is array-like then call the callback on each item. Otherwise call directly on item.
+        if ( null == item ) { return item; } // Skip null|undefined
+        if ( typeof item == 'object' && !item.nodeType && isNumber(item.length) ) { 
+            each(item, fn, scope); 
+        } else {
+            fn.call(scope || item, item); 
+        }
+        return item; // chainable
+    }
+
+    // Handler for defining range comparison booleans:
+    function ranger(fn) {
+        // In previous versions we used inORout() for this but this
+        // is better because the resulting functions are faster
+        // because they don't require an extra function call.
+        return function(min, max) {
+            var bool, curr = fn();
+            bool = curr >= (min || 0);
+            return !max ? bool : bool && curr <= max;        
+        };
+    }
+
+    /** 
+     * Range comparison booleans
+     * @link responsejs.com/#booleans
+     */
+    band = ranger(viewportW);      // Response.band
+    wave = ranger(viewportH);      // Response.wave
+    device.band = ranger(deviceW); // Response.device.band
+    device.wave = ranger(deviceH); // Response.device.wave
+    
+    /**
+     * Response.dpr(decimal)         Tests if a minimum device pixel ratio is active. 
+     *                               Or (version added in 0.3.0) returns the device-pixel-ratio
+     *
+     *
+     * @param    number    decimal   is the integer or float to test.
+     *
+     * @return   boolean|number
+     * @example  Response.dpr();     // get the device-pixel-ratio (or 0 if undetectable)
+     * @example  Response.dpr(1.5);  // true when device-pixel-ratio is 1.5+
+     * @example  Response.dpr(2);    // true when device-pixel-ratio is 2+
+     * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
+     *
+     */
+
+    function dpr(decimal) {
+
+        var dPR = win.devicePixelRatio;
+
+        if ( null == decimal ) {//Return exact value or kinda iterate for approx:
+            return dPR || (dpr(2) ? 2 : dpr(1.5) ? 1.5 : dpr(1) ? 1 : 0);
+        }
+
+        if ( !isFinite(decimal) ) {// Shh. Actually allows numeric strings too. ;)
+            return false;
+        }
+
+        // Use window.devicePixelRatio if supported - supported by Webkit 
+        // (Safari/Chrome/Android) and Presto 2.8+ (Opera) browsers.         
+
+        if ( dPR && dPR > 0 ) {
+            return dPR >= decimal; 
+        }
+
+        // Fallback to .matchMedia/.msMatchMedia. Supported by Gecko (FF6+) and more:
+        // @link developer.mozilla.org/en/DOM/window.matchMedia
+        // -webkit-min- and -o-min- omitted (Webkit/Opera supported above)
+        // The generic min-device-pixel-ratio is expected to be added to the W3 spec.
+        // Return false if neither method is available.
+
+        decimal = 'only all and (min--moz-device-pixel-ratio:' + decimal + ')';
+        if ( media(decimal).matches ) { return true; }
+        return !!media(decimal.replace('-moz-', '')).matches;
+
+    }//dpr
+
+
     /**
      * Response.camelize       Converts data-pulp-fiction to pulpFiction
      *                         via camelize @link github.com/ded/bonzo
@@ -136,114 +336,6 @@
         // Make sure there's no data- already in s for it to work right in IE8.
         return 'data-' + (s ? s.replace(regexDataPrefix, '$1').replace(regexCamels, '$1-$2').toLowerCase() : s);
     }
-        
-    // Isolate native element:
-    function getNative(e) {
-        // stackoverflow.com/questions/9119823/safest-way-to-detect-native-dom-element
-        // See @link jsperf.com/get-native
-        // If e is a native element then return it. If not check if index 0 exists and is
-        // a native elem. If so then return that. Otherwise return false.
-        return !e ? false : e.nodeType === 1 ? e : e[0] && e[0].nodeType === 1 ? e[0] : false;
-    }
-
-    // Local map func adapted from github.com/ded/valentine
-    // A lot of maps ar eused here so I want a local version here faster than $.map
-    // Could use native version where avail and fallback to jQuery like...
-    //, map = 'map' in arrPrototype ? function (arr, callback) { return arrPrototype.map.call(arr, callback); } : $.map
-    // see v.map @link github.com/ded/valentine
-    // ...but the loop below works everywhere, is as fast as the native call, and ends up using about the same amount of code overall.
-
-    function map(arr, callback, scope) {
-        var r = []
-          , i = -1
-          , len = arr.length;
-        while ( i++ < len ) {
-            if (i in arr) {
-                r[i] = callback.call(scope, arr[i]);
-            }
-        }
-        return r;
-    }
-
-    // Adapted from the native forEach / Valentine (v.each) / Optimized for use here. Callbacks
-    // the form (index, value) as args. Scope (thisArg) not supported. Works on arrays/selectors.
-    // It's like [].forEach.call(arr, callback) but slightly faster and w/o support for the thisArg.
-    // jsperf.com/each-loops
-    // github.com/ded/valentine
-    // developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
-
-    // renamed to forEach locally to avoid confusion with $.each and also
-    // reversed callback args to be same as native forEach rather than $.each
-    // Since version 0.4.0, this gets exposed as Response.each()
-
-    function forEach(arr, callback) {
-        var i
-          , len = arr.length;
-        for (i = 0; i < len; i++) {
-            if (i in arr) {
-                callback(arr[i], i, arr);
-            }
-        }
-        return arr; // chainable
-    }
-
-    // revamped affix method reintroduced in version 0.4.0:
-    function affix(arr, prefix, suffix) {
-        // Return array that is a copy of arr with the prefix/suffix added to each value.
-        var r = []
-          , i = arr.length;
-        prefix = prefix || '';
-        suffix = suffix || '';
-        while ( i && i-- ) {
-            if (i in arr) {
-                r[i] = prefix + arr[i] + suffix;
-            }
-        }
-        return r;
-    }
-
-    /**
-     * Response.sift                 Filter out array values that don't pass a callback,
-     *                               or (if no callback provided) filter out falsey values.
-     *                               When the callback param is provided, this method is
-     *                               equivalent to jQuery.grep including the option to 
-     *                               invert the output. Performance @link jsperf.com/sift
-     *
-     * @since   0.4.0
-     *
-     * @param   array      arr
-     * @param   callback   callback   (optional)
-     * @param   boolean    invert     (optional)
-     *
-     * @return  array 
-     *
-     * @example Response.sift([5, 0, 'seven'], isFinite)    // [5, 0]
-     * @example Response.sift([5, 0, '', undefined, null])  // [5]
-     *
-     */
-
-    function sift(arr, callback, invert) {
-        var i = -1
-          , ret = []
-          , len = arr.length
-        ;
-        if (callback) {
-            invert = !!invert; // ensure boolean
-            while ( i++ < len ) {// Filter out values that don't pass callback:
-                if (invert === !callback(arr[i], i)) {
-                    ret.push(arr[i]);
-                }
-            }
-        }
-        else {
-            while ( i++ < len ) {// Filter out all falsey values:
-                if (arr[i]) {
-                    ret.push(arr[i]);
-                }
-            }
-        }
-        return ret;
-    }
 
     /**
      * Response.render                Converts stringified primitives back to JavaScript.
@@ -258,7 +350,7 @@
 
     function render(s) {
         var n; // < undefined
-        return (!s || typeof s !== 'string' ? s              // unchanged
+        return ( !s || typeof s != 'string' ? s              // unchanged
                         : 'true' === s      ? true           // convert "true" to true
                         : 'false' === s     ? false          // convert "false" to false
                         : 'undefined' === s ? n              // convert "undefined" to undefined
@@ -267,83 +359,16 @@
                         : s                                  // unchanged
         );
     }//render
-
-    /**
-     * Response.merge
-     * @since 0.3.0
-     * Generic method for merging objects and/or arrays.
-     * This is fast and simple method. For deep merges see jQuery.extend()
-     * Falsey values in adds do not overwrite values in base, unless
-     * the optional overwrite param is explicitly set to true.
-     * @param   object|array   base
-     * @param   object|array   adds
-     * @param   boolean        overwrite
-     */
-     
-    function merge(base, adds, overwrite) {
-        if (base && adds) {
-            var k
-              , len = adds.length
-              , has = 'hasOwnProperty'
-              , hasHas;
-
-            if ( !isFinite(len) || typeof adds === 'function' ) {// plain object or object func
-                hasHas = !!adds[has];
-                for (k in adds) {
-                    if ((!hasHas || adds[has](k)) && (overwrite || adds[k])) {
-                        base[k] = adds[k];
-                    }
-                }
-            }
-            else {// array or arr-like obj
-                for (k = 0; k < len; k++) {
-                    if (k in adds && (overwrite || adds[k])) {
-                        base[k] = adds[k];
-                    }
-                }
-            }
-        }
-        return base;
+    
+    // Isolate native element:
+    function getNative(e) {
+        // stackoverflow.com/questions/9119823/safest-way-to-detect-native-dom-element
+        // See @link jsperf.com/get-native
+        // If e is a native element then return it. If not check if index 0 exists and is
+        // a native elem. If so then return that. Otherwise return false.
+        return !e ? false : e.nodeType === 1 ? e : e[0] && e[0].nodeType === 1 ? e[0] : false;
     }
 
-    /**
-     * Response.route()                      Handler method for accepting args as arrays or singles, for 
-     *                                       callbacks 
-     * @since   0.3.0
-     *   
-     * @param   array|mixed     ukn          If ukn is an array then the callback gets called on each
-     *                                       array member. Otherwise the callback is called on ukn itself.
-     * @param   callback        fn           The function to call on ukn(s).
-     *
-     * @return  array|mixed
-     *
-     */     
-
-    function route(ukn, fn) {
-        // If ukn is an array or array-like then call the callback on each ukn. Otherwise call it on ukn:
-        return ukn && typeof ukn === 'object' && typeof ukn.length === 'number' ? forEach(ukn, fn) : fn(ukn);
-    }
-
-    // Handler for defining range comparison booleans:
-    function ranger(fn) {
-        // In previous versions we used inORout() for this but this
-        // is better because the resulting functions are faster
-        // because they don't require an extra function call.
-        return function(min, max) {
-            var curr = fn();
-            min = curr >= (min || 0); // Default to zero and repurpose as boolean.
-            return !max ? min : min && curr <= max;        
-        };
-    }
-
-    /** 
-     * Range comparison booleans
-     * @link responsejs.com/#booleans
-     */
-    band = ranger(viewportW);      // Response.band
-    wave = ranger(viewportH);      // Response.wave
-    device.band = ranger(deviceW); // Response.device.band
-    device.wave = ranger(deviceH); // Response.device.wave
 
     /**
      * .dataset()          Cross browser implementation of HTML5 dataset
@@ -369,7 +394,7 @@
     function datasetChainable(key, value) {
 
         var numOfArgs = arguments.length
-          , elem = getNative(this) // || doError('dataset @elem') let this fall thru naturally
+          , elem = getNative(this)
           , ret = {}
           , renderData = false
           , n;
@@ -427,7 +452,7 @@
         }
             
         // adapted from Bonzo @link github.com/ded/bonzo/blob/master/bonzo.js
-        forEach(elem.attributes, function(a) {
+        each(elem.attributes, function(a) {
             if (a && (n = String(a.name).match(regexDataPrefix))) {
                 ret[camelize(n[1])] = a.value;
             }
@@ -452,7 +477,7 @@
 
         /* if ( 'string' === typeof keys ) {
             var $elems = selectOnce(this);
-            forEach(ssvToArr(keys), function(key) {
+            each(ssvToArr(keys), function(key) {
                 if (key) {
                     $elems.removeAttr(datatize(key)); 
                 }
@@ -463,7 +488,7 @@
         if (this && typeof keys === 'string') {
             keys = ssvToArr(keys);
             route(this, function(el) {
-                forEach(keys, function(key) {
+                each(keys, function(key) {
                     if (key) {
                         el.removeAttribute(datatize(key));
                     }
@@ -506,6 +531,35 @@
 
     function deletes(elem, keys) {
         return deletesChainable.call(elem, keys);
+    }
+    
+    function selectify(keys) {
+        // Convert an array of data keys into a selector string
+        // Converts ["a","b","c"] into "[data-a],[data-b],[data-c]"
+        // Double-slash escapes periods so that attrs like data-density-1.5 will work
+        // @link api.jquery.com/category/selectors/
+        // @link github.com/jquery/sizzle/issues/76
+        var k, r = [], i = 0, l = keys.length;
+        while ( i < l ) {
+            if ( k = keys[i++] ) {
+                r.push('[' + datatize(k.replace(regexTrimPunc, '').replace('.', '\\.')) + ']');
+            }
+        }
+        return r.join();
+    }
+
+
+    /**
+     * Response.target()           Get the corresponding data attributes for an array of data keys.
+     * @since    0.1.9
+     * @param    array     keys    is the array of data keys whose attributes you want to select.
+     * @return   object            jQuery selector
+     * @example  Response.target(['a', 'b', 'c'])  //  $('[data-a],[data-b],[data-c]')
+     * @example  Response.target('a b c'])         //  $('[data-a],[data-b],[data-c]')
+     */
+    
+    function target(keys) {
+        return $(selectify(ssvToArr(keys)));    
     }
 
     // Cross-browser versions of window.scrollX and window.scrollY
@@ -554,7 +608,7 @@
         // The native object is read-only so we 
         // have use a copy in order to modify it.
         var r = el.getBoundingClientRect ? el.getBoundingClientRect() : {};
-        verge = 'number' === typeof verge ? verge : 0;
+        verge = typeof verge == 'number' ? verge || 0 : 0;
         return {
             top: (r.top || 0) - verge
           , left: (r.left || 0) - verge
@@ -587,50 +641,6 @@
         return !!r && r.bottom >= 0 && r.top <= viewportH() && r.right >= 0 && r.left <= viewportW();
     }
     
-    /**
-     * Response.dpr(decimal)         Tests if a minimum device pixel ratio is active. 
-     *                               Or (version added in 0.3.0) returns the device-pixel-ratio
-     *
-     *
-     * @param    number    decimal   is the integer or float to test.
-     *
-     * @return   boolean|number
-     * @example  Response.dpr();     // get the device-pixel-ratio (or 0 if undetectable)
-     * @example  Response.dpr(1.5);  // true when device-pixel-ratio is 1.5+
-     * @example  Response.dpr(2);    // true when device-pixel-ratio is 2+
-     * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
-     *
-     */
-
-    function dpr(decimal) {
-
-        var dPR = win.devicePixelRatio;
-
-        if ( !arguments.length ) {//Return exact value or kinda iterate for approx:
-            return dPR || (dpr(2) ? 2 : dpr(1.5) ? 1.5 : dpr(1) ? 1 : 0);
-        }
-
-        if ( !isFinite(decimal) ) {// Shh. Actually allows numeric strings too. ;)
-            return false;
-        }
-
-        // Use window.devicePixelRatio if supported - supported by Webkit 
-        // (Safari/Chrome/Android) and Presto 2.8+ (Opera) browsers.         
-
-        if ( dPR ) {
-            return dPR >= decimal; 
-        }
-
-        // Fallback to .matchMedia/.msMatchMedia. Supported by Gecko (FF6+) and more:
-        // @link developer.mozilla.org/en/DOM/window.matchMedia
-        // -webkit-min- and -o-min- omitted (Webkit/Opera supported above)
-        // The generic min-device-pixel-ratio is expected to be added to the W3 spec.
-        // Return false if neither method is available.
-
-        decimal = 'only all and (min--moz-device-pixel-ratio:' + decimal + ')';
-        return !media ? false : media(decimal).matches || media(decimal.replace('-moz-', '')).matches;
-
-    }//dpr
              
     function detectMode(elem) {
 
@@ -674,74 +684,27 @@
      * elem's orig (no-js) state. This gives us the ability to return the elem to its orig state.
      * The data it stores is either the src attr or the innerHTML based on result of detectMode().
      *
-     * @param          $elems     is the jQuery selector.
-     * @param  string  key        is the key to use to store the orig value w/ @link api.jquery.com/data/
-     * @param  string  overwrite  (optional, @since 0.3.0) gives the option for overwriting the key if it 
-     *                            already exists. Does not overwrite by default. To overwrite, set to true.
+     * @param  {Object}  $elems  DOM element | jQuery object | nodeList | array of elements
+     * @param  {string}  key     is the key to use to store the orig value w/ @link api.jquery.com/data/
+     * @param  {string=} source  (@since 0.6.2) an optional attribute name to read data from
      *
      */
 
-    function store($elems, key, overwrite) {
+    function store($elems, key, source) {
     
-        ($elems && key) || doError('store');
-            
-        var el, i = $elems.length;
-        overwrite = !!overwrite;
-            
-        // Could use: 
-            //forEach($elems, function(el) {
-            //    if ( overwrite || !dataset(el, key) ) {
-            //        dataset(el, key, (0 < detectMode(el) ? el.getAttribute('src') : $(el).html()||'' ));
-            //    }
-            //});
-        // but instead opted for a manual loop here for slightly faster performance,
-        // b/c this happens early (before any swaps) so should be really fast:
+        var valToStore;
+        if ( !$elems || null == key) { doError('store'); }
+        source = typeof source == 'string' && source;
 
-        if ( i ) {
-            while ( i-- ) {
-                if (i in $elems) {
-                    el = $elems[i]; // Use local so that array lookup is only done once.
-                    if (overwrite || !dataset(el, key)) {
-                        // Check mode and store appropriate value. If detectMode(el) is 
-                        // positive then we know getAttribute will return a string:
-                        dataset(el, key, (0 < detectMode(el) ? el.getAttribute('src') : $(el).html()||'' ));
-                    }
-                }
-            }
-        }
-        
+        route($elems, function (el) {
+            if ( source ) { valToStore = el.getAttribute(source); }
+            else if ( 0 < detectMode(el) ) { valToStore = el.getAttribute('src'); }
+            else { valToStore = el.innerHTML; }
+            null == valToStore ? deletes(el, key) : dataset(el, key, valToStore); 
+        });
+
         return Response;
     }//store
-        
-    function selectify(keys) {
-        // Convert an array of data keys into a selector string
-        // Converts ["a","b","c"] into "[data-a],[data-b],[data-c]"
-        // Double-slash escapes periods so that attrs like data-density-1.5 will work
-        // @link api.jquery.com/category/selectors/
-        // @link github.com/jquery/sizzle/issues/76
-        var r = []
-          , i = keys.length;
-        while ( i && i-- ) {
-            if (keys[i]) {
-                // r[i] = '[' + datatize(keys[i].replace(regexTrimPunc, '').replace(regexSelectorOps, '\\\\$1')) + ']';
-                r[i] = '[' + datatize(keys[i].replace(regexTrimPunc, '').replace('.', '\\.')) + ']';
-            }
-        }
-        return r.join();
-    }
-
-    /**
-     * Response.target()           Get the corresponding data attributes for an array of data keys.
-     * @since    0.1.9
-     * @param    array     keys    is the array of data keys whose attributes you want to select.
-     * @return   object            jQuery selector
-     * @example  Response.target(['a', 'b', 'c'])  //  $('[data-a],[data-b],[data-c]')
-     * @example  Response.target('a b c'])         //  $('[data-a],[data-b],[data-c]')
-     */
-    
-    function target(keys) {
-        return $(selectify(ssvToArr(keys)));    
-    }
 
     /**
      * Response.access()               Access data-* values for element from an array of data-* keys. 
@@ -758,33 +721,35 @@
 
     function access(elem, keys) {
         // elem becomes thisArg for datasetChainable:
-        return elem && keys && keys.length ? map(ssvToArr(keys), datasetChainable, elem) : [];
+        var ret = [];
+        elem && keys && each(ssvToArr(keys), function (k, i) {
+            ret.push(dataset(elem, k));
+        }, elem);
+        return ret;
     }
-    
+
     /**
      * Response.addTest
      *
      */
       
     function addTest(prop, fn) {
-        if (typeof prop === 'string' && typeof fn === 'function') {
+        if (typeof prop == 'string' && typeof fn == 'function') {
             propTests[prop] = fn;
             isCustom[prop] = 1;
         }
         return Response;
     }
         
-        /*
-         * Elemset                      Prototype object for element sets used in Response.create
-         *                              Each element in the set inherits this as well, so some of the 
-         *                              methods apply to the set, while others apply to single elements.
-         */
-
+    /*
+     * Elemset   Prototype object for element sets used in Response.create
+     *           Each element in the set inherits this as well, so some of the 
+     *           methods apply to the set, while others apply to single elements.
+     */
     Elemset = (function() {
     
         var crossover = event.crossover
           //, update = event.update
-          , memoizeCache = []
           , min = Math.min;
 
         // Techically data attributes names can contain uppercase in HTML, but, The DOM lowercases 
@@ -796,33 +761,32 @@
             
         function sanitize (key) {
             // Allow lowercase alphanumerics, dashes, underscores, and periods:
-            return typeof key === 'string' ? key.toLowerCase().replace(regexFunkyPunc, '') : '';
+            return typeof key == 'string' ? key.toLowerCase().replace(regexFunkyPunc, '') : '';
         }
 
         return {
-            e: 0                      // object    the native element
-          , $e: 0                     // object    jQuery/Zepto element
+            $e: 0                     // object    jQuery object
           , mode: 0                   // integer   defined per element
-          , breakpoints: 0            // array     validated @ configure()
-          , prefix: 0                 // string    validated @ configure()
+          , breakpoints: null         // array     validated @ configure()
+          , prefix: null              // string    validated @ configure()
           , prop: 'width'             // string    validated @ configure()
           , keys: []                  // array     defined @ configure()
-          , dynamic: 0                // boolean   defined @ configure()
+          , dynamic: null             // boolean   defined @ configure()
           , custom: 0                 // boolean   see addTest()
           , values: []                // array     available values
           , fn: 0                     // callback  the test fn, defined @ configure()
           , verge: null               // integer   defaults to Math.min(screenMax, 500)
           , newValue: 0
           , currValue: 1
-          , aka: 0
-          , lazy: 0
+          , aka: null
+          , lazy: null
           , i: 0                      // integer   the index of the current highest active breakpoint min
-          , selector: 0
-    
+          , uid: null
+          
           , valid8: function() {
               
                 var arr, prop, isNumeric, defaultBreakpoints;
-                   
+
                 if (isArray(arr = this.breakpoints)) {// Custom Breakpoints:
                     // Filter out non numerics and sort lowest to highest:
                     arr = (isNumeric = arr.length === sift(arr, isFinite).length) 
@@ -854,20 +818,15 @@
                 this.breakpoints = isNumeric ? sift(arr, function(n) { return n <= screenMax; }) : arr;
             }
               
-          , reset: function() {// Reset memoize cache -and- fire crossover events:
+          , reset: function() {// Reset / fire crossover events:
           
-                  var subjects = this.breakpoints
+                var subjects = this.breakpoints
                   , i = subjects.length
                   , tempIndex = 0;
-          
-                  // Reset memoize cache. It's safe to set index zero to true b/c all the the test
-                memoizeCache = [true]; // methods (see propTests) return true for zero. E.g. b/c band(0) === true // always
                 
                 // This is similar to the decideValue loop
                 while( !tempIndex && i-- ) {
-                    if ( this.memoize(subjects[i]) ) {
-                        tempIndex = i;
-                    }
+                    this.fn(subjects[i]) && (tempIndex = i);
                 }
 
                 // Fire the crossover event if crossover has occured:
@@ -880,72 +839,61 @@
                 return this;           // chainable
             }
 
-          , memoize: function(breakpoint) {
-                // Prevents repeating tests:
-                var bool = memoizeCache[breakpoint];
-                if ( bool !== !!bool ) {// If bool is not boolean:
-                    memoizeCache[breakpoint] = bool = !!this.fn(breakpoint);
-                }
-                return bool;
-            }
-
           , configure: function(options) {
                 var i 
                   , prefix
-                  , context = this
                   , aliases
                   , aliasKeys
                   , combinedKeys
                 ;
 
-                merge(context, options, true); // Merge properties from options object into this object.
+                merge(this, options); // Merge properties from options object into this object.
+                
+                this.uid = suid++;
 
-                context.verge = isFinite(context.verge) ? context.verge : min(screenMax, 500);
+                this.verge = isFinite(this.verge) ? this.verge : min(screenMax, 500);
                     
-                context.fn = propTests[context.prop] || doError('create @fn');
+                this.fn = propTests[this.prop] || doError('create @fn');
 
                 // If we get to here then we know the prop is one one our supported props:
                 // 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
                 // device- props => NOT dynamic
                     
-                if (context.dynamic === 0) {
-                    context.dynamic = !!('device' !== context.prop.substring(0, 6));
+                if (typeof this.dynamic != 'boolean') {
+                    this.dynamic = !!('device' !== this.prop.substring(0, 6));
                 }
                 
-                context.custom = isCustom[context.prop];
+                this.custom = isCustom[this.prop];
 
-                prefix = context.prefix ? sift(map(ssvToArr(context.prefix), sanitize)) : ['min-' + context.prop + '-'];
+                prefix = this.prefix ? sift(map(ssvToArr(this.prefix), sanitize)) : ['min-' + this.prop + '-'];
                 aliases = 1 < prefix.length ? prefix.slice(1) : 0;
-                context.prefix = prefix[0];
+                this.prefix = prefix[0];
 
                 // Sort and validate custom breakpoints if supplied. Otherwise grab the defaults.
                 // Must be done before Elemset keys are created so that the keys match:
-                context.valid8();
+                this.valid8();
 
                 // Use the breakpoints array to create array of data keys:
-                context.keys = affix(context.breakpoints, context.prefix);
-                context.aka = false; // Reset to false just in case a value was merged in.
+                this.keys = affix(this.breakpoints, this.prefix);
+                this.aka = null; // Reset to just in case a value was merged in.
 
-                if (aliases) {// There may be one of more aliases:
+                if ( aliases ) {// There may be one of more aliases:
                     aliasKeys = [];
                     i = aliases.length;
-                    while ( i-- ) {
-                        aliasKeys.push(affix(context.breakpoints, aliases[i]));
-                    }
-                    context.aka = aliasKeys; // context.aka is an array of arrays (one for each alias)
+                    while ( i-- ) { aliasKeys.push(affix(this.breakpoints, aliases[i])); }
+                    this.aka = aliasKeys; // this.aka is an array of arrays (one for each alias)
                 }
                     
                 // If there are aliases, flatten them into one array with this.keys before creating 
                 // the selector string. Also push the combinedKeys array onto the sets object.
-                sets[context.prop] = combinedKeys = [].concat.apply(context.keys, context.aka||[]);
+                sets[this.uid] = combinedKeys = this.aka ? concat.apply(this.keys, this.aka) : this.keys;
                 sets.all = sets.all.concat(combinedKeys);
-                context.selector = selectify(combinedKeys);
                 
-                return context; // chainable
+                return this; // chainable
             }
 
           , target: function() {// Stuff that can't happen until the DOM is ready:
-                this.$e = $(this.selector);      // Cache jQuery object for the set.
+                this.$e = $(selectify(sets[this.uid])); // Cache jQuery object for the set.
                 store(this.$e, initContentKey);  // Store original (no-js) value to data key.
                 this.keys.push(initContentKey);  // Add key onto end of keys array. (# keys now equals # breakpoints + 1)
                 return this; // chainable
@@ -962,13 +910,10 @@
                 var val = null
                   , subjects = this.breakpoints
                   , sL = subjects.length
-                  , i = sL
-                ;
-                // similar to lastIndexOf:
+                  , i = sL;
+
                 while( val == null && i-- ) {
-                    if ( this.memoize(subjects[i]) ) {
-                        val = this.values[i];
-                    }
+                    this.fn(subjects[i]) && (val = this.values[i]);
                 }
                 this.newValue = typeof val === 'string' ? val : this.values[sL];
                 return this; // chainable
@@ -976,9 +921,8 @@
 
           , prepareData: function(elem) {
              
-                this.e = elem;                      // native element
-                this.$e = $(elem);                   // jQuery selector
-                this.mode = detectMode(this.e);     // Detect the mode of the element.
+                this.$e = $(elem);                // jQuery selector
+                this.mode = detectMode(elem);     // Detect the mode of the element.
                 this.values = access(this.$e, this.keys); // Access Response data- values for the element.
                     
                 if (this.aka) {
@@ -1001,7 +945,18 @@
                 // to single elements. Only update the DOM when the new value is different than the current value.
                 if (this.currValue === this.newValue) { return this; }
                 this.currValue = this.newValue;
-                0 < this.mode ? this.e.setAttribute('src', this.newValue) : this.$e.html(this.newValue);
+                if ( 0 < this.mode ) { 
+                    this.$e[0].setAttribute('src', this.newValue); 
+                } else if ( null == this.newValue ) { 
+                    this.$e.empty && this.$e.empty(); 
+                } else {
+                    if (this.$e.html) {
+                        this.$e.html(this.newValue); 
+                    } else {
+                        this.$e.empty && this.$e.empty();
+                        this.$e[0].innerHTML = this.newValue;
+                    }
+                }
                 // this.$e.trigger(update); // may add this event in future
                 return this;
             }
@@ -1013,8 +968,8 @@
     // The props with dashes in them are added via array notation below.
     // Props marked as dynamic change when the viewport is resized:
     
-    propTests.width = band;   // dynamic
-    propTests.height = wave;  // dynamic
+    propTests['width'] = band;   // dynamic
+    propTests['height'] = wave;  // dynamic
     propTests['device-width'] = device.band;
     propTests['device-height'] = device.wave;
     propTests['device-pixel-ratio'] = dpr;
@@ -1023,26 +978,31 @@
      * Response.resize
      *
      */
-     
+    
     function resize(fn) {
         $win.on('resize', fn);
         return Response; // chainable
     }
-    
+
     /**
      * Response.crossover
      *
      */
     
-    function crossover(fn, prop) {
-        var eventCrossover = event.crossover
-          , eventToFire = prop ? prop + eventCrossover : eventCrossover;
+    function crossover(prop, fn) {
+        var temp, eventToFire, eventCrossover = event.crossover;
+        if (typeof prop == 'function') {// support args in reverse
+            temp = fn;
+            fn = prop;
+            prop = temp;
+        }
+        eventToFire = prop ? '' + prop + eventCrossover : eventCrossover;
         $win.on(eventToFire, fn);
         return Response; // chainable
     }
 
     /**
-     * Response.action           A hook for calling functions on both the ready and resize events.
+     * Response.action        A facade for calling functions on both the ready and resize events.
      *
      * @link     http://responsejs.com/#action
      * @since    0.1.3
@@ -1078,7 +1038,7 @@
 
         route(args, function (options) {
 
-            options === Object(options) || doError('create @args');
+            typeof options == 'object' || doError('create @args');
 
             var elemset = objectCreate(Elemset).configure(options)
               , lowestNonZeroBP
@@ -1101,7 +1061,7 @@
                 // Target elements containing this set's Response data attributes and chain into the 
                 // loop that occurs on ready. The selector is cached to elemset.$e for later use.
 
-                forEach(elemset.target().$e, function(el, i) {
+                each(elemset.target().$e, function(el, i) {
                     elemset[i] = objectCreate(elemset).prepareData(el);// Inherit from elemset
                     if (!lazy || inViewport(elemset[i].$e, verge)) {
                         // If not lazy update all the elems in the set. If
@@ -1112,7 +1072,7 @@
 
                 function resizeHandler() {   // Only runs for dynamic props.
                     elemset.reset();
-                    forEach(elemset.$e, function(el, i) {// Reset memoize cache and then loop thru the set.
+                    each(elemset.$e, function(el, i) {// Reset and then loop thru the set.
                         elemset[i].decideValue().updateDOM(); // Grab elem object from cache and update all.
                     }).trigger(allLoaded);
                 }
@@ -1134,7 +1094,7 @@
                 if ( !lazy ) { return; }
 
                 function scrollHandler() {
-                    forEach(elemset.$e, function(el, i) {
+                    each(elemset.$e, function(el, i) {
                         if (inViewport(elemset[i].$e, verge)) {
                             elemset[i].updateDOM();
                         }
@@ -1152,54 +1112,61 @@
     }//create
     
     function noConflict(callback) {
-        root[name] = old;
-        typeof callback === 'function' && callback.call(root, Response);
+        if ( root[name] === Response ) { root[name] = old; }
+        if (typeof callback == 'function') { callback.call(root, Response); }
         return Response;
     }
 
     // Handler for adding inx/inY/inViewport to $.fn (or another prototype).
     function exposeAreaFilters(engine, proto, force) {
-        forEach(['inX', 'inY', 'inViewport'], function(methodName) {
+        each(['inX', 'inY', 'inViewport'], function(methodName) {
             (force || !proto[methodName]) && (proto[methodName] = function(verge, invert) {
                 return engine(sift(this, function(el) {
-                    return el && !invert === Response[methodName](el, verge); 
+                    return !!el && !invert === Response[methodName](el, verge); 
                 }));
             });
         });
     }
-    
+
     /**
-     * Response.chain >>>> bridge
-     * @since 0.3.0
-     * Expose chainable methods to jQuery.
+     * Response.bridge >>>> bridge
+     * Bridges applicable methods into the specified host (e.g. jQuery).
      */
 
     function bridge(host, force) {
-        if ((typeof host === 'function' && host.fn) || (!arguments.length && (host = $))) {
+
+        if (typeof host == 'function' && host.fn) {
 
             // Expose .dataset() and .deletes() to jQuery:
-            if (force || !host.fn.dataset) { host.fn.dataset = datasetChainable; }
-            if (force || !host.fn.deletes) { host.fn.deletes = deletesChainable; }
+            if (force || void 0 === host.fn.dataset) { host.fn.dataset = datasetChainable; }
+            if (force || void 0 === host.fn.deletes) { host.fn.deletes = deletesChainable; }
             
             // Expose .inX() .inY() .inViewport()
             exposeAreaFilters(host, host.fn, force);
 
         }
+        
         return Response; // chainable
     }
-
+    
+    /**
+     * Response.chain
+     * @since 0.3.0
+     * @depreciated  ( Use Response.bridge instead. ) 
+     */
+    function chain (host, force) {
+        host = arguments.length ? host : $;
+        return bridge(host, force);
+    }
+    
     Response = { // Expose these as props/methods on Response:
-        deviceMin: function() { 
-            return screenMin; 
-        }
-      , deviceMax: function() {
-            return screenMax; 
-        }
-      , sets: function(prop) {
-            return $(selectify(sets[prop] || sets.all));
-        }
+        deviceMin: function() { return screenMin; }
+      , deviceMax: function() { return screenMax; }
+      //, sets: function(prop) {// must be uid
+      //    return $(selectify(sets[prop] || sets.all));
+      //}
       , noConflict: noConflict
-      , chain: bridge
+      , chain: chain
       , bridge: bridge
       , create: create
       , addTest: addTest
@@ -1231,7 +1198,7 @@
       , wave: wave
       , band: band
       , map: map
-      , each: forEach
+      , each: each
       , inViewport: inViewport
       , dataset: dataset
       , viewportH: viewportH
@@ -1241,20 +1208,18 @@
     /**
      * Initialize
      */
-
-    ready(function(customData) {
-        customData = dataset(doc.body, 'responsejs'); // Read data-responsejs attr.            
+    ready(function() {
+        var nativeJSONParse, customData = dataset(doc.body, 'responsejs');
         if ( customData ) {
-            var supportsNativeJSON = win.JSON && JSON.parse;
-            customData = supportsNativeJSON ? JSON.parse(customData) : $.parseJSON ? $.parseJSON(customData) : {};
-            if ( customData.create ) {
-                create(customData.create); 
-            }
+            nativeJSONParse = !!win.JSON && JSON.parse;
+            if ( nativeJSONParse ) { customData = nativeJSONParse(customData); }
+            else if ( $.parseJSON ) { customData = $.parseJSON(customData); }
+            if ( customData && customData.create ) { create(customData.create); }
         }
         // Remove .no-responsejs class from html tag (if it's there) and add .responsejs
         docElem.className = docElem.className.replace(/(^|\s)(no-)?responsejs(\s|$)/, '$1$3') + ' responsejs ';
     });
 
-    return bridge($);  // Bam!
+    return Response;  // Bam!
 
 })); // closure

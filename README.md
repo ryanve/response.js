@@ -142,7 +142,7 @@ Response.camelize(str) // convert 'pulp-fiction' or 'data-pulp-fiction' to pulpF
 Response.datatize(str) // convert 'pulpFiction' to 'data-pulp-fiction'
 Response.target(keys)  // convert keys like "a b c" or ["a","b","c"] to $("[data-a],[data-b],[data-c]")
 Response.access(keys)  // access an array of dataset values that correspond to an array of dataset keys
-Response.store($elems, key [, overwrite]) // store init content of each elem to data key (see source)
+Response.store($elems, key [, attrToReadFrom]) // store init content of each elem to data key
 ```
 
 ### Filters
@@ -183,14 +183,14 @@ Response.crossover(function() {
 ```javascript
 
 Response.affix(arr, prefix, suffix) // create copy of arr w prefix and/or suffix added to each value
-Response.each(arr, callback) // iterator arrays/array-like objs (~like Array.prototype.forEach)
-Response.map(arr, callback, thisArg) // iterator for arrays/array-like objs (like Array.prototype.map)
+Response.each(arr, callback [, thisArg]) // arrays/arr-like objs (this defaults to curr item @since 0.7.0)
+Response.map(arr, callback [, thisArg]) // works like [].map
 Response.merge(base, adds) // merge adds into base (either can be array or object)
-Response.object(prototype) // uses native Object.create (with polyfill support for first arg)
-Response.route(ukn) // handler for accepting args as singles or arrays   
+Response.object(parent) // uses native Object.create (w/ polyfill support for 1st arg)
+Response.route(item, fn, [, thisArg]) // handler for accepting args as singles or collections
 Response.sift(arr)  // create a copy of arr with falsey values removed
-Response.sift(arr, callback) // cross-browser equivalent to arr.filter(callback)
-Response.sift(arr, callback, invert) // equivalent to jQuery.grep
+Response.sift(arr, callback [, thisArg]) // similar to [].filter
+Response.sift(arr, callback [, invert]) //  to invert, set invert to `true`
 ```
 
 ### Extending
@@ -214,7 +214,7 @@ Response.addTest('viewport-area', function(min) {
 ### Integration
 
 ```javascript
-Response.bridge($) // Integrate chainable versions of inX/inY/inViewport/dataset/deletes methods to $.fn
+Response.bridge($) // Integrate chainable inX/inY/inViewport/dataset/deletes methods into $.fn
 ```
 
 ```js

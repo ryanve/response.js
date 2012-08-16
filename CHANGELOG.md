@@ -1,5 +1,15 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
+## 0.7.0
+- `Response.store` now has capability so [store from any attribute](http://www.youtube.com/watch?v=-VBoTq4sTWk).
+- `Response.merge` brings in all values except `undefined`.
+- `Response.dpr()` nows ensures `boolean|number` return.
+- Added thisArg functionality to `Response.each` / `Response.route` / `Response.sift`
+- Added typestring functionality to `Response.sift` (e.g. `Response.sift(arr, "string")` filters for `typeof` string only)
+- `Response.map` now delegates to native `[].map` when available and emulates it otherwise.
+- Removed excess element references in breakpoint set objects.
+- Removed uneeded memoization in breakpoint sets.
+
 ## [0.6.1](https://github.com/ryanve/response.js/commit/c4ce4b5f6b412a71ff6c66cb49ec943506f9b893) (2012-07-19)
 - Allow for empty breakpoints like `data-r961=""` to work as expected. ([See #12](https://github.com/ryanve/response.js/issues/12))
 
