@@ -1,6 +1,7 @@
 # CHANGELOG | [current](https://github.com/ryanve/response.js/blob/master/response.js) 
 
-## 0.7.0
+## [0.7.0](https://github.com/ryanve/response.js/commit/ec0ac38574a73ca325296168d785a695e7eda9e5)
+- Added [elo](http://github.com/ryanve/elo) as a compatible framework. 
 - `Response.store` now has capability so [store from any attribute](http://www.youtube.com/watch?v=-VBoTq4sTWk).
 - `Response.merge` brings in all values except `undefined`.
 - `Response.dpr()` nows ensures `boolean|number` return.
