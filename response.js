@@ -3,22 +3,28 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.7.0
+ * @version   0.7.1
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- elo (github.com/ryanve/elo)
  *            -or- zepto 0.8+ (zeptojs.com)
  */
+ 
+/*jslint browser: true, devel: true, node: true, passfail: false, bitwise: true
+, continue: true, debug: true, eqeq: true, es5: true, forin: true, newcap: true
+, nomen: true, plusplus: true, regexp: true, undef: true, sloppy: true, stupid: true
+, sub: true, white: true, indent: 4, maxerr: 180 */
 
-(function ( factory ) {
-    // This is the place to add AMD or node logic.
-    // github.com/ryanve/response.js/pull/9
-    // @example `define(['jquery'], factory)`
-    // Otherwise we expose to the root:
-    this['Response'] = factory();
-}(function ($) {
+(function ( root, name, factory ) {
 
-    $ = $ || this.jQuery || this.Zepto || this.ender || this.elo;
+    var dep = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
+    if (typeof module != 'undefined' && module['exports']) { module['exports'] = factory(dep); } // node
+    else { root[name] = factory(dep); } // browser
+
+    // see @link github.com/ryanve/response.js/pull/9
+    // AMD @example `define(['jquery'], factory)`
+    
+}(this, 'Response', function ($) {
 
     if ( typeof $ != 'function' ) {// Exit gracefully if dependency is missing:
         throw 'Response unable to run due to missing dep.';

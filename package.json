@@ -1,0 +1,13 @@
+{
+    "name": "response.js",
+    "description": "responsive design toolkit",
+    "version": "0.7.1",
+    "homepage": "http://responsejs.com",
+    "author": "Ryan Van Etten <@ryanve>",
+    "keywords": ["responsive", "jquery", "javascript", "js"],
+    "main": "./response.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ryanve/response.js.git"
+    }
+}
