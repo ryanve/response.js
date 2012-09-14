@@ -147,6 +147,8 @@ Response.store($elems, key [, attrToReadFrom]) // store init content of each ele
 
 ### Filters
 
+**@depreciated** - see [github.com/ryanve/verge/issues/1](https://github.com/ryanve/verge/issues/1)
+
 ```javascript
 
 // Filters - ( Disabled by default. Enable them by calling Response.bridge($) )
