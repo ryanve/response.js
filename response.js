@@ -3,13 +3,13 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.7.1
+ * @version   0.7.2
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- elo (github.com/ryanve/elo)
  *            -or- zepto 0.8+ (zeptojs.com)
  */
- 
+
 /*jslint browser: true, devel: true, node: true, passfail: false, bitwise: true
 , continue: true, debug: true, eqeq: true, es5: true, forin: true, newcap: true
 , nomen: true, plusplus: true, regexp: true, undef: true, sloppy: true, stupid: true
@@ -888,12 +888,10 @@
                     i = aliases.length;
                     while ( i-- ) { aliasKeys.push(affix(this.breakpoints, aliases[i])); }
                     this.aka = aliasKeys; // this.aka is an array of arrays (one for each alias)
+                    this.keys = concat.apply(this.keys, aliasKeys); // flatten aliases into this.keys
                 }
-                    
-                // If there are aliases, flatten them into one array with this.keys before creating 
-                // the selector string. Also push the combinedKeys array onto the sets object.
-                sets[this.uid] = combinedKeys = this.aka ? concat.apply(this.keys, this.aka) : this.keys;
-                sets.all = sets.all.concat(combinedKeys);
+
+                sets.all = sets.all.concat(sets[this.uid] = this.keys); // combined keys ===> sets.all
                 
                 return this; // chainable
             }
