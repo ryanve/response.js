@@ -847,7 +847,7 @@
                 // Sort and validate (#valid8) custom breakpoints if supplied.
                 // Must be done before keys are created so that the keys match:
                 
-                if (arr && typeof arr == 'object') {// custom breakpoints
+                if ( isArray(arr) ) {// custom breakpoints
                             
                     each(arr, function (v) {
                         if ( !v && v !== 0 ) { throw 'invalid breakpoint'; } // null|undefined|''|NaN
