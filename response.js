@@ -3,13 +3,13 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.7.2
+ * @version   0.7.3
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- elo (github.com/ryanve/elo)
  *            -or- zepto 0.8+ (zeptojs.com)
  */
-
+    
 /*jslint browser: true, devel: true, node: true, passfail: false, bitwise: true
 , continue: true, debug: true, eqeq: true, es5: true, forin: true, newcap: true
 , nomen: true, plusplus: true, regexp: true, undef: true, sloppy: true, stupid: true
@@ -55,6 +55,12 @@
             var i, l = ob.length, ret = [];
             for (i = 0; i < l; i++) { i in ob && (ret[i] = fn.call(scope, ob[i], i, ob)); }
             return ret;
+        }
+
+      , defaultBreakpoints = {
+            width: [0, 320, 481, 641, 961, 1025, 1281]  // width  | device-width  (ideal for 960 grids)
+          , height: [0, 481]                            // height | device-height (maybe add 801 too)
+          , ratio: [1, 1.5, 2]                          // device-pixel-ratio     (!omit trailing zeros!)
         }
 
         // these are defined later
@@ -788,43 +794,8 @@
           , lazy: null
           , i: 0                      // integer   the index of the current highest active breakpoint min
           , uid: null
-          
-          , valid8: function() {
               
-                var arr, prop, isNumeric, defaultBreakpoints;
-
-                if (isArray(arr = this.breakpoints)) {// Custom Breakpoints:
-                    // Filter out non numerics and sort lowest to highest:
-                    arr = (isNumeric = arr.length === sift(arr, isFinite).length) 
-                        ? arr.sort(function(a, b){ return (a - b); }) // sort lowest to highest
-                        : sift(arr, function(item){ return !!item || 0 === item; }); // remove null|undefined|''|NaN
-                    arr.length || doError('create @breakpoints');
-                }
-
-                else {// Default Breakpoints:
-                    
-                    // The defaults are presorted so we can skip the need to sort when using the defaults. Omit
-                    // trailing decimal zeros b/c for example if you put 1.0 as a devicePixelRatio breakpoint, 
-                    // then the target would be data-pre1 (NOT data-pre1.0) so drop the zeros.
-
-                    defaultBreakpoints = {
-                        width: [0, 320, 481, 641, 961, 1025, 1281]  // width  | device-width  (ideal for 960 grids)
-                      , height: [0, 481]                            // height | device-height (maybe add 801 too)
-                      , ratio: [1, 1.5, 2]                          // device-pixel-ratio     (!omit trailing zeros!)
-                    };
-                    
-                    // If no breakpoints are supplied, then get the default breakpoints for the specified prop.
-                    // Supported props: 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
-                    prop = this.prop;
-                    arr = defaultBreakpoints[prop] || defaultBreakpoints[prop.split('-').pop()] || doError('create @prop'); 
-                }
-
-                // Remove breakpoints that are above the device's max dimension,
-                // in order to reduce the number of iterations needed later.
-                this.breakpoints = isNumeric ? sift(arr, function(n) { return n <= screenMax; }) : arr;
-            }
-              
-          , reset: function() {// Reset / fire crossover events:
+          , reset: function () {// Reset / fire crossover events:
           
                 var subjects = this.breakpoints
                   , i = subjects.length
@@ -845,39 +816,64 @@
                 return this;           // chainable
             }
 
-          , configure: function(options) {
-                var i 
-                  , prefix
-                  , aliases
-                  , aliasKeys
-                  , combinedKeys
-                ;
-
-                merge(this, options); // Merge properties from options object into this object.
+          , configure: function (options) {
+          
+                merge(this, options);
+          
+                var i, prefix, aliases, aliasKeys, isNumeric = true, arr, prop = this.prop;
                 
                 this.uid = suid++;
 
                 this.verge = isFinite(this.verge) ? this.verge : min(screenMax, 500);
                     
-                this.fn = propTests[this.prop] || doError('create @fn');
+                this.fn = propTests[prop] || doError('create @fn');
 
                 // If we get to here then we know the prop is one one our supported props:
                 // 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
                 // device- props => NOT dynamic
                     
                 if (typeof this.dynamic != 'boolean') {
-                    this.dynamic = !!('device' !== this.prop.substring(0, 6));
+                    this.dynamic = !!('device' !== prop.substring(0, 6));
                 }
                 
-                this.custom = isCustom[this.prop];
+                this.custom = isCustom[prop];
 
-                prefix = this.prefix ? sift(map(ssvToArr(this.prefix), sanitize)) : ['min-' + this.prop + '-'];
+                prefix = this.prefix ? sift(map(ssvToArr(this.prefix), sanitize)) : ['min-' + prop + '-'];
                 aliases = 1 < prefix.length ? prefix.slice(1) : 0;
                 this.prefix = prefix[0];
+                
+                arr = this.breakpoints;
+                
+                // Sort and validate (#valid8) custom breakpoints if supplied.
+                // Must be done before keys are created so that the keys match:
+                
+                if (arr && typeof arr == 'object') {// custom breakpoints
+                            
+                    each(arr, function (v) {
+                        if ( !v && v !== 0 ) { throw 'invalid breakpoint'; } // null|undefined|''|NaN
+                        isNumeric = isNumeric && isFinite(v);
+                    });
 
-                // Sort and validate custom breakpoints if supplied. Otherwise grab the defaults.
-                // Must be done before Elemset keys are created so that the keys match:
-                this.valid8();
+                    arr = isNumeric ? arr.sort(function (a, b) {
+                        return (a - b); // sort lowest to highest
+                    }) : arr; 
+
+                    arr.length || doError('create @breakpoints');
+                    
+                } else {// default breakpoints:
+                    // The defaults are presorted so we can skip the need to sort when using the defaults. Omit
+                    // trailing decimal zeros b/c for example if you put 1.0 as a devicePixelRatio breakpoint, 
+                    // then the target would be data-pre1 (NOT data-pre1.0) so drop the zeros.
+                    // If no breakpoints are supplied, then get the default breakpoints for the specified prop.
+                    // Supported props: 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
+                    arr = defaultBreakpoints[prop] || defaultBreakpoints[prop.split('-').pop()] || doError('create @prop'); 
+                }
+
+                // Remove breakpoints that are above the device's max dimension,
+                // in order to reduce the number of iterations needed later.
+                this.breakpoints = isNumeric ? sift(arr, function(n) { 
+                    return n <= screenMax; 
+                }) : arr;
 
                 // Use the breakpoints array to create array of data keys:
                 this.keys = affix(this.breakpoints, this.prefix);

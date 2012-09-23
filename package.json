@@ -1,7 +1,7 @@
 {
     "name": "response.js",
     "description": "responsive design toolkit",
-    "version": "0.7.2",
+    "version": "0.7.3",
     "homepage": "http://responsejs.com",
     "author": "Ryan Van Etten <@ryanve>",
     "keywords": ["responsive", "jquery", "javascript", "js"],
