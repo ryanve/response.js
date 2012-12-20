@@ -2,7 +2,7 @@
 
 [Response JS](http://responsejs.com) is a [jQuery](http://jquery.com)/[Ender](http://ender.jit.su)/[Zepto](http://zeptojs.com) plugin that gives web designers tools for building performance-optimized, mobile-first responsive websites. It provides semantic ways to dynamically swap code blocks based on breakpoints and serve images (or other media) progressively via HTML5 data attributes (see Breakpoint Sets).
 
-CDN: [airve.github.com/js/response/response.min.js](http://airve.github.com/js/response/response.min.js)
+**[CDN](http://airve.github.com)**: [dev](http://airve.github.com/js/response/response.js) | [min](http://airve.github.com/js/response/response.min.js)
 
 ## API (v 0.7.0)
 
