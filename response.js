@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.7.4
+ * @version   0.7.5
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- elo (github.com/ryanve/elo)
@@ -88,13 +88,6 @@
       , regexCamels = /([a-z])([A-Z])/g
       , regexDashB4 = /-(.)/g
       , regexDataPrefix = /^data-(.+)$/
-
-        // Response.media (normalized matchMedia)
-        // @example Response.media("(orientation:landscape)").matches
-        // If both versions are undefined, .matches will equal undefined 
-        // Also see: band / wave / device.band / device.wave / dpr
-      , matchMedia = win.matchMedia || win.msMatchMedia
-      , media = matchMedia || function () { return {}; }
         
         // Local version of Object.create with polyfill that supports only the first arg.
         // It creates an empty object whose prototype is set to the specified proto param.
@@ -118,17 +111,36 @@
             //, update: namespaceIt('update')       // fires on each elem in a set each time that elem is updated
           , crossover: namespaceIt('crossover') // fires on window each time dynamic breakpoint bands is crossed
         }
+        
+        // Response.media (normalized matchMedia)
+        // @example Response.media("(orientation:landscape)").matches
+        // If both versions are undefined, .matches will equal undefined 
+        // Also see: band / wave / device.band / device.wave / dpr
+      , matchMedia = win.matchMedia || win.msMatchMedia
+      , media = matchMedia || function () { return {}; }
+    
+        // @link responsejs.com/labs/dimensions/#viewport    
+        // @link github.com/ryanve/response.js/issues/17
+    
+      , viewportW = (function (win, docElem, mM) {
+            var client = docElem['clientWidth']
+              , inner = win['innerWidth'];
+            return ( mM && client < inner && true === mM('(min-width:' + inner + 'px)')['matches']
+                ? function () { return win['innerWidth']; }
+                : function () { return docElem['clientWidth']; }
+            );
+        }(win, docElem, matchMedia))
+        
+      , viewportH = (function (win, docElem, mM) {
+            var client = docElem['clientHeight']
+              , inner = win['innerHeight'];
+            return ( mM && client < inner && true === mM('(min-height:' + inner + 'px)')['matches']
+                ? function () { return win['innerHeight']; }
+                : function () { return docElem['clientHeight']; }
+            );
+        }(win, docElem, matchMedia))
 
-    ;//var
-    
-    // responsejs.com/labs/dimensions/#viewport    
-    function viewportW() {
-        return docElem.clientWidth; 
-    }
-    
-    function viewportH() {
-        return docElem.clientHeight; 
-    }
+    ;
     
     function doError(msg) {
         // Error handling. (Throws exception.)
