@@ -15,11 +15,12 @@
 , nomen: true, plusplus: true, regexp: true, undef: true, sloppy: true, stupid: true
 , sub: true, white: true, indent: 4, maxerr: 180 */
 
-(function ( root, name, factory ) {
+(function ( root, name, factory ) {// github.com/umdjs/umd
 
     var dep = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
-    if (typeof module != 'undefined' && module['exports']) { module['exports'] = factory(dep); } // node
-    else { root[name] = factory(dep); } // browser
+    if ( typeof module != 'undefined' && module['exports'] ) {
+        module['exports'] = factory(dep); // common / ender 
+    } else { root[name] = factory(dep); } // browser
 
     // see @link github.com/ryanve/response.js/pull/9
     // AMD @example `define(['jquery'], factory)`
