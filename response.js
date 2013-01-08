@@ -3,17 +3,17 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.7.3
+ * @version   0.7.4
  * @requires  jQuery 1.7+
  *            -or- Jeesh (ender.no.de/#jeesh)
  *            -or- elo (github.com/ryanve/elo)
  *            -or- zepto 0.8+ (zeptojs.com)
  */
-    
-/*jslint browser: true, devel: true, node: true, passfail: false, bitwise: true
-, continue: true, debug: true, eqeq: true, es5: true, forin: true, newcap: true
-, nomen: true, plusplus: true, regexp: true, undef: true, sloppy: true, stupid: true
-, sub: true, white: true, indent: 4, maxerr: 180 */
+
+/*jslint browser: true, devel: true, node: true, passfail: false, bitwise: true, continue: true
+, debug: true, eqeq: true, es5: true, forin: true, newcap: true, nomen: true, plusplus: true
+, regexp: true, undef: true, sloppy: true, stupid: true, sub: true, vars: true, white: true
+, indent: 4, maxerr: 180 */
 
 (function ( root, name, factory ) {// github.com/umdjs/umd
 
@@ -27,8 +27,10 @@
     
 }(this, 'Response', function ($) {
 
-    if ( typeof $ != 'function' ) {// Exit gracefully if dependency is missing:
-        throw 'Response unable to run due to missing dep.';
+    if ( typeof $ != 'function' ) {
+        try {// Exit gracefully if dependency is missing:
+            console.log('Response was unable to run due to missing dependency.');
+        } catch (e) {}
     }
 
     // Combine local vars/funcs into one statement:    
