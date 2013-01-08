@@ -93,7 +93,8 @@
         // @example Response.media("(orientation:landscape)").matches
         // If both versions are undefined, .matches will equal undefined 
         // Also see: band / wave / device.band / device.wave / dpr
-      , media  = win.matchMedia || win.msMatchMedia || Object
+      , matchMedia = win.matchMedia || win.msMatchMedia
+      , media = matchMedia || function () { return {}; }
         
         // Local version of Object.create with polyfill that supports only the first arg.
         // It creates an empty object whose prototype is set to the specified proto param.
