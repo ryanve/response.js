@@ -5,8 +5,7 @@
  * @license   MIT
  * @version   0.7.5
  * @requires  jQuery 1.7+
- *            -or- Jeesh (ender.no.de/#jeesh)
- *            -or- elo (github.com/ryanve/elo)
+ *            -or- ender build jeesh (ender.jit.su)
  *            -or- zepto 0.8+ (zeptojs.com)
  */
 
