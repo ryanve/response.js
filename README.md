@@ -4,7 +4,7 @@
 
 **[CDN](http://airve.github.com)**: [dev](http://airve.github.com/js/response/response.js) | [min](http://airve.github.com/js/response/response.min.js)
 
-## API (v 0.7.0)
+## API - 0.7
 
 ### Breakpoint Sets
 
@@ -97,7 +97,7 @@ Response.media(mediaQuery).matches // uses window.matchMedia || window.msMatchMe
 
 ### HTML5 Dataset
 
-Response's dataset methods mimic the HTML5 dataset specification as closely as possible.
+Response's dataset methods mimic the HTML5 dataset specification as closely as possible. (Please see [#19](https://github.com/ryanve/response.js/issues/19) to let us know if you are using these methods. These methods are also available in [dope](https://github.com/ryanve/dope).)
 
 
 ```javascript
