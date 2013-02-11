@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.7.5
+ * @version   0.7.6
  * @requires  jQuery 1.7+
  *            -or- ender build jeesh (ender.jit.su)
  *            -or- zepto 0.8+ (zeptojs.com)
@@ -268,15 +268,20 @@
         return item; // chainable
     }
 
-    // Handler for defining range comparison booleans:
-    function ranger(fn) {
-        // In previous versions we used inORout() for this but this
-        // is better because the resulting functions are faster
-        // because they don't require an extra function call.
-        return function(min, max) {
-            var bool, curr = fn();
-            bool = curr >= (min || 0);
-            return !max ? bool : bool && curr <= max;        
+    /**
+     * ranger()                Make a range comparison tester.
+     * @param  {Function}  fn  gets a value to compare against
+     * @return {Function}
+     */        
+    function ranger (fn) {
+        /**
+         * @param {string|number}    min
+         * @param {(string|number)=} max
+         */
+        return function (min, max) {
+            var n = fn();
+            min = n >= (min || 0);
+            return max ? min && n <= max : min;        
         };
     }
 
