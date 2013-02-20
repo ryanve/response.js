@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.7.6
+ * @version   0.7.7
  * @requires  jQuery 1.7+
  *            -or- ender build jeesh (ender.jit.su)
  *            -or- zepto 0.8+ (zeptojs.com)
@@ -677,24 +677,16 @@
     function detectMode(elem) {
 
         // Detect whether elem should act in src or markup mode.
-        //
-        // @param   elem      is a native dom element
-        // @return  boolean   true (src mode) or false (markup mode) depending on whether there is a
-        //                     src attr *and* whether the spec allows it on the elem in question.
-        //
+        // @param   elem      is a DOM element
+        // @return  number
         // @link dev.w3.org/html5/spec-author-view/index.html#attributes-1
-        // @link stackoverflow.com/questions/8715689/check-if-element-legally-supports-the-src-attribute-or-innerhtml
-        //
-        // In jQuery you can also use $(elem).prop('tagName') to get the tagName. 
-        // This uses developer.mozilla.org/en/DOM/element.tagName
-        //
-        // In HTML5, element.tagName returns the tagName in uppercase.
-        // We force the case here to make it compatible with XHTML.
+        // @link stackoverflow.com/q/8715689/770127
+        // @link stackoverflow.com/a/4878963/770127
+        // Normalize to lowercase to ensure compatibility across HTML/XHTML/XML.
         // These are the elems that can use src attr per the W3 spec:
             
-        var srcElems = {img:1, input:1, source:3, embed:3, track:3, iframe:5, audio:5, video:5, script:5}
-          , modeID = srcElems[elem.tagName.toLowerCase()] || -1
-        ;
+        var srcElems = { img:1, input:1, source:3, embed:3, track:3, iframe:5, audio:5, video:5, script:5 }
+          , modeID = srcElems[ elem.nodeName.toLowerCase() ] || -1;
 
         // -5 => markup mode for video/audio/iframe w/o src attr.
         // -1 => markup mode for any elem not in the array above.
