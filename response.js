@@ -695,9 +695,9 @@
         //  5 => src mode    for audio/video/iframe/script *with* src attr.
         //  If we at some point we need to differentiate <track> we'll use 4, but for now
         //  it's grouped with the other non-image empty content elems that use src.
-        //  hasAttribute is not supported in IE7 so check typeof elem.getAttribute('src')
+        //  hasAttribute is not supported in IE7 so check elem.getAttribute('src')
 
-        return 4 > modeID ? modeID : typeof elem.getAttribute('src') === 'string' ? 5 : -5; // integer
+        return 4 > modeID ? modeID : null != elem.getAttribute('src') ? 5 : -5;
     }//detectMode
 
     /**
