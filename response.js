@@ -297,16 +297,11 @@
     /**
      * Response.dpr(decimal)         Tests if a minimum device pixel ratio is active. 
      *                               Or (version added in 0.3.0) returns the device-pixel-ratio
-     *
-     *
      * @param    number    decimal   is the integer or float to test.
-     *
      * @return   boolean|number
      * @example  Response.dpr();     // get the device-pixel-ratio (or 0 if undetectable)
      * @example  Response.dpr(1.5);  // true when device-pixel-ratio is 1.5+
      * @example  Response.dpr(2);    // true when device-pixel-ratio is 2+
-     * @example  Response.dpr(3/2);  // [!] FAIL (Gotta be a decimal or integer)
-     *
      */
     function dpr(decimal) {
 
