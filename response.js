@@ -45,11 +45,14 @@
       , ready = $.domReady || $
       , $win = $(win) // cache selector
       , screen = win.screen
-      , owns = {}.hasOwnProperty
-      , slice = [].slice
-      , concat = [].concat
-      , isArray = Array.isArray || function(ukn) { 
-            return ukn instanceof Array; // sufficient for our usage
+      , AP = Array.prototype
+      , OP = Object.prototype
+      , slice = AP.slice
+      , concat = AP.concat
+      , toString = OP.toString
+      , owns = OP.hasOwnProperty
+      , isArray = Array.isArray || function(item) {
+            return '[object Array]' === toString.call(item);
         }
 
       , defaultBreakpoints = {
