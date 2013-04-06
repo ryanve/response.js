@@ -3,7 +3,7 @@
  * @link      http://responsejs.com
  * @author    Ryan Van Etten (c) 2011-2012
  * @license   MIT
- * @version   0.7.7
+ * @version   0.7.8
  * @requires  jQuery 1.7+
  *            -or- ender build jeesh (ender.jit.su)
  *            -or- zepto 0.8+ (zeptojs.com)
@@ -26,7 +26,7 @@
     
 }(this, 'Response', function($) {
 
-    if ( typeof $ != 'function' ) {
+    if (typeof $ != 'function') {
         try {// Exit gracefully if dependency is missing:
             console.log('Response was unable to run due to missing dependency.');
         } catch (e) {}
@@ -48,19 +48,8 @@
       , owns = {}.hasOwnProperty
       , slice = [].slice
       , concat = [].concat
-      , nativeMap = [].map
       , isArray = Array.isArray || function(ukn) { 
-            return ukn instanceof Array; 
-        }
-
-      , map = nativeMap ? function(ob, fn, scope) {
-            return nativeMap.call(ob, fn, scope);
-        } : function(ob, fn, scope) {
-            var i, l = ob.length, ret = [];
-            for (i = 0; i < l; i++) { 
-                i in ob && (ret[i] = fn.call(scope, ob[i], i, ob)); 
-            }
-            return ret;
+            return ukn instanceof Array; // sufficient for our usage
         }
 
       , defaultBreakpoints = {
@@ -154,6 +143,14 @@
     
     function isNumber(item) {// inlined @minification
         return typeof item == 'number' && item === item; // second part stuffs NaN
+    }
+    
+    function map(ob, fn, scope) {
+        var i, l = ob.length, ret = [];
+        for (i = 0; i < l; i++) {
+            ret[i] = fn.call(scope, ob[i], i, ob);
+        }
+        return ret;
     }
 
     function ssvToArr(ukn) {
