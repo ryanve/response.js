@@ -186,7 +186,7 @@ Response.crossover(function() {
 
 Response.affix(arr, prefix, suffix) // create copy of arr w prefix and/or suffix added to each value
 Response.each(arr, callback [, thisArg]) // arrays/arr-like objs (this defaults to curr item @since 0.7.0)
-Response.map(arr, callback [, thisArg]) // works like [].map
+Response.map(arr, callback [, thisArg]) // similar to [].map
 Response.merge(base, adds) // merge adds into base (either can be array or object)
 Response.object(parent) // uses native Object.create (w/ polyfill support for 1st arg)
 Response.route(item, fn, [, thisArg]) // handler for accepting args as singles or collections
