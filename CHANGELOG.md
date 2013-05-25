@@ -15,14 +15,14 @@
 - Removed uneeded memoization in breakpoint sets.
 
 ## [0.6.1](../../tree/0.6.1) (2012-07-19)
-- Allow for empty breakpoints like `data-r961=""` to work as expected. ([See #12](https://github.com/ryanve/response.js/issues/12))
+- Allow for empty breakpoints like `data-r961=""` to work as expected. ([See #12](../../issues/12))
 
 ## [0.6.0](../../tree/0.6.0) (2012-06-19)
 - Added `Response.noConflict()`
-- Added support for [non-numeric custom breakpoints](https://github.com/ryanve/response.js/issues/10#issuecomment-6439578).
+- Added support for [non-numeric custom breakpoints](../../issues/10#issuecomment-6439578).
 - Added `Response.bridge()`. `Response.chain()` is now an alias for `Response.bridge()`. Use `Response.bridge()`.
-- Removed [depreciated](https://github.com/ryanve/response.js/issues/6) `.overflowX()`/`.overflowY()` methods.
-- Reorganized closure to better accomodate [module loaders](https://github.com/ryanve/response.js/pull/9).
+- Removed [depreciated](../../issues/6) `.overflowX()`/`.overflowY()` methods.
+- Reorganized closure to better accomodate [module loaders](../../pull/9).
 
 ## [0.5.3](../../tree/0.5.3) (2012-05-19)
 - Fixed incorrect comparison operator in `Response.render()`
@@ -35,19 +35,19 @@
 - **CSS**: For styling purposes `.responsejs` now gets added to the `html` tag when Response has been successfully loaded. `.no-responsejs` is removed if it is present.
 
 ## [0.5.0](../../tree/0.5.0) (2012-03-18)
-- [Jeesh](http://ender.no.de/#jeesh) compatibility added. (0.5.0 requires jQuery, Zepto, **or** Jeesh.)
-- [Consistency](https://github.com/ryanve/response.js/issues/4): The 4 device dimension getters (deviceW / deviceH / deviceMax / deviceMax) were converted from properties to methods in order to be [consistent](https://github.com/ryanve/response.js/issues/4) with the rest of the dimensions API => they now require parens, e.g. `Response.deviceW()`
+- [Jeesh](http://ender.jit.su/#jeesh) compatibility added. (0.5.0 requires jQuery, Zepto, **or** Jeesh.)
+- [Consistency](../../issues/4): The 4 device dimension getters (deviceW / deviceH / deviceMax / deviceMax) were converted from properties to methods in order to be [consistent](../../issues/4) with the rest of the dimensions API => they now require parens, e.g. `Response.deviceW()`
 - **Events**: Ready, resize, and crossover events added to the API. (See Events in the [readme](README.md))
 - **Extending**: Added ability to add custom props/tests via `Response.addTest(prop, testFn)` (See Extending in the [readme](README.md))
 - Improved performance of inX / inY / inViewport methods. 
 
 ## [0.4.2](../../tree/0.4.2) (2012-03-08)
 - Fixed 2 important bugs: 
-  - [error @breakpoints from custom breakpoints handler](https://github.com/ryanve/response.js/commit/64d3fd9b953809cbbe773769c76b1bcf488635cb)
-  - [escaping in special characters in selector strings](https://github.com/ryanve/response.js/commit/82e8f5b148b6b411438014dbd5b638625d9d73b7)
+  - [error @breakpoints from custom breakpoints handler](../../commit/64d3fd9b953809cbbe773769c76b1bcf488635cb)
+  - [escaping in special characters in selector strings](../../commit/82e8f5b148b6b411438014dbd5b638625d9d73b7)
 
 ## [0.4.1](../../tree/0.4.1) (2012-03-02)
-- Minor [tweak](https://github.com/ryanve/response.js/commit/c06f9c9c7275ef1d154613fe33ed95146d174558) improves performance of the overflowX/overflowY methods.
+- Minor [tweak](../../commit/c06f9c9c7275ef1d154613fe33ed95146d174558) improves performance of the overflowX/overflowY methods.
 
 ## [0.4.0](../../tree/0.4.0) (2012-02-27)
  
@@ -70,7 +70,7 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 ## [0.3.0](../../tree/0.3.0) (2012-02-14)
 - [**Zepto**](https://github.com/madrobby/zepto): Response is now fully compatible with [Zepto](https://github.com/madrobby/zepto). To do this, functions that relied on jQuery methods lacking Zepto equivalents such as [$.grep](http://api.jquery.com/jQuery.grep/) / [$.parseJSON](http://api.jquery.com/jQuery.parseJSON/) / [$.data](http://api.jquery.com/jQuery.data/) needed to be converted. Our code now mostly uses native methods to accomplish these tasks. This has a two-fold effect: the underlying code now is a bit longer but it *runs* way faster—win.
 - [**HTML5 dataset**](README.md): In adapting more methods into native code `Response.dataset` was born. Using syntax just like [jQuery.data](http://api.jquery.com/jQuery.data/), `Response.dataset(elem, key, value)` provides a blazing fast cross-browser implementation of the native dataset API and this is now used for all data attribute storage and access within Response. (See examples in the [readme](README.md).)
-- [**Mode autodetection**](https://twitter.com/#!/ResponseJS/status/158784160754966529): In previous versions it was necessary to specify [markup or src](http://responsejs.com/#modes) mode in their attribute set definitions. In 0.3.0 the appropriated mode is autodetected! This is done by checking the [tagName](https://developer.mozilla.org/en/DOM/element.tagName) against elements that support the `src` attribute per [the spec](dev.w3.org/html5/spec-author-view/index.html#attributes-1). The mode parameter is now ignored in lieu of this autodetection. This is great because it means that devs only need to set up one set for each prop where in previous versions they'd have needed two (but it stills work either way for backwards support).
+- [**Mode autodetection**](https://twitter.com/#!/ResponseJS/status/158784160754966529): In previous versions it was necessary to specify [markup or src](http://responsejs.com/#modes) mode in their attribute set definitions. In 0.3.0 the appropriated mode is autodetected! This is done by checking the [tagName](https://developer.mozilla.org/en/DOM/element.tagName) against elements that support the `src` attribute per [the spec](dev.w3.org/html5/spec-author-view/index.html#attributes-1). The mode parameter is now ignored in favor of autodetection. This means that devs only need to set up one set for each prop where in previous versions they'd have needed two (but it stills work either way for backwards support).
   - `img`|`input`|`source`|`embed`|`track` always behave in src mode.
   - `iframe`|`audio`|`video` behave in src mode *only* if a `src` attribute is present.
   - Otherwise elements behave in [markup mode](http://responsejs.com/#modes). 
@@ -82,7 +82,7 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 - **Dropped**: The legacy version of `Response.create` in 0.2.5 took string params. This was never in the docs so it seems safe to drop support for this. Therefore in 0.3+ the `Response.create` [param](http://responsejs.com/#create) must be an object (or an array of objects). The `Response.decide` method used internally was depreciated/removed in 0.3.0.
 
 ## [0.2.9](../../tree/0.2.9) (2012-01-02)
-- [Fixed issue reading data-responsejs attribute](https://github.com/ryanve/response.js/issues/3).
+- [Fixed issue reading data-responsejs attribute](../../issues/3).
 - Added new boolean methods: 
   - `Response.wave` tests viewport `height` ranges (vertical equivalent to [Response.band](http://responsejs.com/#band))
   - `Response.device.wave` tests `device-height` ranges 
@@ -92,11 +92,11 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 ## [0.2.8](../../tree/0.2.8) (2011-12-17)
 - Added local function for handling range comparison in preparation for new methods in 0.2.9.
 - `Response.decide` loop optimized.
-- Removed depreciated [Response.affix](https://github.com/ryanve/response.js/issues/1) method.
+- Removed depreciated [Response.affix](../../issues/1) method.
 
 ## [0.2.7](../../tree/0.2.7) (2011-10-26)
 - Error handling was improved. Now, most of the public methods will throw an exception to the console if the args sent to them are incorrect. The exception says the name of the method that caused the problem and when possible the name of the arg preceded by an @ sign.
-- Some issues with device-pixel-ratio [decimals](http://stackoverflow.com/questions/7907180/retain-precision-during-numeric-sort) and were resolved. Response.target was updated with the ability to target data keys containing decimal points. [They needed to be escaped.](https://github.com/jquery/sizzle/issues/76) Response.create now properly supports device-pixel-ratio based attributes. Response.dpr was further optimized.
+- Some issues with device-pixel-ratio [decimals](http://stackoverflow.com/questions/7907180/retain-precision-during-numeric-sort) and were resolved. Response.target was updated with the ability to target data keys containing decimal points. [They needed to be escaped.](https://github.com/jquery/sizzle/issues/76) `Response.create` now properly supports `device-pixel-ratio` based attributes. `Response.dpr` was further optimized.
 
 ## [0.2.6](../../tree/0.2.6) (2011-10-24)
 - The default attribute setups were eliminated in favor of letting devs choose their own setup options (breakpoints etc.) either via Response.create or by passing the custom setup options in a JSON object stored in a data attribute on the body tag. The latter method is preferrable because it requires no scripting.
@@ -105,10 +105,10 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 - `Response.mins` was **replaced** w/ `Response.mapBool` to be general and better suited as a method.
 - `Response.band` was optimized by eliminating the check for `.matchMedia`. Checking the `window` width always works.
 
-## [0.2.5](https://github.com/ryanve/response.js/commit/a8790261b4c850aff2dd9be3a7512fa5118d6a01) (2011-09-20)
+## [0.2.5](../../commit/a8790261b4c850aff2dd9be3a7512fa5118d6a01) (2011-09-20)
 
 - Moved default `Response.create()` lines outside the object. 
-- Created GitHub repo.
+- Created [GitHub repo](./).
     
 ## [0.2.4](http://responsejs.com/source/v0/response.0.2.4.js) (2011-09-19)
 
@@ -117,7 +117,7 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
   - see: [opera.com/docs/specs/presto28/#changes](http://opera.com/docs/specs/presto28/#changes)
 - Confirmed Android support for devicePixelRatio 
   - see: [developer.android.com/reference/android/webkit/WebView.html](http://developer.android.com/reference/android/webkit/WebView.html) 
-- Omitting `Moderizr.mq` as second fallback (not needed) 
+- Omitted `Moderizr.mq` as secondary fallback. It was uneeded.
     
 ## [0.2.3](http://responsejs.com/source/v0/response.0.2.3.js) (2011-09-19)
 
@@ -153,30 +153,25 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 - Normalized code formatting and improved inline documentation.
 
 ## [0.1.5](http://responsejs.com/source/v0/response.0.1.5.js) (2011-09-10)
-- Major improvements were made to the HTML5 attribute section.
-    - renamed attributes to number-based names
-    - added additional better optimized breakpoints
-    - added "ternary triangles" for determining priority
+- Improved attributes: Use number-based names. Add better breakpoints. Decide via ternary triangle.
 - Removed `Response.dpr` but may reintroduce later if in demand.
 
 ## [0.1.4](http://responsejs.com/source/v0/response.0.1.4.js) (2011-09-10)
-- Forced a more strict callback for Response.dpr in order to avoid need for eval().
-- Response.actionSet method added.
-    - see: [stackoverflow.com/questions/7375158/using-each-to-execute-array-of-functions-on-resize](http://stackoverflow.com/questions/7375158/using-each-to-execute-array-of-functions-on-resize)
+- Forced a more strict callback for `Response.dpr` in order to avoid `eval`.
+- `Response.actionSet` method added. ([stackoverflow.com/q/7375158/770127](http://stackoverflow.com/q/7375158/770127))
 
 ## [0.1.3](http://responsejs.com/source/v0/response.0.1.3.js) (2011-09-10)
 - Updated description to better reflect the full scope of the lib.
 - Cached `$(window)` and `$(document)` selectors.
-- Changed all global vars to local vars.
-- Applied safer and simpler syntax for property definitions.
-- Honed in on [better (and working) approach to `Response.action`](http://stackoverflow.com/q/7372852/770127)
+- Changed all uncaught global vars to local vars.
+- Honed in on [better working approach to `Response.action`](http://stackoverflow.com/q/7372852/770127)
 
 ## [0.1.2](http://responsejs.com/source/v0/response.0.1.2.js) (2011-09-09)
 - Introduced concept for `Response.on`. Not fully working here and later renamed `Response.action`.
 
 ## [0.1.1](http://responsejs.com/source/v0/response.0.1.1.js) (2011-08-22)
 - Changed `$this.data(key, value)` operations to `$.data(element, key, value)` for speed.
-- Fixed two missing ; errors by adding commas after .band and .dpr methods.
+- Fixed missing `;` errors by adding commas.
 
 ## [0.1.0](http://responsejs.com/source/v0/response.0.1.0.js) (2011-08-21)
 - 1st working version. Includes `Response.band` and `Response.dpr` methods.
