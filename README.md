@@ -8,7 +8,7 @@
 
 ### Breakpoint Sets
 
-Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](https://github.com/ryanve/response.js/blob/master/CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes). [Examples are in the wiki too.](https://github.com/ryanve/response.js/wiki/how-to-create-breakpoint-sets)
+Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes). [Examples are in the wiki too.](../../wiki/how-to-create-breakpoint-sets)
 
 ```javascript
     Response.create({
@@ -38,7 +38,6 @@ Response's most powerful feature is its breakpoint sets. They allow the ability 
        default markup for 480px- or no-js
    </div>
 ```
-
 
 ### Dimensions
 
@@ -97,11 +96,9 @@ Response.media(mediaQuery).matches // uses window.matchMedia || window.msMatchMe
 
 ### HTML5 Dataset
 
-Response's dataset methods mimic the HTML5 dataset specification as closely as possible. (Please see [#19](https://github.com/ryanve/response.js/issues/19) to let us know if you are using these methods. These methods are also available in [dope](https://github.com/ryanve/dope).)
-
+Response's dataset methods mimic the HTML5 dataset specification as closely as possible. (Please see [#19](../../issues/19) to let us know if you are using these methods. These methods are also available in [dope](https://github.com/ryanve/dope).)
 
 ```javascript
-
 @param object         elem  can be a native element or jQuery element
 @param string|object  key   is a camelCase or lowercase name for the data attribute.
 
@@ -239,7 +236,7 @@ define(['jquery'], Response.noConflict);  // define module and destroy global
 
 ## License
 
-### [Response](https://github.com/ryanve/response.js) is available under the [MIT license](http://en.wikipedia.org/wiki/MIT_License)
+### [Response](./) is available under the [MIT license](http://en.wikipedia.org/wiki/MIT_License)
 
 Copyright (C) 2012 by [Ryan Van Etten](https://github.com/ryanve)
 
@@ -260,4 +257,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
