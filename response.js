@@ -747,17 +747,21 @@
           , lazy: null
           , i: 0                      // integer   the index of the current highest active breakpoint min
           , uid: null
-              
-          , reset: function() {// Reset / fire crossover events:
-          
-                var subjects = this.breakpoints
+
+          , _decideValue: function() {
+              var subjects = this.breakpoints
                   , i = subjects.length
                   , tempIndex = 0;
-                
-                // This is similar to the decideValue loop
-                while( !tempIndex && i-- ) {
-                    this.fn(subjects[i]) && (tempIndex = i);
-                }
+
+              // This is similar to the decideValue loop
+              while( !tempIndex && i-- ) {
+                  this.fn(subjects[i]) && (tempIndex = i);
+              }
+
+              return tempIndex;
+          }
+          , reset: function() {// Reset / fire crossover events:
+                var tempIndex = this._decideValue();
 
                 // Fire the crossover event if crossover has occured:
                 if (tempIndex !== this.i) {
@@ -841,7 +845,9 @@
                 }
 
                 sets.all = sets.all.concat(sets[this.uid] = this.keys); // combined keys ===> sets.all
-                
+
+                this.i = this._decideValue();
+
                 return this; // chainable
             }
 
