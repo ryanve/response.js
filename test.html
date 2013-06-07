@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-hero-type="superHero" data-hero-name="Batman">
+<head>
+    <meta charset="utf-8">
+    <title>Test Suite: Response JS</title>
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <link rel=stylesheet href="http://responsejs.com/css/demo.20130000.css">
+    <style>
+        @media (max-width:30em) {
+            /* gist.github.com/ryanve/5457737 */
+            table, thead, tbody, th, td, tr { display:block }
+            tr + tr { margin-top:1em }
+        }
+        html { background:#fdf6e3; color:#657b83 } .dark { background:#eee8d5 }
+        body { margin:1em auto; font-size:1.1em; }
+        #header a { color:#28d }
+        .method h3 { margin:0;color:#678 }
+        .method { padding:.5em 0; color:#657b83 }
+        .lib { color:#9aa }
+        td code { color:#d38 }
+        td { padding:.25em .5em }
+        th { text-align:left;color:#567 }
+        td:first-child { padding-left:0 }
+        td:last-child { padding-right:0 }
+        .entry-title { margin:0 }
+        .part-1,.part-2 { white-space:nowrap }
+        .section-h { margin:1em 0 }
+        .section-a { background:#d38; color:#034; padding:.5em }
+        .section-a:hover { background:#c41; color:#034 }
+        .part-1 .ext { display:none }
+        #sets strong,.output { color:#890 }
+        #alias .section-h { display:none }
+        #alias pre { color:#b80 }
+        #sets h4 { margin-bottom:0 }
+        #sets div { margin-left:1em }
+        .andup { color:#b90 }
+        
+        @media screen and (min-width:481px) {
+            .output, #sets strong { color:#28d }
+        }
+        @media screen and (min-width:961px) {
+            .output, #sets strong { color:#67c }
+        }
+
+        .false, #sets .fail { color:#d32 }
+        footer { margin:2em 0 }
+        footer a { padding:.5em; color:#d32; background:#034 }
+        footer a:hover{ background:#012; color:#b90 }
+        footer ul { list-style-type:none; display:block; padding:0 }
+        footer ul li { display:block; float:left; margin:0 0 1em .25em }
+        body div.dark { background:#ddc }
+        
+        span.andup:after { color: #c41; content:" / 0+ or no-mq"; }
+        .css-value { color: #c41; }
+        .min-device-pixel-ratio .andup:after { content:""; }
+        @media (min-width:320px) {
+            .min-width .andup:after { content:" / 320px+" }
+        }
+        @media (min-width:481px) {
+            .min-width .andup:after { content:" / 481px+" }
+        }
+        @media (min-width:961px) {
+            .min-width .andup:after { content:" / 961px+" }
+        }
+        @media (min-height:481px) {
+            .min-height .andup:after { content:" / 481px+" }
+        }
+        @media (min-device-width:320px) {
+            .min-device-width .andup:after { content:" / 320px+" }
+        }
+        @media (min-device-width:481px) {
+            .min-device-width .andup:after { content:" / 481px+" }
+        }
+        @media (min-device-width:961px) {
+            .min-device-width .andup:after { content:" / 961px+" }
+        }
+        @media (min-device-height:481px) {
+            .min-device-height .andup:after { content:" / 481px+" }
+        }
+    </style>
+</head>
+
+<body data-responsejs='{
+    "create": [
+        { "prop":"width", "prefix": "min-width-", "lazy":true }
+      , { "prop":"height", "prefix": "min-height-", "lazy":true }
+      , { "prop":"device-width", "prefix": "min-device-width-", "lazy":true }
+      , { "prop":"device-height", "prefix": "min-device-height-", "lazy":true }
+      , { "prop":"device-pixel-ratio", "breakpoints":[0, 1, 1.5, 2] }
+    ]}'
+>
+
+    <noscript>no-js</noscript>
+
+    <h1 id="header" class=entry-title>
+        <a href="http://responsejs.com"><span class=part-1>Response<span class=ext> JS</span></span></a><span class=sep> </span><span class=part-2>Test Suite</span>
+    </h1>
+
+    <div id=alias>
+        <h2 class=section-h><a class=section-a href=#alias>alias</a></h2>
+        <pre><b>(</b><b>function</b><b>(</b>R<b>)</b> {<br>    <span class=line-comment>/* */</span><br>}<b>(</b>Response<b>)</b><b>)</b>;</pre>
+    </div>
+
+    <div id=numbers class=method>
+        <h2 class=section-h><a class=section-a title="return type" href=#numbers>numbers</a></h2>
+        <table>
+            <tr id=devicew><td class=lib></td><td><code class="language-javascript">R.deviceW()</code></td><td class="output">no-js</td></tr>
+            <tr id=deviceh><td class=lib></td><td><code class="language-javascript">R.deviceH()</code></td><td class="output">no-js</td></tr>
+            <tr id=devicemax><td class=lib></td><td><code class="language-javascript">R.deviceMax()</code></td><td class="output">no-js</td></tr>
+            <tr id=devicemin><td class=lib></td><td><code class="language-javascript">R.deviceMin()</code></td><td class="output">no-js</td></tr>
+            <tr id=dpr><td class=lib></td><td><code class="language-javascript">R.dpr()</code></td><td class="output">no-js</td></tr>
+            <tr id=viewportw><td class=lib></td><td><code class="language-javascript">R.viewportW()</code></td><td class="output">no-js</td></tr>
+            <tr id=viewporth><td class=lib></td><td><code class="language-javascript">R.viewportH()</code></td><td class="output">no-js</td></tr>
+            <tr id=scrollx><td class=lib></td><td><code class="language-javascript">R.scrollX()</code></td><td class="output">no-js</td></tr>
+            <tr id=scrolly><td class=lib></td><td><code class="language-javascript">R.scrollY()</code></td><td class="output">no-js</td></tr>
+        </table>
+    </div>
+    
+    <div id=booleans class=method>
+        <h2 class=section-h><a class=section-a title="return type" href=#booleans>booleans</a></h2>
+        <table>
+            <tr id=inviewport><td class=lib></td><td><code class="language-javascript">R.inViewport($('#numbers'))</code></td><td class="output">no-js</td></tr>
+            <tr id=inviewport0><td class=lib></td><td><code class="language-javascript" title="works for native elems too">R.inViewport($('#numbers')[0])</code></td><td class="output">no-js</td></tr>
+            <tr id=inx><td class=lib></td><td><code class="language-javascript">R.inX($('#numbers'))</code></td><td class="output">no-js</td></tr>
+            <tr id=iny><td class=lib></td><td><code class="language-javascript">R.inY($('#numbers'))</code></td><td class="output">no-js</td></tr>
+            <tr id=vergepos><td class=lib></td><td><code class="language-javascript">R.inViewport($('#numbers'), 100)</code></td><td class="output">no-js</td></tr>
+            <tr id=vergeneg><td class=lib></td><td><code class="language-javascript">R.inViewport($('#numbers'),-100)</code></td><td class="output">no-js</td></tr>
+            <tr id=bandmin><td class=lib></td><td><code class="language-javascript">R.band(481)</code></td><td class="output">no-js</td></tr>
+            <tr id=wavemin><td class=lib></td><td><code class="language-javascript">R.wave(481)</code></td><td class="output">no-js</td></tr>
+            <tr id=bandminmax><td class=lib></td><td><code class="language-javascript">R.band(481, 960)</code></td><td class="output">no-js</td></tr>
+            <tr id=waveminmax><td class=lib></td><td><code class="language-javascript">R.wave(481, 800)</code></td><td class="output">no-js</td></tr>
+            <tr id=dprmin><td class=lib></td><td><code class="language-javascript">R.dpr(1.5)</code></td><td class="output">no-js</td></tr>
+            <tr id=devicebandmin><td class=lib></td><td><code class="language-javascript">R.device.band(481)</code></td><td class="output">no-js</td></tr>
+            <tr id=devicewavemin><td class=lib></td><td><code class="language-javascript">R.device.wave(481)</code></td><td class="output">no-js</td></tr>
+            <tr id=devicebandminmax><td class=lib></td><td><code class="language-javascript">R.device.band(481, 960)</code></td><td class="output">no-js</td></tr>
+            <tr id=devicewaveminmax><td class=lib></td><td><code class="language-javascript">R.device.wave(481, 800)</code></td><td class="output">no-js</td></tr>
+        </table>
+    </div>
+
+    <div id=sets class=method>
+        <h2 class=section-h><a class=section-a title="breakpoint-based attribute sets" href=#sets>sets</a></h2>
+        <p><b class=andup>JavaScript <span class="css-value">/ CSS</span></b> values should correspond at standard zoom.</p>
+        <h4 class=section-h>width</h4>
+        <div class="min-width" 
+             data-min-width-0="<strong>ok</strong> =) viewport width is <span class=andup>0+</span>"
+             data-min-width-320="<strong>ok</strong> =) viewport width is <span class=andup>320+</span>"
+             data-min-width-481="<strong>ok</strong> =) viewport width is <span class=andup>481+</span>"
+             data-min-width-961="<strong>ok</strong> =) viewport width is <span class=andup>961+</span>"
+        ><strong class=fail>fallback</strong> content</div>
+        <h4 class=section-h>height</h4>
+        <div class="min-height" 
+             data-min-height-0="<strong>ok</strong> =) viewport height is <span class=andup>0+</span>"
+             data-min-height-481="<strong>ok</strong> =) viewport height is <span class=andup>481+</span>"
+        ><strong class=fail>fallback</strong> content</div>
+        <h4 class=section-h>device-width</h4>
+        <div class="min-device-width" 
+             data-min-device-width-0="<strong>ok</strong> =) device width is <span class=andup>0+</span>"
+             data-min-device-width-320="<strong>ok</strong> =) device width is <span class=andup>320+</span>"
+             data-min-device-width-481="<strong>ok</strong> =) device width is <span class=andup>481+</span>"
+             data-min-device-width-961="<strong>ok</strong> =) device width is <span class=andup>961+</span>"
+        ><strong class=fail>fallback</strong> content</div>
+        <h4 class=section-h>device-height</h4>
+        <div class="min-device-height" 
+             data-min-device-height-0="<strong>ok</strong> =) device height is <span class=andup>0+</span>"
+             data-min-device-height-481="<strong>ok</strong> =) device height is <span class=andup>481+</span>"
+        ><strong class=fail>fallback</strong> content</div>    
+        <h4 class=section-h>device-pixel-ratio</h4>
+        <div class="min-device-pixel-ratio"
+             data-min-device-pixel-ratio-0="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>0+</span>"  
+             data-min-device-pixel-ratio-1="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>1+</span>"
+             data-min-device-pixel-ratio-1.5="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>1.5+</span>"
+             data-min-device-pixel-ratio-2="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>2+</span>"
+        ><strong class=fail>fallback</strong> content</div>
+    </div>
+    
+    <footer>
+        <ul>
+            <li><a href="#header"><span class=shape>&#9650;</span> top</a>
+            <li><a href="http://responsejs.com">home</a>
+            <li><a href="https://github.com/ryanve/response.js">github</a>
+        </ul>
+    </footer>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="http://airve.github.io/js/aok/aok.min.js"></script>
+<script src="response.js"></script>
+<script>
+(function(root, win, doc) {
+    var html = doc.documentElement
+      , $ = root.jQuery || root.Zepto || root.ender
+      , O = root.Response
+      , $win = $(win)
+      , $doc = $(doc)
+      , aok = root.aok
+      , log = aok.log
+      , tempBase = O;
+
+    // Expose chainable methods to $.fn
+    O.chain && O.chain(); 
+    
+    $doc.ready(function() {
+        var props = [
+                'devicew', 'deviceh', 'devicemax', 'devicemin', 'dpr', 'dprmin'
+              , 'viewporth', 'viewportw', 'scrollx', 'scrolly'
+              , 'bandmin', 'bandminmax', 'wavemin', 'waveminmax'
+              , 'devicebandmin', 'devicebandminmax', 'devicewavemin', 'devicewaveminmax' 
+              , 'inx', 'iny', 'inviewport', 'inviewport0', 'vergepos', 'vergeneg'
+            ]
+          , $ids = []
+          , $html = $(html)
+          , $numbers = $('#numbers')
+          , $booleans = $('#booleans')
+          , $sections = $('#numbers,#booleans,#sets')
+          , $sets = $('#sets');
+          
+        O.each(props, function(name) {
+            $ids[name] = $('#' + name);
+        });
+        
+        function update(arr) {
+            var result, prop, $el, output;
+            if (typeof arr == 'string') {
+                prop = tempBase[arr];
+                result = typeof prop === 'function' ? prop() : prop;
+                $el = $ids[arr.toLowerCase()];
+            } else {
+                prop = tempBase[arr.shift()];
+                $el = $ids[arr.shift()];
+                result = arr.length ? prop.apply(this, arr) : prop();
+            }
+            if ($el) {
+                if ($el = $el.find('.output')) {
+                    output = String(result);
+                    result === !!result && $el.removeClass('true false').addClass(output);
+                    return $el.html(output);
+                }
+            }
+            return false;
+        }
+
+        O.each(['deviceW','deviceH','deviceMax','deviceMin','dpr'], update);
+        
+        function onReadyAndResize() {
+            O.each(['viewportW', 'viewportH'], update);
+            update(['band', 'bandmin', 481]);
+            update(['wave', 'wavemin', 481]);
+            update(['band', 'bandminmax', 481, 961]);
+            update(['wave', 'waveminmax', 481, 800]);
+        };
+        
+        function crossoverToggle(){
+            $html.toggleClass('dark');
+            log('crossover near ' + O.viewportW() + 'x' + O.viewportH())
+        }
+        
+        O.action(onReadyAndResize)
+         .crossover(crossoverToggle);
+        
+        // These change on scroll:
+        $win.on('scroll', function() {
+            // log("$sections.inY().length = " + $sections.inY().length);
+            
+            // Test both the jQuery and native versions:
+            O.inViewport($booleans) ? $numbers.addClass('dark') : $numbers.removeClass('dark');
+            
+            O.each(['scrollX', 'scrollY'], update);
+            update(['inViewport', 'inviewport', $numbers]); 
+            update(['inViewport', 'inviewport0', $numbers[0]]); // native elem
+            update(['inX', 'inx', $numbers]);
+            update(['inY', 'iny', $numbers]);
+            update(['inViewport', 'vergepos', $numbers,  100]);
+            update(['inViewport', 'vergeneg', $numbers, -100]);
+        }).trigger('scroll');
+        
+        // These ones are static:
+        update(['dpr', 'dprmin', 1.5]);
+        tempBase = O.device;
+        update(['band', 'devicebandmin', 481]);
+        update(['wave', 'devicewavemin', 481]);
+        update(['band', 'devicebandminmax', 481, 961]);
+        update(['wave', 'devicewaveminmax', 481, 800]);
+        tempBase = O;
+        
+        // Test dataset/deletes (use camelcase to test full functionality)
+        $html.dataset(O.dataset($html, 'heroType'), O.dataset(html, 'heroName')).deletes('heroName heroType');
+    });
+}(this, window, document));
+</script>
+
+<script>
+(function(d, t, l, a, h) {
+    // Async Google Analytics
+    // Exit if offline or if optional hostname doesn't match.
+    if (h && h !== l.hostname || !(l = l.protocol) || l.indexOf("http")) return;
+    var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+    this["_gaq"] = [["_setAccount", a], ["_trackPageview"]];
+    g.async = 1;
+    g.src = ("https:" == l ? "//ssl" : "//www") + ".google-analytics.com/ga.js";
+    s.parentNode.insertBefore(g, s)
+})(document, "script", location, "UA-5731919-22", "responsejs.com");
+</script>
+</body> 
+</html>
