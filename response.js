@@ -897,6 +897,7 @@
                 // Apply the method that performs the actual swap. When updateDOM called this.$e and this.e refer
                 // to single elements. Only update the DOM when the new value is different than the current value.
                 if (this.currValue === this.newValue) { return this; }
+                if (this.newValue == null) { return this; }
                 this.currValue = this.newValue;
                 if ( 0 < this.mode ) { 
                     this.$e[0].setAttribute('src', this.newValue); 
