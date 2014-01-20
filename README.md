@@ -1,10 +1,10 @@
-# [Response](http://responsejs.com)
+# Response
 
-[Response JS](http://responsejs.com) is a [jQuery](http://jquery.com)/[Ender](http://ender.jit.su)/[Zepto](http://zeptojs.com) plugin that gives web designers tools for building performance-optimized, mobile-first responsive websites. It provides semantic ways to dynamically swap code blocks based on breakpoints and serve images (or other media) progressively via HTML5 data attributes (see Breakpoint Sets).
+[Response](http://responsejs.com) is an experimental [jQuery](http://jquery.com)/[Ender](http://ender.jit.su)/[Zepto](http://zeptojs.com) plugin that gives web designers performant tools for building mobile-first responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes.
 
 **[CDN](http://airve.github.com)**: [dev](http://airve.github.com/js/response/response.js) | [min](http://airve.github.com/js/response/response.min.js)
 
-## API - 0.7
+## API ([0.7](../../releases))
 
 ### Breakpoint Sets
 
@@ -230,7 +230,7 @@ Response.noConflict(function(Response){
 define(['jquery'], Response.noConflict);  // define module and destroy global
 ```
 
-## Links
+## Resources
 
 [Test Suite](http://responsejs.com/test/)
 
