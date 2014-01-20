@@ -8,7 +8,7 @@
 
 ### Breakpoint Sets
 
-Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes). [Examples are in the wiki too.](../../wiki/how-to-create-breakpoint-sets)
+Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes). See [wiki examples](../../wiki/how-to-create-breakpoint-sets) too.
 
 ```js
 Response.create({
@@ -45,8 +45,8 @@ Response.create({
 ```js
 Response.viewportW() // return viewport width
 Response.viewportH() // return viewport height
-Response.scrollX() // cross-broswer equiv to native window.scrollX   // ~ jQuery(window).scrollLeft()
-Response.scrollY() // cross-broswer equiv to native window.scrollY   // ~ jQuery(window).scrollTop()
+Response.scrollX() // cross-broswer equiv to native window.scrollX
+Response.scrollY() // cross-broswer equiv to native window.scrollY
 
 Response.deviceW() // device width  property
 Response.deviceH() // device height property
@@ -202,6 +202,10 @@ define(['jquery'], Response.noConflict);  // define module and destroy global
 ## Resources
 
 [Test Suite](http://responsejs.com/test/)
+
+## Fund
+
+Fund [opensource dev @ryanve](https://www.gittip.com/ryanve/) <b>=)</b>
 
 ## License
 
