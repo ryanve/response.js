@@ -3,7 +3,8 @@
     "description": "responsive design toolkit",
     "version": "0.7.8",
     "homepage": "http://responsejs.com",
-    "author": "Ryan Van Etten <@ryanve>",
+    "license": "MIT",
+    "author": "Ryan Van Etten",
     "keywords": ["responsive", "jquery", "javascript", "js"],
     "main": "./response.js",
     "repository": {
