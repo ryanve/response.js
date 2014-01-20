@@ -206,6 +206,12 @@ define(['jquery'], Response.noConflict);  // define module and destroy global
 - [Issues](../../issues)
 - [Wiki](../../wiki)
 
+#### Related Modules
+
+- [verge](https://github.com/ryanve/verge) - viewport utilities
+- [dope](https://github.com/ryanve/dope) - dataset abstraction
+- [res](https://github.com/ryanve/res) - resolution utilities
+
 ## Fund
 
 Fund [opensource dev @ryanve](https://www.gittip.com/ryanve/) <b>=)</b>
