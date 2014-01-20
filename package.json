@@ -5,7 +5,7 @@
     "homepage": "http://responsejs.com",
     "license": "MIT",
     "author": "Ryan Van Etten",
-    "keywords": ["responsive", "jquery", "javascript", "js"],
+    "keywords": ["responsive", "breakpoint", "breakpoints", "browser"],
     "main": "./response.js",
     "repository": {
         "type": "git",
