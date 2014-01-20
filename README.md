@@ -136,7 +136,7 @@ Response.store($elems, key, attrToReadFrom?) // store init content of each elem 
 
 ### Filters
 
-**@deprecated** and removed. See [github.com/ryanve/verge/issues/1](https://github.com/ryanve/verge/issues/1)
+**@deprecated**. To be removed. See [github.com/ryanve/verge/issues/1](https://github.com/ryanve/verge/issues/1)
 
 ### Events
 
