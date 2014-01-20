@@ -201,7 +201,10 @@ define(['jquery'], Response.noConflict);  // define module and destroy global
 
 ## Resources
 
-[Test Suite](http://responsejs.com/test/)
+- [Website](http://responsejs.com/)
+- [Test Suite](http://responsejs.com/test/)
+- [Issues](../../issues)
+- [Wiki](../../wiki)
 
 ## Fund
 
