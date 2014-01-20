@@ -90,23 +90,18 @@
       , matchMedia = win.matchMedia || win.msMatchMedia
       , media = matchMedia || function() { return {}; }
     
-        //github.com/ryanve/verge
-        //responsejs.com/labs/dimensions/#viewport
-      , viewportW = (function(win, docElem, mM) {
-            var client = docElem['clientWidth'], inner = win['innerWidth'];
-            return (mM && client < inner && true === mM('(min-width:' + inner + 'px)')['matches']
-                ? function() { return win['innerWidth']; }
-                : function() { return docElem['clientWidth']; }
-            );
-        }(win, docElem, matchMedia))
-        
-      , viewportH = (function(win, docElem, mM) {
-            var client = docElem['clientHeight'], inner = win['innerHeight'];
-            return ( mM && client < inner && true === mM('(min-height:' + inner + 'px)')['matches']
-                ? function() { return win['innerHeight']; }
-                : function() { return docElem['clientHeight']; }
-            );
-        }(win, docElem, matchMedia));
+        // http://ryanve.com/lab/dimensions
+        // http://github.com/ryanve/verge/issues/7
+      , viewportW = docElem['clientWidth'] < win['innerWidth'] ? function() {
+            return win['innerWidth'];
+        } : function() {
+            return docElem['clientWidth'];
+        }
+      , viewportH = docElem['clientHeight'] < win['innerHeight'] ? function() {
+            return win['innerHeight'];
+        } : function() {
+            return docElem['clientHeight'];
+        };
     
     function doError(msg) {
         // Error handling. (Throws exception.)
