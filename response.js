@@ -3,7 +3,7 @@
  * @link http://github.com/ryanve/response.js
  * @copyright 2014 Ryan Van Etten
  * @license MIT
- * @version 0.7.9
+ * @version 0.7.10
  */
  
 /*jshint expr:true, sub:true, supernew:true, debug:true, node:true, boss:true, devel:true, evil:true, 
@@ -579,12 +579,12 @@
           , custom: 0         // boolean  see addTest()
           , values: []        // array    available values
           , fn: 0             // callback the test fn, defined @ configure()
-          , verge: null       // integer  defaults to Math.min(screenMax, 500)
+          , verge: null       // integer  uses default based on device size
           , newValue: 0
           , currValue: 1
           , aka: null
           , lazy: null
-          , i: 0                      // integer   the index of the current highest active breakpoint min
+          , i: 0              // integer   the index of the current highest active breakpoint min
           , uid: null
           
             // Reset and fire crossover events.
@@ -609,7 +609,7 @@
           
                 var i, prefix, aliases, aliasKeys, isNumeric = true, arr, prop = this.prop;
                 this.uid = suid++;
-                this.verge = isFinite(this.verge) ? this.verge : min(screenMax, 500);
+                if (null == this.verge) this.verge = min(screenMax, 500);
                 this.fn = propTests[prop] || doError('create @fn');
 
                 // If we get to here then we know the prop is one one our supported props:
