@@ -141,10 +141,10 @@ Response.store($elems, key, attrToReadFrom?) // store init content of each elem 
 ### Events
 
 ```js
-Response.ready(callback)  // run callback on ready
-Response.resize(callback) // run callback on resize
-Response.action(callback) // run callback (or array of callbacks) on ready *and* on resize
-Response.crossover(callback, prop?) // run callback on breakpoint set crossovers points
+Response.ready(fn)  // call fn on ready
+Response.resize(fn) // call fn on resize
+Response.action(fn|fns) // call fn(s) on ready *and* on resize
+Response.crossover(fn, prop?) // call fn on breakpoint set crossovers points
 
 Response.crossover(function() {
   // do stuff each time viewport crosses width breakpoints
@@ -154,13 +154,13 @@ Response.crossover(function() {
 ### Objects/Arrays
 
 ```js
-Response.affix(arr, prefix, suffix) // create copy of arr w prefix and/or suffix added to each value
-Response.each(arr, callback, scope?) // arrays/arr-like objs (this defaults to curr item @since 0.7.0)
-Response.map(arr, callback, scope?) // similar to [].map
-Response.merge(base, adds) // merge adds into base (either can be array or object)
-Response.object(parent) // uses native Object.create w/ polyfill support for 1st arg
-Response.route(item, fn, scope?) // handler for accepting args as singles or collections
-Response.sift(arr, callback?, scope|invert?) // like _.compact, [].filter, and jQuery.grep
+Response.affix(stack, prefix, suffix) // create array w/ prefix|suffix added to each stack value
+Response.each(stack, fn, scope?) // call fn for each item in stack
+Response.map(stack, fn, scope?) // map stack into a new array
+Response.merge(target, source) // merge source's defined values into target
+Response.object(parent) // create a new object that inherits parent (via Object.create where possible)
+Response.route(stack|other, fn, scope?) // call fn on each stack value or on a non-stack
+Response.sift(stack, fn?, scope|invert?) // like _.compact, [].filter, and jQuery.grep
 ```
 
 ### Extending
