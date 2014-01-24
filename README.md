@@ -154,7 +154,7 @@ Response.crossover(function() {
 ### Objects/Arrays
 
 ```js
-Response.affix(stack, prefix, suffix) // create array w/ prefix|suffix added to each stack value
+Response.affix(stack, prefix?, suffix?) // create array w/ prefix|suffix added to each stack value
 Response.each(stack, fn, scope?) // call fn for each item in stack
 Response.map(stack, fn, scope?) // map stack into a new array
 Response.merge(target, source) // merge source's defined values into target
