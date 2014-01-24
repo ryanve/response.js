@@ -36,6 +36,7 @@
       , screen = win.screen
       , AP = Array.prototype
       , OP = Object.prototype
+      , push = AP.push
       , slice = AP.slice
       , concat = AP.concat
       , toString = OP.toString
@@ -174,23 +175,15 @@
     /**
      * Response.merge
      * @since 0.3.0
-     * Generic method for merging objects and/or arrays.
-     * Undefined values in `adds` are skipped.
-     * When `adds` is array-like, this behaves similar to jQuery.merge(base, adds)
-     * Otherwise it behaves similar to jQuery.extend(base, adds)
-     * @param {Object|Array|Function|*} base
-     * @param {Object|Array|Function|*} adds
+     * @param {Object|Array|Function|*} r receiver
+     * @param {Object|Array|Function|*} s supplier Undefined values are ignored.
+     * @return {Object|Array|Function|*} receiver
      */
-    function merge(base, adds) {
-        var k, l;
-        if (!base || !adds) return base;
-        if (typeof adds != 'function' && isNumber(l = adds.length)) {
-            for (k = 0; k < l; k++) void 0 === adds[k] || (base[k] = adds[k]);
-            base.length > k || (base.length = k); // non-arrays
-        } else {
-            for (k in adds) owns.call(adds, k) && void 0 !== adds[k] && (base[k] = adds[k]);
-        }
-        return base;
+    function merge(r, s) {
+        if (null == r || null == s) return r;
+        if (typeof s == 'object' && isNumber(s.length)) push.apply(r, sift(s, 'undefined', true));
+        else for (var k in s) owns.call(s, k) && void 0 !== s[k] && (r[k] = s[k]);
+        return r;
     }
 
     /**
@@ -941,7 +934,7 @@
       , dataset: dataset
       , viewportH: viewportH
       , viewportW: viewportW
-    };// Response
+    };
 
     // Initialize
     ready(function() {
