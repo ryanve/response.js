@@ -127,7 +127,7 @@
      * @param {string|{length:number}} list
      * @return {Array} new and compact
      */
-    function ssvToArr(list) {
+    function compact(list) {
         return !list ? [] : sift(typeof list == 'string' ? list.split(' ') : list);
     }
 
@@ -345,7 +345,7 @@
 
     function deletesChainable(keys) {
         if (this && typeof keys === 'string') {
-            keys = ssvToArr(keys);
+            keys = compact(keys);
             route(this, function(el) {
                 each(keys, function(key) {
                     if (key) {
@@ -396,7 +396,7 @@
      * @example Response.target('a b c']) //  $('[data-a],[data-b],[data-c]')
      */
     function target(keys) {
-        return $(sel(ssvToArr(keys)));    
+        return $(sel(compact(keys)));    
     }
 
     // Cross-browser versions of window.scrollX and window.scrollY
@@ -522,7 +522,7 @@
      */
     function access(elem, keys) {
         var ret = [];
-        elem && keys && each(ssvToArr(keys), function(k) {
+        elem && keys && each(compact(keys), function(k) {
             ret.push(dataset(elem, k));
         }, elem);
         return ret;
@@ -603,7 +603,7 @@
                 if (null == this.dynamic) this.dynamic = 'device' !== prop.slice(0, 6);
                 
                 this.custom = isCustom[prop];
-                prefix = this.prefix ? sift(map(ssvToArr(this.prefix), sanitize)) : ['min-' + prop + '-'];
+                prefix = this.prefix ? sift(map(compact(this.prefix), sanitize)) : ['min-' + prop + '-'];
                 aliases = 1 < prefix.length ? prefix.slice(1) : 0;
                 this.prefix = prefix[0];
                 points = this.breakpoints;
