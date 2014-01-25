@@ -9,12 +9,12 @@
 /*jshint expr:true, sub:true, supernew:true, debug:true, node:true, boss:true, devel:true, evil:true, 
   laxcomma:true, eqnull:true, undef:true, unused:true, browser:true, jquery:true, maxerr:100 */
 
-(function(root, name, factory) {
+(function(root, name, make) {
     var $ = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
-    if (typeof module != 'undefined' && module['exports']) module['exports'] = factory($);
-    else root[name] = factory($);
-    // see @link github.com/ryanve/response.js/pull/9
-    // AMD @example `define(['jquery'], factory)
+    if (typeof module != 'undefined' && module['exports']) module['exports'] = make($);
+    else root[name] = make($);
+    // @link github.com/ryanve/response.js/pull/9
+    // @example AMD `define(['jquery'], make)
 }(this, 'Response', function($) {
 
     if (typeof $ != 'function') {
@@ -27,12 +27,12 @@
       , root = this
       , name = 'Response'
       , old = root[name]
-      , initContentKey = 'init' + name // key for storing initial content
+      , initContentKey = 'init' + name
       , win = window
       , doc = document
       , docElem = doc.documentElement
       , ready = $.domReady || $
-      , $win = $(win) // cache selector
+      , $win = $(win)
       , screen = win.screen
       , AP = Array.prototype
       , OP = Object.prototype
@@ -45,9 +45,9 @@
             return '[object Array]' === toString.call(item);
         }
       , defaultBreakpoints = {
-            width: [0, 320, 481, 641, 961, 1025, 1281]  // width  | device-width  (ideal for 960 grids)
-          , height: [0, 481]                            // height | device-height (maybe add 801 too)
-          , ratio: [1, 1.5, 2]                          // device-pixel-ratio     (!omit trailing zeros!)
+            width: [0, 320, 481, 641, 961, 1025, 1281]
+          , height: [0, 481]
+          , ratio: [1, 1.5, 2] // device-pixel-ratio
         }
       , Elemset, band, wave, device = {}
       , propTests = {}
@@ -66,21 +66,19 @@
       , regexDashB4 = /-(.)/g
       , regexDataPrefix = /^data-(.+)$/
 
-      , objectCreate = Object.create || function(proto) {
+      , procreate = Object.create || function(parent) {
             /** @constructor */
-            function Type() {} // Function to output empty object.
-            Type.prototype = proto; // Set prototype property to the proto.
-            return new Type; // Instantiate the new object.
+            function Type() {}
+            Type.prototype = parent;
+            return new Type;
         }
-
-      , namespaceIt = function(eventName, customNamespace) {// namepace defaults to 'Response'
+      , namespaceIt = function(eventName, customNamespace) {
             customNamespace = customNamespace || name;
             return eventName.replace(regexTrimPunc, '') + '.' + customNamespace.replace(regexTrimPunc, '');
         }
-
       , event = {
             allLoaded: namespaceIt('allLoaded') // fires on lazy elemsets when all elems in a set have been loaded once
-            //, update: namespaceIt('update')       // fires on each elem in a set each time that elem is updated
+            //, update: namespaceIt('update') // fires on each elem in a set each time that elem is updated
           , crossover: namespaceIt('crossover') // fires on window each time dynamic breakpoint bands is crossed
         }
         
@@ -114,27 +112,35 @@
         return typeof item == 'number' && item === item; // second part stuffs NaN
     }
     
-    function map(ob, fn, scope) {
-        var i, l = ob.length, ret = [];
-        for (i = 0; i < l; i++) ret[i] = fn.call(scope, ob[i], i, ob);
-        return ret;
-    }
-
-    function ssvToArr(ukn) {
-        // Convert space separated values to array. Always returns a compact array:
-        return typeof ukn == 'string' ? sift(ukn.split(' ')) : isArray(ukn) ? sift(ukn) : [];
+    /**
+     * @param {{length:number}} stack
+     * @param {Function} fn
+     * @param {*=} scope
+     * @return {Array}
+     */
+    function map(stack, fn, scope) {
+        for (var r = [], l = stack.length, i = 0; i < l;) r[i] = fn.call(scope, stack[i], i++, stack);
+        return r;
     }
 
     /**
-     * Response.each()
-     * @since 0.4.0
-     * omits `in` check and supports scope since 0.6.2
+     * @param {string|{length:number}} list
+     * @return {Array} new and compact
      */
-    function each(ob, callback, scope) {
-        if (null == ob) { return ob; }
-        var i = 0, len = ob.length;
-        while (i < len) callback.call(scope || ob[i], ob[i], i++, ob); 
-        return ob;
+    function ssvToArr(list) {
+        return !list ? [] : sift(typeof list == 'string' ? list.split(' ') : list);
+    }
+
+    /**
+     * @since 0.4.0, supports scope and sparse-item iteration since 0.6.2
+     * @param {{length:number}} stack
+     * @param {Function} fn
+     * @param {*=} scope
+     */
+    function each(stack, fn, scope) {
+        if (null == stack) return stack;
+        for (var l = stack.length, i = 0; i < l;) fn.call(scope || stack[i], stack[i], i++, stack);
+        return stack;
     }
 
     /**
@@ -153,27 +159,24 @@
     }
 
     /**
-     * @param {Array|Object} ob is an array or collection to iterate over.
-     * @param {(Function|string|*)=} fn is a callback or typestring
-     * @param {(Object|boolean|*)=} scope thisArg or invert
-     * @since  0.4.0 Updated in 0.6.2 to support scope and typestrings
+     * @param {{length:number}} stack to iterate
+     * @param {(Function|string|*)=} fn callback or typestring
+     * @param {(Object|boolean|*)=} scope or inversion boolean
+     * @since 0.4.0, supports scope and typestrings since 0.6.2
      * @example Response.sift([5, 0, 'str'], isFinite) // [5, 0]
      * @example Response.sift([5, 0, 'str']) // [5, 'str']
      */
-    function sift(ob, fn, scope) {
-        var l, u = 0, i = 0, v, ret = [], invert, isF = typeof fn == 'function';
-        if (!ob) return ret;
-        scope = (invert = true === scope) ? null : scope;
-        for (l = ob.length; i < l; i++) {
-            v = ob[i]; // save reference to value in case `fn` mutates `ob[i]`
-            // Use `=== !` to ensure that the comparison is bool-to-bool
-            invert === !(isF ? fn.call(scope, v, i, ob) : fn ? typeof v === fn : v) && (ret[u++] = v);
+    function sift(stack, fn, scope) {
+        var fail, l, v, r = [], u = 0, i = 0, run = typeof fn == 'function', not = true === scope;
+        for (l = stack && stack.length, scope = not ? null : scope; i < l; i++) {
+            v = stack[i];
+            fail = run ? !fn.call(scope, v, i, stack) : fn ? typeof v !== fn : !v;
+            fail === not && (r[u++] = v);
         }
-        return ret;
+        return r;
     }
 
     /**
-     * Response.merge
      * @since 0.3.0
      * @param {Object|Array|Function|*} r receiver
      * @param {Object|Array|Function|*} s supplier Undefined values are ignored.
@@ -187,20 +190,17 @@
     }
 
     /**
-     * Response.route()  Handler method for accepting args as arrays or singles, for 
-     *   callbacks. Returns self for chaining.
+     * @description Call `fn` on each stack value or directly on a non-stack item
      * @since 0.3.0 scope support added in 0.6.2
-     * @param {*} item  If `item` is an array or array-like object then `callback` gets called
-     *   on each member. Otherwise `callback` is called on the `item` itself.
-     * @param {Function} fn The function to call on item(s).
-     * @param {*=} scope  thisArg (defaults to current item)
+     * @param {*} item stack or non-stack item
+     * @param {Function} fn callback
+     * @param {*=} scope defaults to current item
      */
     function route(item, fn, scope) {
-        // If item is array-like then call the callback on each item. Otherwise call directly on item.
-        if (null == item) return item; // Skip null|undefined
+        if (null == item) return item;
         if (typeof item == 'object' && !item.nodeType && isNumber(item.length)) each(item, fn, scope);
-        else fn.call(scope || item, item); 
-        return item; // chainable
+        else fn.call(scope || item, item);
+        return item;
     }
 
     /**
@@ -211,11 +211,11 @@
         /**
          * @param {string|number} min
          * @param {(string|number)=} max
+         * @return {boolean}
          */
         return function(min, max) {
-            var n = fn();
-            min = n >= (min || 0);
-            return max ? min && n <= max : min;        
+            var point = fn();
+            return point >= (min || 0) && (!max || point <= max);        
         };
     }
 
@@ -376,16 +376,14 @@
         return deletesChainable.call(elem, keys);
     }
     
-    function selectify(keys) {
+    function sel(keys) {
         // Convert an array of data keys into a selector string
         // Converts ["a","b","c"] into "[data-a],[data-b],[data-c]"
         // Double-slash escapes periods so that attrs like data-density-1.5 will work
         // @link api.jquery.com/category/selectors/
         // @link github.com/jquery/sizzle/issues/76
-        var k, r = [], i = 0, l = keys.length;
-        while (i < l) {
+        for (var k, r = [], i = 0, l = keys.length; i < l;)
             (k = keys[i++]) && r.push('[' + datatize(k.replace(regexTrimPunc, '').replace('.', '\\.')) + ']');
-        }
         return r.join();
     }
 
@@ -398,7 +396,7 @@
      * @example Response.target('a b c']) //  $('[data-a],[data-b],[data-c]')
      */
     function target(keys) {
-        return $(selectify(ssvToArr(keys)));    
+        return $(sel(ssvToArr(keys)));    
     }
 
     // Cross-browser versions of window.scrollX and window.scrollY
@@ -505,14 +503,12 @@
         var valToStore;
         if (!$elems || null == key) doError('store');
         source = typeof source == 'string' && source;
-
         route($elems, function(el) {
-            if ( source ) { valToStore = el.getAttribute(source); }
-            else if ( 0 < detectMode(el) ) { valToStore = el.getAttribute('src'); }
-            else { valToStore = el.innerHTML; }
+            if (source) valToStore = el.getAttribute(source);
+            else if (0 < detectMode(el)) valToStore = el.getAttribute('src');
+            else valToStore = el.innerHTML;
             null == valToStore ? deletes(el, key) : dataset(el, key, valToStore); 
         });
-
         return Response;
     }
 
@@ -525,7 +521,6 @@
      *   the params are wrong then the return is an empty array.
      */
     function access(elem, keys) {
-        // elem becomes thisArg for datasetChainable:
         var ret = [];
         elem && keys && each(ssvToArr(keys), function(k) {
             ret.push(dataset(elem, k));
@@ -607,10 +602,7 @@
 
                 // If we get to here then we know the prop is one one our supported props:
                 // 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
-                // device- props => NOT dynamic
-                if (typeof this.dynamic != 'boolean') {
-                    this.dynamic = !!('device' !== prop.substring(0, 6));
-                }
+                if (null == this.dynamic) this.dynamic = 'device' !== prop.slice(0, 6);
                 
                 this.custom = isCustom[prop];
                 prefix = this.prefix ? sift(map(ssvToArr(this.prefix), sanitize)) : ['min-' + prop + '-'];
@@ -664,11 +656,11 @@
                 return this;
             }
 
-          , target: function() {// Stuff that can't happen until the DOM is ready:
-                this.$e = $(selectify(sets[this.uid])); // Cache jQuery object for the set.
+          , target: function() {
+                this.$e = $(sel(sets[this.uid])); // Cache selection. DOM must be ready.
                 store(this.$e, initContentKey);  // Store original (no-js) value to data key.
-                this.keys.push(initContentKey);  // Add key onto end of keys array. (# keys now equals # breakpoints + 1)
-                return this; // chainable
+                this.keys.push(initContentKey);  // #keys now equals #breakpoints+1
+                return this;
             }
 
             // The rest of the methods are designed for use with single elements.
@@ -780,7 +772,7 @@
         route(args, function(options) {
             typeof options == 'object' || doError('create @args');
             
-            var elemset = objectCreate(Elemset).configure(options)
+            var elemset = procreate(Elemset).configure(options)
               , lowestNonZeroBP
               , verge = elemset.verge
               , breakpoints = elemset.breakpoints
@@ -794,24 +786,30 @@
         
             ready(function() {
                 var allLoaded = event.allLoaded, lazy = !!elemset.lazy;
+                
+                function resizeHandler() {
+                    elemset.reset();
+                    each(elemset.$e, function(el, i) {
+                        elemset[i].decideValue().updateDOM();
+                    }).trigger(allLoaded);
+                }
+                
+                function scrollHandler() {
+                    each(elemset.$e, function(el, i) {
+                        inViewport(elemset[i].$e, verge) && elemset[i].updateDOM();
+                    });
+                }
 
                 // Target elements containing this set's Response data attributes and chain into the 
                 // loop that occurs on ready. The selector is cached to elemset.$e for later use.
                 each(elemset.target().$e, function(el, i) {
-                    elemset[i] = objectCreate(elemset).prepareData(el);// Inherit from elemset
+                    elemset[i] = procreate(elemset).prepareData(el);// Inherit from elemset
                     if (!lazy || inViewport(elemset[i].$e, verge)) {
                         // If not lazy update all the elems in the set. If
                         // lazy, only update elems in the current viewport.
                         elemset[i].updateDOM(); 
                     }
                 });
-
-                function resizeHandler() {   // Only runs for dynamic props.
-                    elemset.reset();
-                    each(elemset.$e, function(el, i) {// Reset and then loop thru the set.
-                        elemset[i].decideValue().updateDOM(); // Grab elem object from cache and update all.
-                    }).trigger(allLoaded);
-                }
 
                 // device-* props are static and only need to be tested once. The others are
                 // dynamic, meaning they need to be tested on resize. Also if a device so small
@@ -827,20 +825,11 @@
                 // event. Once everything in the set has been swapped once, the scroll handler is deactivated
                 // through the use of a custom event.
                 if (!lazy) return;
-
-                function scrollHandler() {
-                    each(elemset.$e, function(el, i) {
-                        if (inViewport(elemset[i].$e, verge)) {
-                            elemset[i].updateDOM();
-                        }
-                    });
-                }
-
+                
                 $win.on(scrollName, scrollHandler);
                 elemset.$e.one(allLoaded, function() {
                     $win.off(scrollName, scrollHandler);
                 });
-
             });
         });
         return Response;
@@ -894,7 +883,7 @@
         deviceMin: function() { return screenMin; }
       , deviceMax: function() { return screenMax; }
       //, sets: function(prop) {// must be uid
-      //    return $(selectify(sets[prop] || sets.all));
+      //    return $(sel(sets[prop] || sets.all));
       //}
       , noConflict: noConflict
       , chain: chain
@@ -907,7 +896,7 @@
       , store: store
       , access: access
       , target: target
-      , object: objectCreate
+      , object: procreate
       , crossover: crossover
       , action: action
       , resize: resize
@@ -938,14 +927,10 @@
 
     // Initialize
     ready(function() {
-        var nativeJSONParse, customData = dataset(doc.body, 'responsejs');
-        if (customData) {
-            nativeJSONParse = !!win.JSON && JSON.parse;
-            if (nativeJSONParse) customData = nativeJSONParse(customData); 
-            else if ($.parseJSON) customData = $.parseJSON(customData); 
-            customData && customData.create && create(customData.create);
-        }
-        // Remove .no-responsejs class from html tag (if it's there) and add .responsejs
+        var settings = dataset(doc.body, 'responsejs'), parse = win.JSON && JSON.parse || $.parseJSON;
+        settings = settings && parse ? parse(settings) : settings;
+        settings && settings.create && create(settings.create);
+        // Remove .no-responsejs and add .responsejs
         docElem.className = docElem.className.replace(/(^|\s)(no-)?responsejs(\s|$)/, '$1$3') + ' responsejs ';
     });
 
