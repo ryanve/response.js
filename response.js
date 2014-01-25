@@ -44,7 +44,7 @@
       , isArray = Array.isArray || function(item) {
             return '[object Array]' === toString.call(item);
         }
-      , defaultBreakpoints = {
+      , defaultPoints = {
             width: [0, 320, 481, 641, 961, 1025, 1281]
           , height: [0, 481]
           , ratio: [1, 1.5, 2] // device-pixel-ratio
@@ -555,6 +555,10 @@
             // Allow lowercase alphanumerics, dashes, underscores, and periods:
             return typeof key == 'string' ? key.toLowerCase().replace(regexFunkyPunc, '') : '';
         }
+        
+        function ascending(a, b) {
+          return a - b;
+        }
 
         return {
             $e: 0             // object   jQuery object
@@ -572,21 +576,15 @@
           , currValue: 1
           , aka: null
           , lazy: null
-          , i: 0              // integer   the index of the current highest active breakpoint min
+          , i: 0  // integer   the index of the current highest active breakpoint min
           , uid: null
-          
-            // Reset and fire crossover events.
-          , reset: function() {
-                var subjects = this.breakpoints
-                  , i = subjects.length
-                  , tempIndex = 0;
-                  
-                while (!tempIndex && i--) this.fn(subjects[i]) && (tempIndex = i);
 
-                // Fire the crossover event if crossover has occured:
+          , reset: function() {
+                var subjects = this.breakpoints, i = subjects.length, tempIndex = 0;
+                while (!tempIndex && i--) this.fn(subjects[i]) && (tempIndex = i);
                 if (tempIndex !== this.i) {
-                    $win.trigger(crossover) // fires for each set
-                        .trigger(this.prop + crossover); // fires 
+                    // Crossover occurred. Fire the crossover events:
+                    $win.trigger(crossover).trigger(this.prop + crossover);
                     this.i = tempIndex || 0;
                 }
                 return this;
@@ -595,7 +593,7 @@
           , configure: function(options) {
                 merge(this, options);
           
-                var i, prefix, aliases, aliasKeys, isNumeric = true, arr, prop = this.prop;
+                var i, points, prefix, aliases, aliasKeys, isNumeric = true, prop = this.prop;
                 this.uid = suid++;
                 if (null == this.verge) this.verge = min(screenMax, 500);
                 this.fn = propTests[prop] || doError('create @fn');
@@ -608,43 +606,34 @@
                 prefix = this.prefix ? sift(map(ssvToArr(this.prefix), sanitize)) : ['min-' + prop + '-'];
                 aliases = 1 < prefix.length ? prefix.slice(1) : 0;
                 this.prefix = prefix[0];
-                arr = this.breakpoints;
+                points = this.breakpoints;
                 
                 // Sort and validate (#valid8) custom breakpoints if supplied.
                 // Must be done before keys are created so that the keys match:
-                if (isArray(arr)) {// custom breakpoints
-                            
-                    each(arr, function(v) {
+                if (isArray(points)) {
+                    each(points, function(v) {
                         if (!v && v !== 0) throw 'invalid breakpoint';
                         isNumeric = isNumeric && isFinite(v);
                     });
-
-                    arr = isNumeric ? arr.sort(function(a, b) {
-                        return (a - b); // sort lowest to highest
-                    }) : arr; 
-
-                    arr.length || doError('create @breakpoints');
                     
-                } else {// default breakpoints:
-                    // The defaults are presorted so we can skip the need to sort when using the defaults. Omit
-                    // trailing decimal zeros b/c for example if you put 1.0 as a devicePixelRatio breakpoint, 
-                    // then the target would be data-pre1 (NOT data-pre1.0) so drop the zeros.
-                    // If no breakpoints are supplied, then get the default breakpoints for the specified prop.
-                    // Supported props: 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
-                    arr = defaultBreakpoints[prop] || defaultBreakpoints[prop.split('-').pop()] || doError('create @prop'); 
+                    isNumeric && points.sort(ascending);
+                    points.length || doError('create @breakpoints');
+                } else {
+                    // The default breakpoints are presorted.
+                    points = defaultPoints[prop] || defaultPoints[prop.split('-').pop()] || doError('create @prop'); 
                 }
 
                 // Remove breakpoints that are above the device's max dimension,
                 // in order to reduce the number of iterations needed later.
-                this.breakpoints = isNumeric ? sift(arr, function(n) { 
+                this.breakpoints = isNumeric ? sift(points, function(n) { 
                     return n <= screenMax; 
-                }) : arr;
+                }) : points;
 
                 // Use the breakpoints array to create array of data keys:
                 this.keys = affix(this.breakpoints, this.prefix);
                 this.aka = null; // Reset to just in case a value was merged in.
 
-                if (aliases) {// There may be one of more aliases:
+                if (aliases) {
                     aliasKeys = [];
                     i = aliases.length;
                     while (i--) aliasKeys.push(affix(this.breakpoints, aliases[i]));
