@@ -137,18 +137,18 @@
         return ob;
     }
 
-    // revamped affix method reintroduced in version 0.4.0:
-    // updated again in 0.6.2 to skip null|undef values
-    function affix(arr, prefix, suffix) {
-        // Return new array with prefix/suffix added to each value.
-        // null|undefined values are not included in the new array
-        var r = [], l = arr.length, i = 0, v;
-        prefix = prefix || '';
-        suffix = suffix || '';
-        while (i < l) {
-            v = arr[i++]; 
-            null == v || r.push(prefix + v + suffix);
-        }
+    /**
+     * @since 0.4.0 skips null|undefined since 0.6.2, adds `0` since 0.7.11
+     * @param {{length:number}} stack
+     * @param {(string|number)=} prefix
+     * @param {(string|number)=} suffix
+     * @return {Array} new array of affixed strings or added numbers
+     */
+    function affix(stack, prefix, suffix) {
+        if (null == prefix) prefix = '';
+        if (null == suffix) suffix = '';
+        for (var r = [], l = stack.length, i = 0; i < l; i++)
+            null == stack[i] || r.push(prefix + stack[i] + suffix);
         return r;
     }
 
@@ -197,7 +197,7 @@
      */
     function route(item, fn, scope) {
         // If item is array-like then call the callback on each item. Otherwise call directly on item.
-        if (null == item ) return item; // Skip null|undefined
+        if (null == item) return item; // Skip null|undefined
         if (typeof item == 'object' && !item.nodeType && isNumber(item.length)) each(item, fn, scope);
         else fn.call(scope || item, item); 
         return item; // chainable
