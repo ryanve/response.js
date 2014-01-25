@@ -1,7 +1,7 @@
 {
     "name": "response.js",
     "description": "responsive design toolkit",
-    "version": "0.7.10",
+    "version": "0.7.11",
     "homepage": "http://responsejs.com",
     "license": "MIT",
     "author": "Ryan Van Etten",

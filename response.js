@@ -3,7 +3,7 @@
  * @link http://github.com/ryanve/response.js
  * @copyright 2014 Ryan Van Etten
  * @license MIT
- * @version 0.7.10
+ * @version 0.7.11
  */
  
 /*jshint expr:true, sub:true, supernew:true, debug:true, node:true, boss:true, devel:true, evil:true, 
