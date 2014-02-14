@@ -3,7 +3,7 @@
  * @link http://github.com/ryanve/response.js
  * @copyright 2014 Ryan Van Etten
  * @license MIT
- * @version 0.7.11
+ * @version 0.7.12
  */
  
 /*jshint expr:true, sub:true, supernew:true, debug:true, node:true, boss:true, devel:true, evil:true, 
@@ -90,16 +90,14 @@
       , media = matchMedia || function() { return {}; }
     
         // http://ryanve.com/lab/dimensions
-        // http://github.com/ryanve/verge/issues/7
-      , viewportW = docElem['clientWidth'] < win['innerWidth'] ? function() {
-            return win['innerWidth'];
-        } : function() {
-            return docElem['clientWidth'];
+        // http://github.com/ryanve/verge/issues/13
+      , viewportW = function() {
+            var a = docElem['clientWidth'], b = win['innerWidth'];
+            return a < b ? b : a;
         }
-      , viewportH = docElem['clientHeight'] < win['innerHeight'] ? function() {
-            return win['innerHeight'];
-        } : function() {
-            return docElem['clientHeight'];
+      , viewportH = function() {
+            var a = docElem['clientHeight'], b = win['innerHeight'];
+            return a < b ? b : a;
         };
     
     function doError(msg) {
