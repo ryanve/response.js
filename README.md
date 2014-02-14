@@ -91,36 +91,28 @@ Response.media(mediaQuery).matches
 
 ### HTML5 Dataset
 
-Response's dataset methods mimic the HTML5 dataset specification as closely as possible. (Please see [#19](../../issues/19) to let us know if you are using these methods. These methods are also available in [dope](https://github.com/ryanve/dope).)
+Response includes dataset methods like those in [<b>dope</b>](https://github.com/ryanve/dope). Please see [#19](../../issues/19) and let us know if you are using these.
 
 ```js
-// @param {Element|Object} elem  can be a native element or jQuery element
-// @param {string|Object} key is a camelCase or lowercase name for the data attribute.
-
-Response.dataset(elem, key) // get (elem can be native or jQuery elem)
+Response.dataset(elem, key) // get
 Response.dataset(elem, [key]) // get and render (See Response.render)
 Response.dataset(elem, key, value) // set
+Response.dataset(elem, atts) // set multiple data atts at once
+Response.deletes(elem, keys) // delete one or more data atts
 
-Response.dataset(elem, {key1:1, key:2})  // set multiple data attrs at once
-Response.deletes(elem, keys)  // delete attrs (space-separated string)
-Response.deletes(elem, keys)  // delete (remove) one or more space-separated data attributes
+Response.dataset(document.body, "pulpFiction", 5) // sets <body data-pulp-fiction="5">
+Response.dataset(document.body, "pulpFiction") // -> "5"
+Response.dataset(document.body, ["pulpFiction"]) // -> 5
+```
 
-// Integrated into jQuery
-$('div').dataset(key)  // get (from first matched element)
+#### Dataset methods [integrated](#integration) into jQuery
+
+```js
+$('div').dataset(key) // get (from first matched element)
 $('div').dataset([key]) // get and render (See Response.render)
 $('div').dataset(key, value) // set (sets all matched elems)
-$('div').dataset({k1:val, k2:val}) // set multiple attrs at once (on all matched elems)
-$('div').deletes(keys) // delete attrs (space-separated string)
-
-// Examples
-$('body').dataset("pulpFiction", 5) // sets <body data-pulp-fiction="5">
-$('div').dataset("pulpFiction", 5) // sets <div data-pulp-fiction="5"> on all matched divs
-$('div').deletes("pulpFiction") // remove data-pulp-fiction from all matched divs
-$('body').dataset({pulpFiction:5, movie:true}) // sets <body data-pulp-fiction="5" data-movie="true">
-$('body').dataset("pulpFiction") // returns "5"
-$('body').dataset(["pulpFiction"]) // returns 5
-Response.dataset(document.body, "movie") // returns "true"
-Response.dataset(document.body, ["movie"]) // returns true
+$('div').dataset(atts) // set multiple data atts at once
+$('div').deletes(keys) // delete one or more data atts
 ```
 
 ### Data Utils
