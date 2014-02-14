@@ -43,13 +43,13 @@ Response.create({
 ### Dimensions
 
 ```js
-Response.viewportW() // return viewport width
-Response.viewportH() // return viewport height
-Response.scrollX() // cross-broswer equiv to native window.scrollX
-Response.scrollY() // cross-broswer equiv to native window.scrollY
+Response.viewportW() // CSS viewport width
+Response.viewportH() // CSS viewport height
+Response.scrollX() // cross-broswer window.scrollX
+Response.scrollY() // cross-broswer window.scrollY
 
-Response.deviceW() // device width  property
-Response.deviceH() // device height property
+Response.deviceW() // device width
+Response.deviceH() // device height
 Response.deviceMax() // calculated Math.max(deviceW, deviceH)
 Response.deviceMin() // calculated Math.min(deviceW, deviceH)
 ```
@@ -81,7 +81,7 @@ Response.inY(elem, cushion) // true if any part of elem is in the same y axis ra
 Response.inViewport(elem, cushion) // true if any part of elem is in the viewport
 
 // Examples
-Response.inViewport($('p.example'))  // true if any part of <p class=example> is in viewport (exact)
+Response.inViewport($('p.example')) // true if any part of <p class=example> is in viewport (exact)
 Response.inViewport(this) // true if any part of `this` elem is in viewport (exact)
 Response.inViewport(this, 100) // true if any part of `this` elem is in viewport (or w/in 100px of it)
 
@@ -209,12 +209,13 @@ define(['jquery'], Response.noConflict);  // define module and destroy global
 #### Related Modules
 
 - [verge](https://github.com/ryanve/verge) - viewport utilities
+- [actual](https://github.com/ryanve/actual) - `@media` detector
 - [dope](https://github.com/ryanve/dope) - dataset abstraction
 - [res](https://github.com/ryanve/res) - resolution utilities
 
 ## Fund
 
-Fund [opensource dev @ryanve](https://www.gittip.com/ryanve/) <b>=)</b>
+<b>[Tip the developer](https://www.gittip.com/ryanve/)</b> =)
 
 ## License
 
