@@ -277,25 +277,19 @@
   }
 
   /**
-   * Response.render
-   * Converts stringified primitives back to JavaScript.
-   * Adapted from dataValue() @link github.com/ded/bonzo
+   * Convert stringified primitives back to JavaScript.
    * @since 0.3.0
-   * @param {string|*} s String to render back to its correct JavaScript value.
-   *   If s is not a string then it is returned unaffected. 
-   * @return  converted data
-   *
+   * @param {string|*} s String to parse into a JavaScript value.
+   * @return {*} 
    */
   function render(s) {
-    var n; // undefined
-    return (!s || typeof s != 'string' ? s
-      : 'true' === s    ? true    // convert "true" to true
-      : 'false' === s   ? false     // convert "false" to false
-      : 'undefined' === s ? n       // convert "undefined" to undefined
-      : 'null' === s    ? null    // convert "null" to null
-      : (n = parseFloat(s)) === +n ? n  // convert "1000" to 1000
-      : s                 // unchanged
-    );
+    var n; // undefined, or becomes number
+    return typeof s != 'string' || !s ? s
+      : 'false' === s ? false
+      : 'true' === s ? true
+      : 'null' === s ? null
+      : 'undefined' === s || (n = (+s)) || 0 === n || 'NaN' === s ? n
+      : s;
   }
   
   // Isolate native element:
