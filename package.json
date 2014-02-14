@@ -1,14 +1,14 @@
 {
-    "name": "response.js",
-    "description": "responsive design toolkit",
-    "version": "0.7.11",
-    "homepage": "http://responsejs.com",
-    "license": "MIT",
-    "author": "Ryan Van Etten",
-    "keywords": ["responsive", "breakpoint", "breakpoints", "browser"],
-    "main": "./response.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/ryanve/response.js.git"
-    }
+  "name": "response.js",
+  "description": "responsive design toolkit",
+  "version": "0.7.11",
+  "homepage": "http://responsejs.com",
+  "license": "MIT",
+  "author": "Ryan Van Etten",
+  "keywords": ["responsive", "breakpoint", "breakpoints", "browser"],
+  "main": "./response.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ryanve/response.js.git"
+  }
 }
