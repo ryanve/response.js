@@ -106,8 +106,8 @@
     throw new TypeError(msg ? name + '.' + msg : name);
   }
   
-  function isNumber(item) {// inlined @minification
-    return typeof item == 'number' && item === item; // second part stuffs NaN
+  function isNumber(item) {
+    return item === +item;
   }
   
   /**
