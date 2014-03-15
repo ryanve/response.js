@@ -43,8 +43,8 @@
       }
       if ($el) {
         if ($el = $el.find('.output')) {
-          output = String(result);
-          result === !!result && $el.removeClass('true false').addClass(output);
+          output = '' + result;
+          if (typeof result == 'boolean') $el.removeClass('true false').addClass(output);
           return $el.html(output);
         }
       }
@@ -59,7 +59,7 @@
       update(['wave', 'wavemin', 481]);
       update(['band', 'bandminmax', 481, 961]);
       update(['wave', 'waveminmax', 481, 800]);
-    };
+    }
     
     function crossoverToggle(){
       $html.toggleClass('dark');

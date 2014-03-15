@@ -314,7 +314,7 @@
 
     // ** Zero args **
     // Get object containing all the data attributes. Use native dataset when avail.
-    if (elem.dataset && DOMStringMap) return elem.dataset;
+    if (elem.dataset && typeof DOMStringMap != 'undefined') return elem.dataset;
     each(elem.attributes, function(a) {
       // Fallback adapted from ded/bonzo
       a && (n = String(a.name).match(regexDataPrefix)) && (ret[camelize(n[1])] = a.value);
@@ -803,9 +803,10 @@
   // Handler for adding inx/inY/inViewport to $.fn (or another prototype).
   function exposeAreaFilters(engine, proto, force) {
     each(['inX', 'inY', 'inViewport'], function(methodName) {
-      (force || !proto[methodName]) && (proto[methodName] = function(verge, invert) {
+      (force || !proto[methodName]) && (proto[methodName] = function(cushion, invert) {
+        var keep = !invert;
         return engine(sift(this, function(el) {
-          return !!el && !invert === Response[methodName](el, verge); 
+          return !!el && keep === Response[methodName](el, cushion); 
         }));
       });
     });
