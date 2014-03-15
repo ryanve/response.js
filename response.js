@@ -13,8 +13,6 @@
   var $ = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
   if (typeof module != 'undefined' && module['exports']) module['exports'] = make($);
   else root[name] = make($);
-  // @link github.com/ryanve/response.js/pull/9
-  // @example AMD `define(['jquery'], make)
 }(this, 'Response', function($) {
 
   if (typeof $ != 'function') {
