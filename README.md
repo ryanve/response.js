@@ -172,7 +172,7 @@ Response.addTest('viewport-area', function(min) {
 ### Integration
 
 ```js
-Response.bridge($) // Integrate chainable inX/inY/inViewport/dataset/deletes methods into $.fn
+Response.bridge($) // Integrate chainable dataset/deletes methods into $.fn
 ```
 
 ```js
