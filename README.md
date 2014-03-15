@@ -209,4 +209,4 @@ define(['jquery'], Response.noConflict);  // define module and destroy global
 
 ## License
 
-[MIT](response.js#L4-L5)
+[MIT](response.js#L4)

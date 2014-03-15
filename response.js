@@ -1,5 +1,5 @@
 /*!
- * response.js 0.8.0-0+201403151626
+ * response.js 0.8.0+201403151700
  * https://github.com/ryanve/response.js
  * MIT License (c) 2014 Ryan Van Etten
  */
@@ -806,18 +806,6 @@
     return Response;
   }
 
-  // Handler for adding inx/inY/inViewport to $.fn (or another prototype).
-  function exposeAreaFilters(engine, proto, force) {
-    each(['inX', 'inY', 'inViewport'], function(methodName) {
-      (force || !proto[methodName]) && (proto[methodName] = function(cushion, invert) {
-        var keep = !invert;
-        return engine(sift(this, function(el) {
-          return !!el && keep === Response[methodName](el, cushion); 
-        }));
-      });
-    });
-  }
-
   /**
    * Response.bridge
    * Bridges applicable methods into the specified host (e.g. jQuery)
@@ -829,20 +817,8 @@
       // Expose .dataset() and .deletes() to jQuery:
       if (force || void 0 === host.fn.dataset) host.fn.dataset = datasetChainable; 
       if (force || void 0 === host.fn.deletes) host.fn.deletes = deletesChainable;
-      // Expose .inX() .inY() .inViewport()
-      exposeAreaFilters(host, host.fn, force);
     }
     return Response;
-  }
-  
-  /**
-   * Response.chain
-   * @since 0.3.0
-   * @deprecated Use Response.bridge instead.
-   */
-  function chain (host, force) {
-    host = arguments.length ? host : $;
-    return bridge(host, force);
   }
   
   Response = {
@@ -852,7 +828,6 @@
     //  return $(sel(sets[prop] || sets.all));
     //}
     , noConflict: noConflict
-    , chain: chain
     , bridge: bridge
     , create: create
     , addTest: addTest
