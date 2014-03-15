@@ -1,7 +1,7 @@
 # Response
 [Response](http://responsejs.com) is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers performant tools for building responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes.
 
-## API ([0.7](../../releases))
+## API ([0.8](../../releases))
 
 ### Breakpoint Sets
 
@@ -127,10 +127,6 @@ Response.target(keys) // convert keys like "a b c" or ["a","b","c"] to $("[data-
 Response.access(keys) // access an array of dataset values that correspond to an array of dataset keys
 Response.store($elems, key, attrToReadFrom?) // store init content of each elem to data key
 ```
-
-### Filters
-
-**@deprecated**. To be removed. See [github.com/ryanve/verge/issues/1](https://github.com/ryanve/verge/issues/1)
 
 ### Events
 
