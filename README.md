@@ -1,11 +1,16 @@
 # Response
-[Response](http://responsejs.com) is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers performant tools for building mobile-first responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes.
+[Response](http://responsejs.com) is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers performant tools for building responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes.
 
 ## API ([0.7](../../releases))
 
 ### Breakpoint Sets
 
-Response's most powerful feature is its breakpoint sets. They allow the ability to serve different content via breakpoint-based data attributes. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup. Sets can be created using [Response.create(options)](http://responsejs.com/#create) directly or by passing args in a JSON object stored in a `data-responsejs` attribute on the `<body>` tag. In either case, a single set can be setup by passing a single object or multiple sets can be setup by passing an array of objects. See [change notes](CHANGELOG.md) for 0.3.0 (about mode autodetection) and 0.3.1 (about aliased prefixes). See [wiki examples](../../wiki/how-to-create-breakpoint-sets) too.
+Response's main feature is its breakpoint sets. They offer the ability to serve different content via breakpoint-based data attributes. They are best applied with a mobile-first approach. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup.
+
+#### Creating Breakpoint Sets
+
+Sets are created either by calling [Response.create(options)](http://responsejs.com/#create) directly, or automatically via JSON stored in a `body[data-responsejs]`. 
+The <var>options</var> can be a plain object or an array of them. See [wiki examples](../../wiki/how-to-create-breakpoint-sets).
 
 ```js
 Response.create({
