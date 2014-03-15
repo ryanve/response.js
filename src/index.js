@@ -815,16 +815,6 @@
     return Response;
   }
   
-  /**
-   * Response.chain
-   * @since 0.3.0
-   * @deprecated Use Response.bridge instead.
-   */
-  function chain (host, force) {
-    host = arguments.length ? host : $;
-    return bridge(host, force);
-  }
-  
   Response = {
     deviceMin: function() { return screenMin; }
     , deviceMax: function() { return screenMax; }
@@ -832,7 +822,6 @@
     //  return $(sel(sets[prop] || sets.all));
     //}
     , noConflict: noConflict
-    , chain: chain
     , bridge: bridge
     , create: create
     , addTest: addTest

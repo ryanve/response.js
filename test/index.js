@@ -11,7 +11,7 @@
     , tempBase = O;
 
   // Expose chainable methods to $.fn
-  O.chain && O.chain(); 
+  O.bridge && O.bridge($); 
   
   $doc.ready(function() {
     var props = [
