@@ -1,5 +1,5 @@
 # Response
-[Response](http://responsejs.com) is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers performant tools for building responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes.
+<b>Response</b> is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers performant tools for building responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes. (<b>npm</b>: [response.js](https://www.npmjs.org/package/response.js))
 
 ## API ([0.8](../../releases))
 
@@ -185,14 +185,11 @@ Response.noConflict(function(Response){
 #### [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) usage
 
 ```js
-// see the source for more info on this
 define(['jquery'], Response.noConflict);  // define module and destroy global
 ```
 
 ## Resources
 
-- [Website](http://responsejs.com/)
-- [Test Suite](http://responsejs.com/test/)
 - [Issues](../../issues)
 - [Wiki](../../wiki)
 

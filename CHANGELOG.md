@@ -1,7 +1,12 @@
 # Changelog
 
-- Browse/download the [current](./) or [previous versions](../../tags).
-- Compare [version tags](../../tags) like [0.6.1...0.7.7](../../compare/0.6.1...0.7.7)
+- Browse/download the [current](./) or [previous versions](../../releases).
+- Compare [version tags](../../tags) like [0.6.1...0.7.13](../../compare/0.6.1...0.7.13)
+
+## 0.8.0
+- Use [grunt](GruntFile.js) to lint and create builds
+- Remove deprecated [filters](../../tree/0.7.13#filters)
+- Remove deprecated [`.chain()`](../../commit/814713da826d47b38b7d6393ca366fe9a948df4d) method
 
 ## [0.7.0](../../tree/0.7.0)
 - Added [elo](http://github.com/ryanve/elo) as a compatible framework. 
@@ -11,8 +16,6 @@
 - Added thisArg functionality to `Response.each` / `Response.route` / `Response.sift`
 - Added typestring functionality to `Response.sift` (e.g. `Response.sift(arr, "string")` filters for `typeof` string only)
 - `Response.map` now delegates to native `[].map` when available and emulates it otherwise.
-- Removed excess element references in breakpoint set objects.
-- Removed uneeded memoization in breakpoint sets.
 
 ## [0.6.1](../../tree/0.6.1) (2012-07-19)
 - Allow for empty breakpoints like `data-r961=""` to work as expected. ([See #12](../../issues/12))
@@ -61,9 +64,7 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 
 ```html
 <body data-responsejs='{ 
-    "create": {  "prop": "width"
-               , "prefix": "min-width- r src"
-               , "breakpoints": [1281,1025,961,641,481,320,0]  }
+  "create": {  "prop": "width", "prefix": "min-width- r src", "breakpoints": [961, 641, 481, 0] }
 }'>
 ```
 
