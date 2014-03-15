@@ -3,7 +3,7 @@
  * @link http://github.com/ryanve/response.js
  * @copyright 2014 Ryan Van Etten
  * @license MIT
- * @version 0.7.12
+ * @version 0.7.13
  */
  
 /*jshint expr:true, sub:true, supernew:true, debug:true, node:true, boss:true, devel:true, evil:true, 
@@ -16,8 +16,8 @@
 }(this, 'Response', function($) {
 
   if (typeof $ != 'function') {
-    try {// Exit gracefully if dependency is missing:
-      console.log('Response was unable to run due to missing dependency.');
+    try {
+      return void console.warn('response.js aborted due to missing dependency');
     } catch (e) {}
   }
 
