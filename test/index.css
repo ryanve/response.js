@@ -1,0 +1,80 @@
+html { font-family:sans-serif; font-size:1em }
+body {
+  margin:0 auto; width:94%; max-width:64em;  
+  font-size:1.1em; word-wrap:break-word;
+}
+code, kbd, pre, samp { font-family:monospace; font-size:1.125em }
+pre { white-space:pre-wrap }
+a { text-decoration:none; color:#268bd2; font-weight:bold }
+a:hover { color:#6c71c4; text-decoration:underline }
+#header h1 { margin:0 }
+@media (max-width:30em) {
+  /* gist.github.com/ryanve/5457737 */
+  table, thead, tbody, th, td, tr { display:block }
+  tr + tr { margin-top:1em }
+}
+html { background:#fdf6e3; color:#657b83 } .dark { background:#eee8d5 }
+#header a { color:#28d }
+.method h3 { margin:0;color:#678 }
+.method { padding:.5em 0; color:#657b83 }
+.lib { color:#9aa }
+td code { color:#d38 }
+td { padding:.25em .5em }
+th { text-align:left;color:#567 }
+td:first-child { padding-left:0 }
+td:last-child { padding-right:0 }
+.entry-title { margin:0 }
+.part-1,.part-2 { white-space:nowrap }
+.section-h { margin:1em 0 }
+.section-a { background:#d38; color:#034; padding:.5em }
+.section-a:hover { background:#c41; color:#034 }
+.part-1 .ext { display:none }
+#sets strong,.output { color:#890 }
+#alias .section-h { display:none }
+#alias pre { color:#b80 }
+#sets h4 { margin-bottom:0 }
+#sets div { margin-left:1em }
+.andup { color:#b90 }
+
+@media screen and (min-width:481px) {
+  .output, #sets strong { color:#28d }
+}
+@media screen and (min-width:961px) {
+  .output, #sets strong { color:#67c }
+}
+
+.false, #sets .fail { color:#d32 }
+footer { margin:2em 0 }
+footer a { padding:.5em; color:#d32; background:#034 }
+footer a:hover{ background:#012; color:#b90 }
+footer ul { list-style-type:none; display:block; padding:0 }
+footer ul li { display:block; float:left; margin:0 0 1em .25em }
+body div.dark { background:#ddc }
+
+span.andup:after { color: #c41; content:" / 0+ or no-mq"; }
+.css-value { color: #c41; }
+.min-device-pixel-ratio .andup:after { content:""; }
+@media (min-width:320px) {
+  .min-width .andup:after { content:" / 320px+" }
+}
+@media (min-width:481px) {
+  .min-width .andup:after { content:" / 481px+" }
+}
+@media (min-width:961px) {
+  .min-width .andup:after { content:" / 961px+" }
+}
+@media (min-height:481px) {
+  .min-height .andup:after { content:" / 481px+" }
+}
+@media (min-device-width:320px) {
+  .min-device-width .andup:after { content:" / 320px+" }
+}
+@media (min-device-width:481px) {
+  .min-device-width .andup:after { content:" / 481px+" }
+}
+@media (min-device-width:961px) {
+  .min-device-width .andup:after { content:" / 961px+" }
+}
+@media (min-device-height:481px) {
+  .min-device-height .andup:after { content:" / 481px+" }
+}

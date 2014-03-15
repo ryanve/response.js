@@ -1,9 +1,3 @@
-/*!
- * response.js 0.8.0-0+201403151609
- * https://github.com/ryanve/response.js
- * MIT License (c) 2014 Ryan Van Etten
- */
-
 (function(root, name, make) {
   var $ = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
   if (typeof module != 'undefined' && module['exports']) module['exports'] = make($);

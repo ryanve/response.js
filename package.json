@@ -1,8 +1,8 @@
 {
   "name": "response.js",
   "description": "responsive design toolkit",
-  "version": "0.7.13",
-  "homepage": "http://responsejs.com",
+  "version": "0.8.0-0",
+  "homepage": "https://github.com/ryanve/response.js",
   "license": "MIT",
   "author": "Ryan Van Etten",
   "keywords": ["responsive", "breakpoint", "breakpoints", "browser"],
@@ -10,5 +10,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ryanve/response.js.git"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.4",
+    "grunt-contrib-uglify": "~0.3.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-jshint": "~0.8.0"
   }
 }
