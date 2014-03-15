@@ -1,5 +1,5 @@
 # Response
-[Response](http://responsejs.com) is an experimental [jQuery](http://jquery.com)/[Ender](http://ender.jit.su)/[Zepto](http://zeptojs.com) plugin that gives web designers performant tools for building mobile-first responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes.
+[Response](http://responsejs.com) is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers performant tools for building mobile-first responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes.
 
 ## API ([0.7](../../releases))
 
