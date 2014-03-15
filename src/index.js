@@ -800,18 +800,6 @@
     return Response;
   }
 
-  // Handler for adding inx/inY/inViewport to $.fn (or another prototype).
-  function exposeAreaFilters(engine, proto, force) {
-    each(['inX', 'inY', 'inViewport'], function(methodName) {
-      (force || !proto[methodName]) && (proto[methodName] = function(cushion, invert) {
-        var keep = !invert;
-        return engine(sift(this, function(el) {
-          return !!el && keep === Response[methodName](el, cushion); 
-        }));
-      });
-    });
-  }
-
   /**
    * Response.bridge
    * Bridges applicable methods into the specified host (e.g. jQuery)
@@ -823,8 +811,6 @@
       // Expose .dataset() and .deletes() to jQuery:
       if (force || void 0 === host.fn.dataset) host.fn.dataset = datasetChainable; 
       if (force || void 0 === host.fn.deletes) host.fn.deletes = deletesChainable;
-      // Expose .inX() .inY() .inViewport()
-      exposeAreaFilters(host, host.fn, force);
     }
     return Response;
   }
