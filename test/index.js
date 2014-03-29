@@ -9,9 +9,6 @@
     , O = root.Response || void console.warn('Try refreshing the page.')
     , crossovers = 0
     , tempBase = O;
-
-  // Expose chainable methods to $.fn
-  O.bridge && O.bridge($); 
   
   $doc.ready(function() {
     var props = [
@@ -92,8 +89,5 @@
     update(['band', 'devicebandminmax', 481, 961]);
     update(['wave', 'devicewaveminmax', 481, 800]);
     tempBase = O;
-    
-    // Test dataset/deletes (use camelcase to test full functionality)
-    $html.dataset(O.dataset($html, 'heroType'), O.dataset(html, 'heroName')).deletes('heroName heroType');
   });
 }(this, window, document));
