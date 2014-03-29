@@ -799,21 +799,6 @@
     if (typeof callback == 'function') callback.call(root, Response);
     return Response;
   }
-
-  /**
-   * Response.bridge
-   * Bridges applicable methods into the specified host (e.g. jQuery)
-   * @param {Function} host
-   * @param {boolean=} force
-   */
-  function bridge(host, force) {
-    if (typeof host == 'function' && host.fn) {
-      // Expose .dataset() and .deletes() to jQuery:
-      if (force || void 0 === host.fn.dataset) host.fn.dataset = datasetChainable; 
-      if (force || void 0 === host.fn.deletes) host.fn.deletes = deletesChainable;
-    }
-    return Response;
-  }
   
   Response = {
     deviceMin: function() { return screenMin; }
@@ -822,7 +807,6 @@
     //  return $(sel(sets[prop] || sets.all));
     //}
     , noConflict: noConflict
-    , bridge: bridge
     , create: create
     , addTest: addTest
     , datatize: datatize
