@@ -11,6 +11,7 @@
   }
 
   var Response
+    , Elemset
     , root = this
     , name = 'Response'
     , old = root[name]
@@ -35,7 +36,6 @@
         , height: [0, 481]
         , ratio: [1, 1.5, 2] // device-pixel-ratio
       }
-    , Elemset, band, wave, device = {}
     , propTests = {}
     , isCustom = {}
     , sets = { all: [] }
@@ -88,6 +88,13 @@
     , viewportH = function() {
         var a = docElem['clientHeight'], b = win['innerHeight'];
         return a < b ? b : a;
+      }
+
+    , band = bind(between, viewportW)
+    , wave = bind(between, viewportH)
+    , device = {
+          'band': bind(between, deviceW)
+        , 'wave': bind(between, deviceH)
       };
 
   function isNumber(item) {
@@ -104,7 +111,18 @@
       return fn.apply(scope, arguments);
     };
   }
-  
+
+  /**
+   * @this {Function}
+   * @param {number} min
+   * @param {number=} max
+   * @return {boolean}
+   */
+  function between(min, max) {
+    var point = this.call();
+    return point >= (min || 0) && (!max || point <= max);
+  }
+
   /**
    * @param {{length:number}} stack
    * @param {Function} fn
@@ -195,31 +213,6 @@
     else fn.call(scope || item, item);
     return item;
   }
-
-  /**
-   * @param {Function} fn gets a value to compare against
-   * @return {Function} range comparison tester
-   */    
-  function ranger(fn) {
-    /**
-     * @param {string|number} min
-     * @param {(string|number)=} max
-     * @return {boolean}
-     */
-    return function(min, max) {
-      var point = fn();
-      return point >= (min || 0) && (!max || point <= max);    
-    };
-  }
-
-  /** 
-   * Range comparison booleans
-   * @link responsejs.com/#booleans
-   */
-  band = ranger(viewportW); // Response.band
-  wave = ranger(viewportH); // Response.wave
-  device.band = ranger(deviceW); // Response.device.band
-  device.wave = ranger(deviceH); // Response.device.wave
   
   /**
    * Response.dpr(decimal) Tests if a minimum device pixel ratio is active. 
