@@ -31,7 +31,7 @@
       var result, prop, $el, output;
       if (typeof arr == 'string') {
         prop = tempBase[arr];
-        result = typeof prop === 'function' ? prop() : prop;
+        result = typeof prop == 'function' ? prop() : prop;
         $el = $ids[arr.toLowerCase()];
       } else {
         prop = tempBase[arr.shift()];

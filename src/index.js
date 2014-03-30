@@ -648,7 +648,7 @@
           // The extra member in the values array is the initContentKey value.
           var val = null, subjects = this.breakpoints, sL = subjects.length, i = sL;
           while (val == null && i--) this.fn(subjects[i]) && (val = this.values[i]);
-          this.newValue = typeof val === 'string' ? val : this.values[sL];
+          this.newValue = typeof val == 'string' ? val : this.values[sL];
           return this; // chainable
         }
 
