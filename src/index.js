@@ -20,7 +20,6 @@
     , docElem = doc.documentElement
     , ready = $.domReady || $
     , $win = $(win)
-    , screen = win.screen
     , DMS = typeof DOMStringMap != 'undefined'
     , AP = Array.prototype
     , OP = Object.prototype
