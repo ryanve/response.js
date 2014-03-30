@@ -68,12 +68,16 @@
         , crossover: namespaceIt('crossover') // fires on window each time dynamic breakpoint bands is crossed
       }
     
-      // Response.media (normalized matchMedia)
-      // @example Response.media("(orientation:landscape)").matches
-      // If both versions are undefined, .matches will equal undefined 
-      // Also see: band / wave / device.band / device.wave / dpr
+      // normalized matchMedia
     , matchMedia = win.matchMedia || win.msMatchMedia
-    , media = matchMedia || function() { return {}; }
+    , media = matchMedia ? bind(matchMedia, win) : function() {
+        return {}; 
+      }
+    , mq = matchMedia ? function(q) {
+        return !!matchMedia.call(win, q);
+      } : function() {
+        return false;
+      }
   
       // http://ryanve.com/lab/dimensions
       // http://github.com/ryanve/verge/issues/13
@@ -85,9 +89,20 @@
         var a = docElem['clientHeight'], b = win['innerHeight'];
         return a < b ? b : a;
       };
-  
+
   function isNumber(item) {
     return item === +item;
+  }
+  
+  /**
+   * @param {Function} fn
+   * @param {*=} scope
+   * @return {Function}
+   */
+  function bind(fn, scope) {
+    return function() {
+      return fn.apply(scope, arguments);
+    };
   }
   
   /**
@@ -231,8 +246,8 @@
     // The generic min-device-pixel-ratio is expected to be added to the W3 spec.
     // Return false if neither method is available.
     decimal = 'only all and (min--moz-device-pixel-ratio:' + decimal + ')';
-    if (media(decimal).matches) return true;
-    return !!media(decimal.replace('-moz-', '')).matches;
+    if (mq(decimal)) return true;
+    return mq(decimal.replace('-moz-', ''));
   }
 
   /**
