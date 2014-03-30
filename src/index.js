@@ -271,13 +271,12 @@
       : s;
   }
   
-  // Isolate native element:
+  /**
+   * @param {Element|{length:number}} e
+   * @return {Element|*}
+   */
   function first(e) {
-    // stackoverflow.com/questions/9119823/safest-way-to-detect-native-dom-element
-    // See @link jsperf.com/get-native
-    // If e is a native element then return it. If not check if index 0 exists and is
-    // a native elem. If so then return that. Otherwise return false.
-    return !e ? false : e.nodeType === 1 ? e : e[0] && e[0].nodeType === 1 ? e[0] : false;
+    return !e || e.nodeType ? e : e[0];
   }
 
   /**
