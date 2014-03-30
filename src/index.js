@@ -279,7 +279,7 @@
   }
   
   // Isolate native element:
-  function getNative(e) {
+  function first(e) {
     // stackoverflow.com/questions/9119823/safest-way-to-detect-native-dom-element
     // See @link jsperf.com/get-native
     // If e is a native element then return it. If not check if index 0 exists and is
@@ -336,7 +336,7 @@
    * @param {*=} v
    */  
   function dataset(el, k, v) {
-    el = getNative(el);
+    el = first(el);
     if (!el || !el.setAttribute) return;
     if (void 0 === k && v === k) return getDataset(el);
     var exact = isArray(k) && datatize(k[0]);
@@ -434,20 +434,20 @@
   // outside the viewport are 'on the verge' of being scrolled to.
 
   function inX(elem, verge) {
-    var r = rectangle(getNative(elem), verge);
+    var r = rectangle(first(elem), verge);
     return !!r && r.right >= 0 && r.left <= viewportW();
   }
 
   function inY(elem, verge) {
-    var r = rectangle(getNative(elem), verge);
+    var r = rectangle(first(elem), verge);
     return !!r && r.bottom >= 0 && r.top <= viewportH();
   }
 
   function inViewport(elem, verge) {
     // equiv to: inX(elem, verge) && inY(elem, verge)
-    // But just manually do both to avoid calling rectangle() and getNative() twice.
+    // But just manually do both to avoid calling rectangle() and first() twice.
     // It actually gzips smaller this way too:
-    var r = rectangle(getNative(elem), verge);
+    var r = rectangle(first(elem), verge);
     return !!r && r.bottom >= 0 && r.top <= viewportH() && r.right >= 0 && r.left <= viewportW();
   }
   
