@@ -86,12 +86,6 @@
         return a < b ? b : a;
       };
   
-  function doError(msg) {
-    // Error handling. (Throws exception.)
-    // Use Ctrl+F to find specific @errors
-    throw new TypeError(msg ? name + '.' + msg : name);
-  }
-  
   function isNumber(item) {
     return item === +item;
   }
@@ -487,7 +481,7 @@
    */
   function store($elems, key, source) {
     var valToStore;
-    if (!$elems || null == key) doError('store');
+    if (!$elems || null == key) throw new TypeError('@store');
     source = typeof source == 'string' && source;
     route($elems, function(el) {
       if (source) valToStore = el.getAttribute(source);
@@ -582,7 +576,7 @@
           var i, points, prefix, aliases, aliasKeys, isNumeric = true, prop = this.prop;
           this.uid = suid++;
           if (null == this.verge) this.verge = min(screenMax, 500);
-          this.fn = propTests[prop] || doError('create @fn');
+          if (!(this.fn = propTests[prop])) throw new TypeError('@create');
 
           // If we get to here then we know the prop is one one our supported props:
           // 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
@@ -603,10 +597,11 @@
             });
             
             isNumeric && points.sort(ascending);
-            points.length || doError('create @breakpoints');
+            if (!points.length) throw new TypeError('.breakpoints');
           } else {
             // The default breakpoints are presorted.
-            points = defaultPoints[prop] || defaultPoints[prop.split('-').pop()] || doError('create @prop'); 
+            points = defaultPoints[prop] || defaultPoints[prop.split('-').pop()];
+            if (!points) throw new TypeError('.prop');
           }
 
           // Remove breakpoints that are above the device's max dimension,
@@ -744,8 +739,7 @@
 
   function create(args) {
     route(args, function(options) {
-      typeof options == 'object' || doError('create @args');
-      
+      if (typeof options != 'object') throw new TypeError('@create');
       var elemset = procreate(Elemset).configure(options)
         , lowestNonZeroBP
         , verge = elemset.verge
