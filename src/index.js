@@ -322,18 +322,6 @@
     return ret; // plain object
   }
 
-  function deletesChainable(keys) {
-    if (this && typeof keys === 'string') {
-      keys = compact(keys);
-      route(this, function(el) {
-        each(keys, function(key) {
-          key && el.removeAttribute(datatize(key));
-        });
-      });
-    }
-    return this;
-  }
-
   /**
    * Response.dataset() See datasetChainable above
    * @since 0.3.0
@@ -343,16 +331,20 @@
   }
 
   /**
-   * Response.deletes(elem, keys)  Delete HTML5 data attributes (remove them from them DOM)
+   * Response.deletes(elem, keys) Delete HTML5 data attributes (remove them from them DOM)
    * @since 0.3.0
-   * @param {Element|Object} elem is a native element or jQuery object
-   * @param {string} keys  one or more space-separated data attribute keys (names) to delete (removed
-   * from the DOM) Should be camelCased or lowercase.         // from all divs.
+   * @param {Element|{length:number}} elem is a DOM element or stack of them
+   * @param {string|Array} ssv data attribute key(s) in camelCase or lowercase to delete
    */
-  function deletes(elem, keys) {
-    return deletesChainable.call(elem, keys);
+  function deletes(elem, ssv) {
+    ssv = compact(ssv);
+    route(elem, function(el) {
+      each(ssv, function(k) {
+        el.removeAttribute(datatize(k));
+      });
+    });
   }
-  
+
   function sel(keys) {
     // Convert an array of data keys into a selector string
     // Converts ["a","b","c"] into "[data-a],[data-b],[data-c]"
