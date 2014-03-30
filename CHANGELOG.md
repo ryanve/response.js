@@ -1,5 +1,4 @@
 # Changelog
-
 - Browse/download the [current](./) or [previous versions](../../releases).
 - Compare [version tags](../../tags) like [0.6.1...0.7.13](../../compare/0.6.1...0.7.13)
 
@@ -24,7 +23,7 @@
 - Added `Response.noConflict()`
 - Added support for [non-numeric custom breakpoints](../../issues/10#issuecomment-6439578).
 - Added `Response.bridge()`. `Response.chain()` is now an alias for `Response.bridge()`. Use `Response.bridge()`.
-- Removed [depreciated](../../issues/6) `.overflowX()`/`.overflowY()` methods.
+- Removed [deprecated](../../issues/6) `.overflowX()`/`.overflowY()` methods.
 - Reorganized closure to better accomodate [module loaders](../../pull/9).
 
 ## [0.5.3](../../releases/0.5.3) (2012-05-19)
@@ -35,14 +34,14 @@
 
 ## [0.5.1](../../releases/0.5.1) (2012-03-21)
 - `Response.addTest()` now can be chained like `Response.addTest().addTest().addTest()` 
-- **CSS**: For styling purposes `.responsejs` now gets added to the `html` tag when Response has been successfully loaded. `.no-responsejs` is removed if it is present.
+- CSS: For styling purposes `.responsejs` now gets added to the `html` tag when Response has been successfully loaded. `.no-responsejs` is removed if it is present.
 
 ## [0.5.0](../../releases/0.5.0) (2012-03-18)
 - [Jeesh](http://ender.jit.su/#jeesh) compatibility added. (0.5.0 requires jQuery, Zepto, **or** Jeesh.)
-- [Consistency](../../issues/4): The 4 device dimension getters (deviceW / deviceH / deviceMax / deviceMax) were converted from properties to methods in order to be [consistent](../../issues/4) with the rest of the dimensions API => they now require parens, e.g. `Response.deviceW()`
-- **Events**: Ready, resize, and crossover events added to the API. (See Events in the [readme](README.md))
-- **Extending**: Added ability to add custom props/tests via `Response.addTest(prop, testFn)` (See Extending in the [readme](README.md))
-- Improved performance of inX / inY / inViewport methods. 
+- [Consistency](../../issues/4): The 4 device dimension getters were converted from properties to methods in order to be [consistent](../../issues/4) with the rest of the dimensions API. They now must be called with parenthesis, e.g. `Response.deviceW()`
+- [Events](../../tree/0.5.0#events): `.ready`, `.resize`, and `.crossover` event methods were added to the API.
+- [Extending](../../tree/0.5.0#extending): Added ability to add custom props/tests via `Response.addTest(prop, testFn)`
+- Improved performance of `.inX`, `.inY`, and `.inViewport` methods.
 
 ## [0.4.2](../../releases/0.4.2) (2012-03-08)
 - Fixed 2 important bugs: 
@@ -50,7 +49,7 @@
   - [escaping in special characters in selector strings](../../commit/82e8f5b148b6b411438014dbd5b638625d9d73b7)
 
 ## [0.4.1](../../releases/0.4.1) (2012-03-02)
-- Minor [tweak](../../commit/c06f9c9c7275ef1d154613fe33ed95146d174558) improves performance of the overflowX/overflowY methods.
+- Minor [tweak](../../commit/c06f9c9c7275ef1d154613fe33ed95146d174558) improves performance of the `.overflowX` and `.overflowY` methods.
 
 ## [0.4.0](../../releases/0.4.0) (2012-02-27)
  
@@ -69,35 +68,38 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 ```
 
 ## [0.3.0](../../releases/0.3.0) (2012-02-14)
-- [**Zepto**](https://github.com/madrobby/zepto): Response is now fully compatible with [Zepto](https://github.com/madrobby/zepto). To do this, functions that relied on jQuery methods lacking Zepto equivalents such as [$.grep](http://api.jquery.com/jQuery.grep/) / [$.parseJSON](http://api.jquery.com/jQuery.parseJSON/) / [$.data](http://api.jquery.com/jQuery.data/) needed to be converted. Our code now mostly uses native methods to accomplish these tasks. This has a two-fold effect: the underlying code now is a bit longer but it *runs* way faster—win.
-- [**HTML5 dataset**](README.md): In adapting more methods into native code `Response.dataset` was born. Using syntax just like [jQuery.data](http://api.jquery.com/jQuery.data/), `Response.dataset(elem, key, value)` provides a blazing fast cross-browser implementation of the native dataset API and this is now used for all data attribute storage and access within Response. (See examples in the [readme](README.md).)
-- [**Mode autodetection**](https://twitter.com/#!/ResponseJS/status/158784160754966529): In previous versions it was necessary to specify [markup or src](http://responsejs.com/#modes) mode in their attribute set definitions. In 0.3.0 the appropriated mode is autodetected! This is done by checking the [tagName](https://developer.mozilla.org/en/DOM/element.tagName) against elements that support the `src` attribute per [the spec](dev.w3.org/html5/spec-author-view/index.html#attributes-1). The mode parameter is now ignored in favor of autodetection. This means that devs only need to set up one set for each prop where in previous versions they'd have needed two (but it stills work either way for backwards support).
+- [Zepto](https://github.com/madrobby/zepto): Response is now fully compatible with [Zepto](https://github.com/madrobby/zepto). To do this, functions that relied on jQuery methods lacking Zepto equivalents such as [$.grep](http://api.jquery.com/jQuery.grep/) / [$.parseJSON](http://api.jquery.com/jQuery.parseJSON/) / [$.data](http://api.jquery.com/jQuery.data/) needed to be converted. Our code now mostly uses native methods to accomplish these tasks. This has a two-fold effect: the underlying code now is a bit longer but it *runs* way faster—win.
+- [HTML5 dataset](../../tree/0.3.0#html5-dataset): In adapting more methods into native code `Response.dataset` was born. Using syntax just like [jQuery.data](http://api.jquery.com/jQuery.data/), `Response.dataset(elem, key, value)` provides a blazing fast cross-browser implementation of the native dataset API and this is now used for all data attribute storage and access within Response. (See examples in the [readme](README.md).)
+- [Mode autodetection](https://twitter.com/#!/ResponseJS/status/158784160754966529): In previous versions it was necessary to specify either `"markup"` or `"src"` `.mode` when calling Response.create. In 0.3+ the appropriate mode is autodetected according to [elements that support](http://dev.w3.org/html5/spec-author-view/index.html#attributes-1) `[src]`. The `.mode` is now ignored in favor of autodetection. This means that only one set is needed for each `.prop` where in prior versions 2 were needed.
   - `img`|`input`|`source`|`embed`|`track` always behave in src mode.
   - `iframe`|`audio`|`video` behave in src mode *only* if a `src` attribute is present.
-  - Otherwise elements behave in [markup mode](http://responsejs.com/#modes). 
-- **OO**: The code that powers the attribute sets now employs an object-based approach. Using prototypal/differential inheritance, attribute sets now inherit from an internal base object called `Elemset`. Each individual element within the set also inherits from the same object. Whoa—slick. This makes the code that powers the sets easier to maintain and at the same time improves their efficiency.
-- **Lazyloading**: Attribute sets are now capable of lazyloading. In 0.3.0 this feature is at an experimental phase and is only rolled out for Webkit browsers—where the JavaScript engine is lightning fast. The effect of this is that content stored in Response data attributes is not loaded until it is near the active viewport. This has potential for enormous performance savings. In creating this feature, three area-based methods were introduced: [inX/inY/inViewport](README.md).
-- **Chainable** forms of Response's dataset / deletes / inX / inY / inViewport methods are available as an opt-in. They are disabled by default. Calling `Response.chain()` exposes them to `$.fn` and makes them available in the jQuery chain. (See [readme](README.md))
-- [**Dimensions methods**](README.md) were added to the main API.
-- **Local Iterators**: In an effort to further improve performance, local iteration functions optimized for their needed usage in Response using native loops are now used in place of `$.map` / `$.each` / `$.grep`
-- **Dropped**: The legacy version of `Response.create` in 0.2.5 took string params. This was never in the docs so it seems safe to drop support for this. Therefore in 0.3+ the `Response.create` [param](http://responsejs.com/#create) must be an object (or an array of objects). The `Response.decide` method used internally was depreciated/removed in 0.3.0.
+  - Otherwise elements behave in markup mode. 
+- <b>OO</b>: The code that powers the attribute sets now employs an object-based approach. Using prototypal/differential inheritance, attribute sets now inherit from an internal base object called `Elemset`. Each individual element within the set also inherits from the same object. Whoa—slick. This makes the code that powers the sets easier to maintain and at the same time improves their efficiency.
+- <b>Lazyloading</b>: Attribute sets are now capable of lazyloading. In 0.3.0 this feature is at an experimental phase and is only rolled out for Webkit browsers—where the JavaScript engine is lightning fast. The effect of this is that content stored in Response data attributes is not loaded until it is near the active viewport. This has potential for enormous performance savings. In creating this feature, three area-based methods were introduced: [inX/inY/inViewport](README.md).
+- <b>Chainable</b> forms of Response's dataset, deletes, inX, inY, inViewport methods are optionally available. Calling `Response.chain()` exposes them to `$.fn` and makes them available in the jQuery chain.
+- [Dimensions methods](../../tree/0.3.0#dimensions) were added to the API.
+- <b>Local iterators</b>: Response now mainly uses local functions for iteration.
+- **Removed features**:
+  - The initial version of `Response.create` in 0.2.5 took string parameters. These were undocumented and now removed. `Response.create` now only accepts either an object or an array of them.
+  - The internal `Response.decide` method was removed.
 
 ## [0.2.9](../../releases/0.2.9) (2012-01-02)
 - [Fixed issue reading data-responsejs attribute](../../issues/3).
 - Added new boolean methods: 
-  - `Response.wave` tests viewport `height` ranges (vertical equivalent to [Response.band](http://responsejs.com/#band))
+  - `Response.wave` tests viewport `height` ranges (vertical equivalent to `Response.band`)
   - `Response.device.wave` tests `device-height` ranges 
   - `Response.device.band` tests `device-width` ranges 
-- Breakpoints can now be based on any of the props—in addition to `'width'` and `'device-pixel-ratio'` the [Response.create](http://responsejs.com/#create) `prop` parameter now accepts `'height'`, `'device-width'`, and `'device-height'`.
+- Breakpoints can now be based on any of the properties. Recognized `.prop` values are: `'width'`, `'device-pixel-ratio'`, `'height'`, `'device-width'`, and `'device-height'`.
 
 ## [0.2.8](../../releases/0.2.8) (2011-12-17)
 - Added local function for handling range comparison in preparation for new methods in 0.2.9.
 - `Response.decide` loop optimized.
-- Removed depreciated [Response.affix](../../issues/1) method.
+- Removed deprecated [Response.affix](../../issues/1) method.
 
 ## [0.2.7](../../releases/0.2.7) (2011-10-26)
 - Error handling was improved. Now, most of the public methods will throw an exception to the console if the args sent to them are incorrect. The exception says the name of the method that caused the problem and when possible the name of the arg preceded by an @ sign.
-- Some issues with device-pixel-ratio [decimals](http://stackoverflow.com/questions/7907180/retain-precision-during-numeric-sort) and were resolved. Response.target was updated with the ability to target data keys containing decimal points. [They needed to be escaped.](https://github.com/jquery/sizzle/issues/76) `Response.create` now properly supports `device-pixel-ratio` based attributes. `Response.dpr` was further optimized.
+- Resolve issue with sorting `device-pixel-ratio` [decimal values](http://stackoverflow.com/q/7907180/770127). `Response.target` was updated with the ability to target data keys containing decimal points. [They needed to be escaped.](https://github.com/jquery/sizzle/issues/76) `Response.create` now properly supports `device-pixel-ratio` based attributes.
+- `Response.dpr` was further optimized.
 
 ## [0.2.6](../../releases/0.2.6) (2011-10-24)
 - The default attribute setups were eliminated in favor of letting devs choose their own setup options (breakpoints etc.) either via Response.create or by passing the custom setup options in a JSON object stored in a data attribute on the body tag. The latter method is preferrable because it requires no scripting.
@@ -107,9 +109,8 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 - `Response.band` was optimized by eliminating the check for `.matchMedia`. Checking the `window` width always works.
 
 ## [0.2.5](../../releases/0.2.5) (2011-09-20)
-
 - Moved default `Response.create()` lines outside the object. 
-- Created [GitHub repo](./).
+- Created [GitHub repo](../../).
     
 ## 0.2.4 (2011-09-19)
 
@@ -121,11 +122,9 @@ Aliasing is the recommended way to backsupport the separate prefixes previously 
 - Omitted `Moderizr.mq` as secondary fallback. It was uneeded.
     
 ## 0.2.3 (2011-09-19)
-
 - Streamlined code need to run `.dpr` to by combinating arrays and local vars.
     
 ## 0.2.2 (2011-09-19)
-
 - Changed `.dpr` to use local vars to reduce long text in media queries.
     
 ## 0.2.1 (2011-09-19)
