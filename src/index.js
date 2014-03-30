@@ -63,8 +63,8 @@
         return eventName.replace(regexTrimPunc, '') + '.' + customNamespace.replace(regexTrimPunc, '');
       }
     , event = {
-        allLoaded: namespaceIt('allLoaded') // fires on lazy elemsets when all elems in a set have been loaded once
-        //, update: namespaceIt('update') // fires on each elem in a set each time that elem is updated
+          allLoaded: namespaceIt('allLoaded') // fires on lazy elemsets when all elems in a set have been loaded once
+          //, update: namespaceIt('update') // fires on each elem in a set each time that elem is updated
         , crossover: namespaceIt('crossover') // fires on window each time dynamic breakpoint bands is crossed
       }
     
@@ -537,8 +537,7 @@
     // and periods so that we don't have to worry about escaping anything crazy.
     // Rules @link dev.w3.org/html5/spec/Overview.html#custom-data-attribute
     // jQuery selectors @link api.jquery.com/category/selectors/ 
-      
-    function sanitize (key) {
+    function sanitize(key) {
       // Allow lowercase alphanumerics, dashes, underscores, and periods:
       return typeof key == 'string' ? key.toLowerCase().replace(regexFunkyPunc, '') : '';
     }
