@@ -31,7 +31,7 @@
         return '[object Array]' === toString.call(item);
       }
     , defaultPoints = {
-      width: [0, 320, 481, 641, 961, 1025, 1281]
+          width: [0, 320, 481, 641, 961, 1025, 1281]
         , height: [0, 481]
         , ratio: [1, 1.5, 2] // device-pixel-ratio
       }
@@ -419,7 +419,7 @@
     var r = el.getBoundingClientRect ? el.getBoundingClientRect() : {};
     verge = typeof verge == 'number' ? verge || 0 : 0;
     return {
-      top: (r.top || 0) - verge
+        top: (r.top || 0) - verge
       , left: (r.left || 0) - verge
       , bottom: (r.bottom || 0) + verge
       , right: (r.right || 0) + verge
@@ -547,7 +547,7 @@
     }
 
     return {
-      $e: 0 // jQuery instance
+        $e: 0 // jQuery instance
       , mode: 0 // integer  defined per element
       , breakpoints: null // array, validated @ configure()
       , prefix: null // string, validated @ configure()
@@ -816,7 +816,7 @@
   }
   
   Response = {
-    deviceMin: function() { return screenMin; }
+      deviceMin: function() { return screenMin; }
     , deviceMax: function() { return screenMax; }
     //, sets: function(prop) {// must be uid
     //  return $(sel(sets[prop] || sets.all));
