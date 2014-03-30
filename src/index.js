@@ -21,10 +21,10 @@
     , ready = $.domReady || $
     , $win = $(win)
     , screen = win.screen
+    , DMS = typeof DOMStringMap != 'undefined'
     , AP = Array.prototype
     , OP = Object.prototype
     , push = AP.push
-    , slice = AP.slice
     , concat = AP.concat
     , toString = OP.toString
     , owns = OP.hasOwnProperty
@@ -265,11 +265,10 @@
 
   /**
    * Convert stringified primitives back to JavaScript.
-   * @since 0.3.0
    * @param {string|*} s String to parse into a JavaScript value.
    * @return {*}
    */
-  function render(s) {
+  function parse(s) {
     var n; // undefined, or becomes number
     return typeof s != 'string' || !s ? s
       : 'false' === s ? false
@@ -288,46 +287,71 @@
     return !e ? false : e.nodeType === 1 ? e : e[0] && e[0].nodeType === 1 ? e[0] : false;
   }
 
-  function datasetChainable(key, value) {
-    var n, numOfArgs = arguments.length, elem = getNative(this), ret = {}, renderData = false;
-
-    if (numOfArgs) { 
-      if (isArray(key)) {
-        renderData = true;
-        key = key[0];
+  /**
+   * internal-use function to iterate a node's attributes
+   * @param {Element} el
+   * @param {Function} fn
+   * @param {(boolean|*)=} exp
+   */
+  function eachAttr(el, fn, exp) {
+    var test, n, a, i, l;
+    if (!el.attributes) return;
+    test = typeof exp == 'boolean' ? /^data-/ : test;
+    for (i = 0, l = el.attributes.length; i < l;) {
+      if (a = el.attributes[i++]) {
+        n = '' + a.name;
+        test && test.test(n) !== exp || null == a.value || fn.call(el, a.value, n, a);
       }
-      if (typeof key === 'string') {
-        key = datatize(key);
-        if (1 === numOfArgs) {//GET
-          ret = elem.getAttribute(key);
-          return renderData ? render(ret) : ret;
-        }
-        if (this === elem || 2 > (n = this.length || 1)) elem.setAttribute(key, value);
-        else while (n--) n in this && datasetChainable.apply(this[n], arguments);
-      } else if (key instanceof Object) {
-        for (n in key) {
-          key.hasOwnProperty(n) && datasetChainable.call(this, n, key[n]);
-        }
-      }
-      return this;
     }
-
-    // ** Zero args **
-    // Get object containing all the data attributes. Use native dataset when avail.
-    if (elem.dataset && typeof DOMStringMap != 'undefined') return elem.dataset;
-    each(elem.attributes, function(a) {
-      // Fallback adapted from ded/bonzo
-      a && (n = String(a.name).match(regexDataPrefix)) && (ret[camelize(n[1])] = a.value);
-    });
-    return ret; // plain object
   }
 
   /**
-   * Response.dataset() See datasetChainable above
-   * @since 0.3.0
+   * Get object containing an element's data attrs.
+   * @param {Element} el
+   * @return {DOMStringMap|Object|undefined}
    */
-  function dataset(elem) {
-    return datasetChainable.apply(elem, slice.call(arguments, 1));
+  function getDataset(el) {
+    var ob;
+    if (!el || 1 !== el.nodeType) return;  // undefined
+    if (ob = DMS && el.dataset) return ob; // native
+    ob = {}; // Fallback plain object cannot mutate the dataset via reference.
+    eachAttr(el, function(v, k) {
+      ob[camelize(k)] = '' + v;
+    }, true);
+    return ob;
+  }
+  
+  /**
+   * @param {Element} el
+   * @param {Object} ob
+   * @param {Function} fn
+   */
+  function setViaObject(el, ob, fn) {
+    for (var n in ob) owns.call(ob, n) && fn(el, n, ob[n]);
+  }
+  
+  /**
+   * @param {Object|Array|Function} el
+   * @param {(string|Object|*)=} k
+   * @param {*=} v
+   */  
+  function dataset(el, k, v) {
+    el = getNative(el);
+    if (!el || !el.setAttribute) return;
+    if (void 0 === k && v === k) return getDataset(el);
+    var exact = isArray(k) && datatize(k[0]);
+    if (typeof k == 'object' && !exact) {
+      k && setViaObject(el, k, dataset);
+    } else {
+      k = exact || datatize(k);
+      if (!k) return;
+      if (void 0 === v) {
+        k = el.getAttribute(k); // repurpose
+        return null == k ? v : exact ? parse(k) : '' + k; // normalize
+      }
+      el.setAttribute(k, v = '' + v);
+      return v; // current value
+    }
   }
 
   /**
@@ -803,7 +827,7 @@
     , addTest: addTest
     , datatize: datatize
     , camelize: camelize
-    , render: render
+    , render: parse
     , store: store
     , access: access
     , target: target
