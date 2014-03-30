@@ -82,11 +82,11 @@
       // http://ryanve.com/lab/dimensions
       // http://github.com/ryanve/verge/issues/13
     , viewportW = function() {
-        var a = docElem['clientWidth'], b = win['innerWidth'];
+        var a = docElem.clientWidth, b = win.innerWidth;
         return a < b ? b : a;
       }
     , viewportH = function() {
-        var a = docElem['clientHeight'], b = win['innerHeight'];
+        var a = docElem.clientHeight, b = win.innerHeight;
         return a < b ? b : a;
       }
 
@@ -734,8 +734,7 @@
   }
   
   /**
-   * Response.create()  Create their own Response attribute sets, with custom 
-   *   breakpoints and data-* names.
+   * Create their own Response attribute sets, with custom breakpoints and data-* names.
    * @since 0.1.9
    * @param {Object|Array} args is an options object or an array of options objects.
    * @link http://responsejs.com/#create
