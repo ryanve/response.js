@@ -610,15 +610,9 @@
             if (!points) throw new TypeError('.prop');
           }
 
-          // Remove breakpoints that are above the device's max dimension,
-          // in order to reduce the number of iterations needed later.
-          this.breakpoints = isNumeric ? sift(points, function(n) { 
-            return n <= screenMax; 
-          }) : points;
-
-          // Use the breakpoints array to create array of data keys:
-          this.keys = affix(this.breakpoints, this.prefix);
-          this.aka = null; // Reset to just in case a value was merged in.
+          this.breakpoints = points;
+          this.keys = affix(this.breakpoints, this.prefix); // Create array of data keys.
+          this.aka = null; // Reset just in case a value was merged in.
 
           if (aliases) {
             aliasKeys = [];
