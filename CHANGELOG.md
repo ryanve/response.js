@@ -1,6 +1,11 @@
 # Changelog
 - Browse/download the [current](./) or [previous versions](../../releases).
-- Compare [version tags](../../tags) like [0.6.1...0.7.13](../../compare/0.6.1...0.7.13)
+- Compare [version tags](../../tags) like [0.8.0...0.9.0](../../compare/0.8.0...0.9.0)
+
+## 0.9.0
+- [Deprecate utils](../../issues/51)
+- [Remove `Response.bridge` and `.fn` method integration](../../issues/48)
+- [Unreference `matchMedia` and tentatively add `Response.mq`](../../commit/1994fb6b735cf32a8ef1ba7a855c5c2fba112816)
 
 ## [0.8.0](../../releases/0.8.0)
 - Use [grunt](GruntFile.js) to lint and create builds
