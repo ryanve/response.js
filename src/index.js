@@ -735,7 +735,6 @@
    * @example Response.create(object) // single
    * @example Response.create([object1, object2]) // bulk
    */
-
   function create(args) {
     route(args, function(options) {
       if (typeof options != 'object') throw new TypeError('@create');
@@ -808,6 +807,7 @@
     return Response;
   }
   
+  // Many methods are @deprecated (see issue #51)
   Response = {
       deviceMin: function() { return screenMin; }
     , deviceMax: function() { return screenMax; }
