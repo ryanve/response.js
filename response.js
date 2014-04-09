@@ -1,5 +1,5 @@
 /*!
- * response.js 0.8.0+201403151700
+ * response.js 0.9.0+201404091831
  * https://github.com/ryanve/response.js
  * MIT License (c) 2014 Ryan Van Etten
  */
@@ -17,6 +17,7 @@
   }
 
   var Response
+    , Elemset
     , root = this
     , name = 'Response'
     , old = root[name]
@@ -26,11 +27,10 @@
     , docElem = doc.documentElement
     , ready = $.domReady || $
     , $win = $(win)
-    , screen = win.screen
+    , DMS = typeof DOMStringMap != 'undefined'
     , AP = Array.prototype
     , OP = Object.prototype
     , push = AP.push
-    , slice = AP.slice
     , concat = AP.concat
     , toString = OP.toString
     , owns = OP.hasOwnProperty
@@ -38,11 +38,10 @@
         return '[object Array]' === toString.call(item);
       }
     , defaultPoints = {
-      width: [0, 320, 481, 641, 961, 1025, 1281]
+          width: [0, 320, 481, 641, 961, 1025, 1281]
         , height: [0, 481]
         , ratio: [1, 1.5, 2] // device-pixel-ratio
       }
-    , Elemset, band, wave, device = {}
     , propTests = {}
     , isCustom = {}
     , sets = { all: [] }
@@ -70,39 +69,66 @@
         return eventName.replace(regexTrimPunc, '') + '.' + customNamespace.replace(regexTrimPunc, '');
       }
     , event = {
-        allLoaded: namespaceIt('allLoaded') // fires on lazy elemsets when all elems in a set have been loaded once
-        //, update: namespaceIt('update') // fires on each elem in a set each time that elem is updated
+          allLoaded: namespaceIt('allLoaded') // fires on lazy elemsets when all elems in a set have been loaded once
+          //, update: namespaceIt('update') // fires on each elem in a set each time that elem is updated
         , crossover: namespaceIt('crossover') // fires on window each time dynamic breakpoint bands is crossed
       }
     
-      // Response.media (normalized matchMedia)
-      // @example Response.media("(orientation:landscape)").matches
-      // If both versions are undefined, .matches will equal undefined 
-      // Also see: band / wave / device.band / device.wave / dpr
+      // normalized matchMedia
     , matchMedia = win.matchMedia || win.msMatchMedia
-    , media = matchMedia || function() { return {}; }
+    , media = matchMedia ? bind(matchMedia, win) : function() {
+        return {}; 
+      }
+    , mq = matchMedia ? function(q) {
+        return !!matchMedia.call(win, q);
+      } : function() {
+        return false;
+      }
   
       // http://ryanve.com/lab/dimensions
       // http://github.com/ryanve/verge/issues/13
     , viewportW = function() {
-        var a = docElem['clientWidth'], b = win['innerWidth'];
+        var a = docElem.clientWidth, b = win.innerWidth;
         return a < b ? b : a;
       }
     , viewportH = function() {
-        var a = docElem['clientHeight'], b = win['innerHeight'];
+        var a = docElem.clientHeight, b = win.innerHeight;
         return a < b ? b : a;
+      }
+
+    , band = bind(between, viewportW)
+    , wave = bind(between, viewportH)
+    , device = {
+          'band': bind(between, deviceW)
+        , 'wave': bind(between, deviceH)
       };
-  
-  function doError(msg) {
-    // Error handling. (Throws exception.)
-    // Use Ctrl+F to find specific @errors
-    throw new TypeError(msg ? name + '.' + msg : name);
-  }
-  
+
   function isNumber(item) {
     return item === +item;
   }
   
+  /**
+   * @param {Function} fn
+   * @param {*=} scope
+   * @return {Function}
+   */
+  function bind(fn, scope) {
+    return function() {
+      return fn.apply(scope, arguments);
+    };
+  }
+
+  /**
+   * @this {Function}
+   * @param {number} min
+   * @param {number=} max
+   * @return {boolean}
+   */
+  function between(min, max) {
+    var point = this.call();
+    return point >= (min || 0) && (!max || point <= max);
+  }
+
   /**
    * @param {{length:number}} stack
    * @param {Function} fn
@@ -193,31 +219,6 @@
     else fn.call(scope || item, item);
     return item;
   }
-
-  /**
-   * @param {Function} fn gets a value to compare against
-   * @return {Function} range comparison tester
-   */    
-  function ranger(fn) {
-    /**
-     * @param {string|number} min
-     * @param {(string|number)=} max
-     * @return {boolean}
-     */
-    return function(min, max) {
-      var point = fn();
-      return point >= (min || 0) && (!max || point <= max);    
-    };
-  }
-
-  /** 
-   * Range comparison booleans
-   * @link responsejs.com/#booleans
-   */
-  band = ranger(viewportW); // Response.band
-  wave = ranger(viewportH); // Response.wave
-  device.band = ranger(deviceW); // Response.device.band
-  device.wave = ranger(deviceH); // Response.device.wave
   
   /**
    * Response.dpr(decimal) Tests if a minimum device pixel ratio is active. 
@@ -244,8 +245,8 @@
     // The generic min-device-pixel-ratio is expected to be added to the W3 spec.
     // Return false if neither method is available.
     decimal = 'only all and (min--moz-device-pixel-ratio:' + decimal + ')';
-    if (media(decimal).matches) return true;
-    return !!media(decimal.replace('-moz-', '')).matches;
+    if (mq(decimal)) return true;
+    return mq(decimal.replace('-moz-', ''));
   }
 
   /**
@@ -271,11 +272,10 @@
 
   /**
    * Convert stringified primitives back to JavaScript.
-   * @since 0.3.0
    * @param {string|*} s String to parse into a JavaScript value.
    * @return {*}
    */
-  function render(s) {
+  function parse(s) {
     var n; // undefined, or becomes number
     return typeof s != 'string' || !s ? s
       : 'false' === s ? false
@@ -285,80 +285,96 @@
       : s;
   }
   
-  // Isolate native element:
-  function getNative(e) {
-    // stackoverflow.com/questions/9119823/safest-way-to-detect-native-dom-element
-    // See @link jsperf.com/get-native
-    // If e is a native element then return it. If not check if index 0 exists and is
-    // a native elem. If so then return that. Otherwise return false.
-    return !e ? false : e.nodeType === 1 ? e : e[0] && e[0].nodeType === 1 ? e[0] : false;
-  }
-
-  function datasetChainable(key, value) {
-    var n, numOfArgs = arguments.length, elem = getNative(this), ret = {}, renderData = false;
-
-    if (numOfArgs) { 
-      if (isArray(key)) {
-        renderData = true;
-        key = key[0];
-      }
-      if (typeof key === 'string') {
-        key = datatize(key);
-        if (1 === numOfArgs) {//GET
-          ret = elem.getAttribute(key);
-          return renderData ? render(ret) : ret;
-        }
-        if (this === elem || 2 > (n = this.length || 1)) elem.setAttribute(key, value);
-        else while (n--) n in this && datasetChainable.apply(this[n], arguments);
-      } else if (key instanceof Object) {
-        for (n in key) {
-          key.hasOwnProperty(n) && datasetChainable.call(this, n, key[n]);
-        }
-      }
-      return this;
-    }
-
-    // ** Zero args **
-    // Get object containing all the data attributes. Use native dataset when avail.
-    if (elem.dataset && typeof DOMStringMap != 'undefined') return elem.dataset;
-    each(elem.attributes, function(a) {
-      // Fallback adapted from ded/bonzo
-      a && (n = String(a.name).match(regexDataPrefix)) && (ret[camelize(n[1])] = a.value);
-    });
-    return ret; // plain object
-  }
-
-  function deletesChainable(keys) {
-    if (this && typeof keys === 'string') {
-      keys = compact(keys);
-      route(this, function(el) {
-        each(keys, function(key) {
-          key && el.removeAttribute(datatize(key));
-        });
-      });
-    }
-    return this;
+  /**
+   * @param {Element|{length:number}} e
+   * @return {Element|*}
+   */
+  function first(e) {
+    return !e || e.nodeType ? e : e[0];
   }
 
   /**
-   * Response.dataset() See datasetChainable above
-   * @since 0.3.0
+   * internal-use function to iterate a node's attributes
+   * @param {Element} el
+   * @param {Function} fn
+   * @param {(boolean|*)=} exp
    */
-  function dataset(elem) {
-    return datasetChainable.apply(elem, slice.call(arguments, 1));
+  function eachAttr(el, fn, exp) {
+    var test, n, a, i, l;
+    if (!el.attributes) return;
+    test = typeof exp == 'boolean' ? /^data-/ : test;
+    for (i = 0, l = el.attributes.length; i < l;) {
+      if (a = el.attributes[i++]) {
+        n = '' + a.name;
+        test && test.test(n) !== exp || null == a.value || fn.call(el, a.value, n, a);
+      }
+    }
   }
 
   /**
-   * Response.deletes(elem, keys)  Delete HTML5 data attributes (remove them from them DOM)
-   * @since 0.3.0
-   * @param {Element|Object} elem is a native element or jQuery object
-   * @param {string} keys  one or more space-separated data attribute keys (names) to delete (removed
-   * from the DOM) Should be camelCased or lowercase.         // from all divs.
+   * Get object containing an element's data attrs.
+   * @param {Element} el
+   * @return {DOMStringMap|Object|undefined}
    */
-  function deletes(elem, keys) {
-    return deletesChainable.call(elem, keys);
+  function getDataset(el) {
+    var ob;
+    if (!el || 1 !== el.nodeType) return;  // undefined
+    if (ob = DMS && el.dataset) return ob; // native
+    ob = {}; // Fallback plain object cannot mutate the dataset via reference.
+    eachAttr(el, function(v, k) {
+      ob[camelize(k)] = '' + v;
+    }, true);
+    return ob;
   }
   
+  /**
+   * @param {Element} el
+   * @param {Object} ob
+   * @param {Function} fn
+   */
+  function setViaObject(el, ob, fn) {
+    for (var n in ob) owns.call(ob, n) && fn(el, n, ob[n]);
+  }
+  
+  /**
+   * @param {Object|Array|Function} el
+   * @param {(string|Object|*)=} k
+   * @param {*=} v
+   */  
+  function dataset(el, k, v) {
+    el = first(el);
+    if (!el || !el.setAttribute) return;
+    if (void 0 === k && v === k) return getDataset(el);
+    var exact = isArray(k) && datatize(k[0]);
+    if (typeof k == 'object' && !exact) {
+      k && setViaObject(el, k, dataset);
+    } else {
+      k = exact || datatize(k);
+      if (!k) return;
+      if (void 0 === v) {
+        k = el.getAttribute(k); // repurpose
+        return null == k ? v : exact ? parse(k) : '' + k; // normalize
+      }
+      el.setAttribute(k, v = '' + v);
+      return v; // current value
+    }
+  }
+
+  /**
+   * Response.deletes(elem, keys) Delete HTML5 data attributes (remove them from them DOM)
+   * @since 0.3.0
+   * @param {Element|{length:number}} elem is a DOM element or stack of them
+   * @param {string|Array} ssv data attribute key(s) in camelCase or lowercase to delete
+   */
+  function deletes(elem, ssv) {
+    ssv = compact(ssv);
+    route(elem, function(el) {
+      each(ssv, function(k) {
+        el.removeAttribute(datatize(k));
+      });
+    });
+  }
+
   function sel(keys) {
     // Convert an array of data keys into a selector string
     // Converts ["a","b","c"] into "[data-a],[data-b],[data-c]"
@@ -410,7 +426,7 @@
     var r = el.getBoundingClientRect ? el.getBoundingClientRect() : {};
     verge = typeof verge == 'number' ? verge || 0 : 0;
     return {
-      top: (r.top || 0) - verge
+        top: (r.top || 0) - verge
       , left: (r.left || 0) - verge
       , bottom: (r.bottom || 0) + verge
       , right: (r.right || 0) + verge
@@ -424,20 +440,20 @@
   // outside the viewport are 'on the verge' of being scrolled to.
 
   function inX(elem, verge) {
-    var r = rectangle(getNative(elem), verge);
+    var r = rectangle(first(elem), verge);
     return !!r && r.right >= 0 && r.left <= viewportW();
   }
 
   function inY(elem, verge) {
-    var r = rectangle(getNative(elem), verge);
+    var r = rectangle(first(elem), verge);
     return !!r && r.bottom >= 0 && r.top <= viewportH();
   }
 
   function inViewport(elem, verge) {
     // equiv to: inX(elem, verge) && inY(elem, verge)
-    // But just manually do both to avoid calling rectangle() and getNative() twice.
+    // But just manually do both to avoid calling rectangle() and first() twice.
     // It actually gzips smaller this way too:
-    var r = rectangle(getNative(elem), verge);
+    var r = rectangle(first(elem), verge);
     return !!r && r.bottom >= 0 && r.top <= viewportH() && r.right >= 0 && r.left <= viewportW();
   }
   
@@ -478,7 +494,7 @@
    */
   function store($elems, key, source) {
     var valToStore;
-    if (!$elems || null == key) doError('store');
+    if (!$elems || null == key) throw new TypeError('@store');
     source = typeof source == 'string' && source;
     route($elems, function(el) {
       if (source) valToStore = el.getAttribute(source);
@@ -527,8 +543,7 @@
     // and periods so that we don't have to worry about escaping anything crazy.
     // Rules @link dev.w3.org/html5/spec/Overview.html#custom-data-attribute
     // jQuery selectors @link api.jquery.com/category/selectors/ 
-      
-    function sanitize (key) {
+    function sanitize(key) {
       // Allow lowercase alphanumerics, dashes, underscores, and periods:
       return typeof key == 'string' ? key.toLowerCase().replace(regexFunkyPunc, '') : '';
     }
@@ -538,7 +553,7 @@
     }
 
     return {
-      $e: 0 // jQuery instance
+        $e: 0 // jQuery instance
       , mode: 0 // integer  defined per element
       , breakpoints: null // array, validated @ configure()
       , prefix: null // string, validated @ configure()
@@ -573,7 +588,7 @@
           var i, points, prefix, aliases, aliasKeys, isNumeric = true, prop = this.prop;
           this.uid = suid++;
           if (null == this.verge) this.verge = min(screenMax, 500);
-          this.fn = propTests[prop] || doError('create @fn');
+          if (!(this.fn = propTests[prop])) throw new TypeError('@create');
 
           // If we get to here then we know the prop is one one our supported props:
           // 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
@@ -594,21 +609,16 @@
             });
             
             isNumeric && points.sort(ascending);
-            points.length || doError('create @breakpoints');
+            if (!points.length) throw new TypeError('.breakpoints');
           } else {
             // The default breakpoints are presorted.
-            points = defaultPoints[prop] || defaultPoints[prop.split('-').pop()] || doError('create @prop'); 
+            points = defaultPoints[prop] || defaultPoints[prop.split('-').pop()];
+            if (!points) throw new TypeError('.prop');
           }
 
-          // Remove breakpoints that are above the device's max dimension,
-          // in order to reduce the number of iterations needed later.
-          this.breakpoints = isNumeric ? sift(points, function(n) { 
-            return n <= screenMax; 
-          }) : points;
-
-          // Use the breakpoints array to create array of data keys:
-          this.keys = affix(this.breakpoints, this.prefix);
-          this.aka = null; // Reset to just in case a value was merged in.
+          this.breakpoints = points;
+          this.keys = affix(this.breakpoints, this.prefix); // Create array of data keys.
+          this.aka = null; // Reset just in case a value was merged in.
 
           if (aliases) {
             aliasKeys = [];
@@ -638,7 +648,7 @@
           // The extra member in the values array is the initContentKey value.
           var val = null, subjects = this.breakpoints, sL = subjects.length, i = sL;
           while (val == null && i--) this.fn(subjects[i]) && (val = this.values[i]);
-          this.newValue = typeof val === 'string' ? val : this.values[sL];
+          this.newValue = typeof val == 'string' ? val : this.values[sL];
           return this; // chainable
         }
 
@@ -724,19 +734,16 @@
   }
   
   /**
-   * Response.create()  Create their own Response attribute sets, with custom 
-   *   breakpoints and data-* names.
+   * Create their own Response attribute sets, with custom breakpoints and data-* names.
    * @since 0.1.9
    * @param {Object|Array} args is an options object or an array of options objects.
    * @link http://responsejs.com/#create
    * @example Response.create(object) // single
    * @example Response.create([object1, object2]) // bulk
    */
-
   function create(args) {
     route(args, function(options) {
-      typeof options == 'object' || doError('create @args');
-      
+      if (typeof options != 'object') throw new TypeError('@create');
       var elemset = procreate(Elemset).configure(options)
         , lowestNonZeroBP
         , verge = elemset.verge
@@ -805,35 +812,20 @@
     if (typeof callback == 'function') callback.call(root, Response);
     return Response;
   }
-
-  /**
-   * Response.bridge
-   * Bridges applicable methods into the specified host (e.g. jQuery)
-   * @param {Function} host
-   * @param {boolean=} force
-   */
-  function bridge(host, force) {
-    if (typeof host == 'function' && host.fn) {
-      // Expose .dataset() and .deletes() to jQuery:
-      if (force || void 0 === host.fn.dataset) host.fn.dataset = datasetChainable; 
-      if (force || void 0 === host.fn.deletes) host.fn.deletes = deletesChainable;
-    }
-    return Response;
-  }
   
+  // Many methods are @deprecated (see issue #51)
   Response = {
-    deviceMin: function() { return screenMin; }
+      deviceMin: function() { return screenMin; }
     , deviceMax: function() { return screenMax; }
     //, sets: function(prop) {// must be uid
     //  return $(sel(sets[prop] || sets.all));
     //}
     , noConflict: noConflict
-    , bridge: bridge
     , create: create
     , addTest: addTest
     , datatize: datatize
     , camelize: camelize
-    , render: render
+    , render: parse
     , store: store
     , access: access
     , target: target
@@ -856,6 +848,7 @@
     , route: route
     , merge: merge
     , media: media
+    , mq: mq
     , wave: wave
     , band: band
     , map: map
