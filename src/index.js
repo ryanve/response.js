@@ -1,4 +1,4 @@
-(function(root, name, make) {
+!function(root, name, make) {
   var $ = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
   if (typeof module != 'undefined' && module['exports']) module['exports'] = make($);
   else root[name] = make($);
@@ -863,4 +863,4 @@
   });
 
   return Response;
-}));
+});

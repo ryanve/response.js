@@ -1,4 +1,4 @@
-(function(root, win, doc) {
+!function(root, win, doc) {
   var $ = root.$ = require('ender') // expose for console use
     , html = doc.documentElement
     , $win = $(win)
@@ -99,4 +99,4 @@
         }).create({prefix: 'view-', prop: 'view', breakpoints: names, dynamic: true});    
     }(original);
   });
-}(this, window, document));
+}(this, window, document);
