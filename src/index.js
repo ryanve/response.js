@@ -74,7 +74,7 @@
         return {}; 
       }
     , mq = matchMedia ? function(q) {
-        return !!matchMedia.call(win, q);
+        return !!matchMedia.call(win, q).matches;
       } : function() {
         return false;
       }
