@@ -6,9 +6,9 @@
     , sos = require('sos')
     , log = sos.log
     , clear = sos.clear
-    , O = root.Response || void console.warn('Try refreshing the page.')
     , crossovers = 0
-    , tempBase = O;
+    , original = root.Response || void console.warn('Try refreshing the page.')
+    , tempBase = original;
   
   $doc.ready(function() {
     var props = [
@@ -23,7 +23,7 @@
       , $numbers = $('#numbers')
       , $booleans = $('#booleans');
       
-    O.each(props, function(name) {
+    original.each(props, function(name) {
       $ids[name] = $('#' + name);
     });
     
@@ -48,10 +48,10 @@
       return false;
     }
 
-    O.each(['deviceW','deviceH','deviceMax','deviceMin','dpr'], update);
+    original.each(['deviceW','deviceH','deviceMax','deviceMin','dpr'], update);
     
     function onReadyAndResize() {
-      O.each(['viewportW', 'viewportH'], update);
+      original.each(['viewportW', 'viewportH'], update);
       update(['band', 'bandmin', 481]);
       update(['wave', 'wavemin', 481]);
       update(['band', 'bandminmax', 481, 961]);
@@ -61,18 +61,17 @@
     function crossoverToggle(){
       $html.toggleClass('dark');
       crossovers++ && clear();
-      log('crossover (' + crossovers + ') near ' + O.viewportW() + 'x' + O.viewportH());
+      log('crossover (' + crossovers + ') near ' + original.viewportW() + 'x' + original.viewportH());
     }
     
-    O.action(onReadyAndResize)
-     .crossover(crossoverToggle);
+    original.action(onReadyAndResize).crossover(crossoverToggle);
     
     // These change on scroll:
     $win.on('scroll', function() {
       // Test both the jQuery and native versions:
-      O.inViewport($booleans) ? $numbers.addClass('dark') : $numbers.removeClass('dark');
+      original.inViewport($booleans) ? $numbers.addClass('dark') : $numbers.removeClass('dark');
       
-      O.each(['scrollX', 'scrollY'], update);
+      original.each(['scrollX', 'scrollY'], update);
       update(['inViewport', 'inviewport', $numbers]); 
       update(['inViewport', 'inviewport0', $numbers[0]]); // native elem
       update(['inX', 'inx', $numbers]);
@@ -83,11 +82,21 @@
     
     // These ones are static:
     update(['dpr', 'dprmin', 1.5]);
-    tempBase = O.device;
+    tempBase = original.device;
     update(['band', 'devicebandmin', 481]);
     update(['wave', 'devicewavemin', 481]);
     update(['band', 'devicebandminmax', 481, 961]);
     update(['wave', 'devicewaveminmax', 481, 800]);
-    tempBase = O;
+    tempBase = original;
+    
+    // Create custom breakpoints
+    !function(Response) {
+        var names = ['small', 'medium', 'large'];
+        var values = {small: null, medium: '(min-width:40em)', large: '(min-width:64em)'};
+        Response.addTest('view', function(breakpoint) {
+            var query = values.hasOwnProperty(breakpoint) && values[breakpoint];
+            return !query || Response.mq(values[breakpoint]);
+        }).create({prefix: 'view-', prop: 'view', breakpoints: names, dynamic: true});    
+    }(original);
   });
 }(this, window, document));
