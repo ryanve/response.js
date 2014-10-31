@@ -1,10 +1,10 @@
 /*!
- * response.js 0.9.0+201404091831
+ * response.js 0.9.1+201410311050
  * https://github.com/ryanve/response.js
  * MIT License (c) 2014 Ryan Van Etten
  */
 
-(function(root, name, make) {
+!function(root, name, make) {
   var $ = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
   if (typeof module != 'undefined' && module['exports']) module['exports'] = make($);
   else root[name] = make($);
@@ -80,7 +80,7 @@
         return {}; 
       }
     , mq = matchMedia ? function(q) {
-        return !!matchMedia.call(win, q);
+        return !!matchMedia.call(win, q).matches;
       } : function() {
         return false;
       }
@@ -869,4 +869,4 @@
   });
 
   return Response;
-}));
+});
