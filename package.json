@@ -5,7 +5,12 @@
   "homepage": "https://github.com/ryanve/response.js",
   "license": "MIT",
   "author": "Ryan Van Etten",
-  "keywords": ["responsive", "breakpoint", "breakpoints", "browser"],
+  "keywords": [
+    "responsive",
+    "breakpoint",
+    "breakpoints",
+    "browser"
+  ],
   "main": "./response.js",
   "repository": {
     "type": "git",
