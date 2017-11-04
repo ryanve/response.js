@@ -5,13 +5,17 @@
   "license": "MIT",
   "author": "Ryan Van Etten",
   "main": "response.js",
-  "scripts": {},
+  "scripts": {
+    "min": "uglifyjs response.js -o response.min.js --comments /^!/"
+  },
   "homepage": "https://github.com/ryanve/response.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/ryanve/response.js.git"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "uglify-js": "^3.1.6"
+  },
   "keywords": [
     "responsive",
     "breakpoint",
