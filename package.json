@@ -6,7 +6,8 @@
   "author": "Ryan Van Etten",
   "main": "response.js",
   "scripts": {
-    "min": "uglifyjs response.js -o response.min.js --comments /^!/"
+    "min": "uglifyjs response.js -o response.min.js --comments /^!/",
+    "test": "eslint ."
   },
   "homepage": "https://github.com/ryanve/response.js",
   "repository": {
@@ -14,6 +15,7 @@
     "url": "https://github.com/ryanve/response.js.git"
   },
   "devDependencies": {
+    "eslint": "^4.10.0",
     "uglify-js": "^3.1.6"
   },
   "keywords": [

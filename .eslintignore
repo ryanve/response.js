@@ -1,0 +1,3 @@
+node_modules
+test/vendor
+*.min.js
