@@ -1,14 +1,12 @@
-/*!
- * response.js 0.9.1+201410311050
+/*
  * https://github.com/ryanve/response.js
- * MIT License (c) 2014 Ryan Van Etten
+ * @license CC0-1.0
  */
-
 !function(root, name, make) {
-  var $ = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
-  if (typeof module != 'undefined' && module['exports']) module['exports'] = make($);
+  var $ = root.jQuery || root.Zepto || root.ender || root.elo;
+  if (typeof module != 'undefined' && module.exports) module.exports = make($);
   else root[name] = make($);
-}(this, 'Response', function($) {
+}(this || window, 'Response', function($) {
 
   if (typeof $ != 'function') {
     try {
@@ -46,13 +44,13 @@
     , isCustom = {}
     , sets = { all: [] }
     , suid = 1
-    , screenW = screen.width   
-    , screenH = screen.height  
+    , screenW = screen.width
+    , screenH = screen.height
     , screenMax = screenW > screenH ? screenW : screenH
     , screenMin = screenW + screenH - screenMax
     , deviceW = function() { return screenW; }
     , deviceH = function() { return screenH; }
-    , regexFunkyPunc = /[^a-z0-9_\-\.]/gi
+    , regexFunkyPunc = /[^a-z0-9_.-]/gi
     , regexTrimPunc = /^[\W\s]+|[\W\s]+$|/g
     , regexCamels = /([a-z])([A-Z])/g
     , regexDashB4 = /-(.)/g
@@ -69,22 +67,22 @@
         return eventName.replace(regexTrimPunc, '') + '.' + customNamespace.replace(regexTrimPunc, '');
       }
     , event = {
-          allLoaded: namespaceIt('allLoaded') // fires on lazy elemsets when all elems in a set have been loaded once
+          allLoaded: namespaceIt('allLoaded') // fires on lazy elemsets when all elems in a set have loaded once
           //, update: namespaceIt('update') // fires on each elem in a set each time that elem is updated
         , crossover: namespaceIt('crossover') // fires on window each time dynamic breakpoint bands is crossed
       }
-    
+
       // normalized matchMedia
     , matchMedia = win.matchMedia || win.msMatchMedia
     , media = matchMedia ? bind(matchMedia, win) : function() {
-        return {}; 
+        return {};
       }
     , mq = matchMedia ? function(q) {
         return !!matchMedia.call(win, q).matches;
       } : function() {
         return false;
       }
-  
+
       // http://ryanve.com/lab/dimensions
       // http://github.com/ryanve/verge/issues/13
     , viewportW = function() {
@@ -106,7 +104,7 @@
   function isNumber(item) {
     return item === +item;
   }
-  
+
   /**
    * @param {Function} fn
    * @param {*=} scope
@@ -219,9 +217,9 @@
     else fn.call(scope || item, item);
     return item;
   }
-  
+
   /**
-   * Response.dpr(decimal) Tests if a minimum device pixel ratio is active. 
+   * Response.dpr(decimal) Tests if a minimum device pixel ratio is active.
    * Or (version added in 0.3.0) returns the device-pixel-ratio
    * @param {number} decimal is the integer or float to test.
    * @return {boolean|number}
@@ -235,9 +233,9 @@
     if (null == decimal) return dPR || (dpr(2) ? 2 : dpr(1.5) ? 1.5 : dpr(1) ? 1 : 0); // approx
     if (!isFinite(decimal)) return false;
 
-    // Use window.devicePixelRatio if supported - supported by Webkit 
-    // (Safari/Chrome/Android) and Presto 2.8+ (Opera) browsers.     
-    if (dPR && dPR > 0) return dPR >= decimal; 
+    // Use window.devicePixelRatio if supported - supported by Webkit
+    // (Safari/Chrome/Android) and Presto 2.8+ (Opera) browsers.
+    if (dPR && dPR > 0) return dPR >= decimal;
 
     // Fallback to .matchMedia/.msMatchMedia. Supported by Gecko (FF6+) and more:
     // @link developer.mozilla.org/en/DOM/window.matchMedia
@@ -284,7 +282,7 @@
       : 'undefined' === s || (n = (+s)) || 0 === n || 'NaN' === s ? n
       : s;
   }
-  
+
   /**
    * @param {Element|{length:number}} e
    * @return {Element|*}
@@ -326,7 +324,7 @@
     }, true);
     return ob;
   }
-  
+
   /**
    * @param {Element} el
    * @param {Object} ob
@@ -335,12 +333,12 @@
   function setViaObject(el, ob, fn) {
     for (var n in ob) owns.call(ob, n) && fn(el, n, ob[n]);
   }
-  
+
   /**
    * @param {Object|Array|Function} el
    * @param {(string|Object|*)=} k
    * @param {*=} v
-   */  
+   */
   function dataset(el, k, v) {
     el = first(el);
     if (!el || !el.setAttribute) return;
@@ -381,8 +379,9 @@
     // Double-slash escapes periods so that attrs like data-density-1.5 will work
     // @link api.jquery.com/category/selectors/
     // @link github.com/jquery/sizzle/issues/76
-    for (var k, r = [], i = 0, l = keys.length; i < l;)
+    for (var k, r = [], i = 0, l = keys.length; i < l;) {
       (k = keys[i++]) && r.push('[' + datatize(k.replace(regexTrimPunc, '').replace('.', '\\.')) + ']');
+    }
     return r.join();
   }
 
@@ -395,23 +394,23 @@
    * @example Response.target('a b c']) //  $('[data-a],[data-b],[data-c]')
    */
   function target(keys) {
-    return $(sel(compact(keys)));  
+    return $(sel(compact(keys)));
   }
 
-  /** 
+  /**
    * @since 0.3.0
    * @return {number} like jQuery(window).scrollLeft()
    */
   function scrollX() {
-    return window.pageXOffset || docElem.scrollLeft; 
+    return window.pageXOffset || docElem.scrollLeft;
   }
 
-  /** 
+  /**
    * @since 0.3.0
    * @return {number} like $(window).scrollTop()
    */
-  function scrollY() { 
-    return window.pageYOffset || docElem.scrollTop; 
+  function scrollY() {
+    return window.pageYOffset || docElem.scrollTop;
   }
 
   /**
@@ -421,7 +420,7 @@
   function rectangle(el, verge) {
     // Local handler for area methods:
     // adapted from github.com/ryanve/dime
-    // The native object is read-only so we 
+    // The native object is read-only so we
     // have use a copy in order to modify it.
     var r = el.getBoundingClientRect ? el.getBoundingClientRect() : {};
     verge = typeof verge == 'number' ? verge || 0 : 0;
@@ -432,11 +431,11 @@
       , right: (r.right || 0) + verge
     };
   }
-     
-  // The verge is the amount of pixels to act as a cushion around the viewport. It can be any 
-  // integer. If verge is zero, then the inX/inY/inViewport methods are exact. If verge is set to 100, 
-  // then those methods return true when for elements that are are in the viewport *or* near it, 
-  // with *near* being defined as within 100 pixels outside the viewport edge. Elements immediately 
+
+  // The verge is the amount of pixels to act as a cushion around the viewport. It can be any
+  // integer. If verge is zero, then the inX/inY/inViewport methods are exact. If verge is set to 100,
+  // then those methods return true when for elements that are are in the viewport *or* near it,
+  // with *near* being defined as within 100 pixels outside the viewport edge. Elements immediately
   // outside the viewport are 'on the verge' of being scrolled to.
 
   function inX(elem, verge) {
@@ -456,7 +455,7 @@
     var r = rectangle(first(elem), verge);
     return !!r && r.bottom >= 0 && r.top <= viewportH() && r.right >= 0 && r.left <= viewportW();
   }
-  
+
   /**
    * @description Detect whether elem should act in src or markup mode.
    * @param {Element} elem
@@ -484,7 +483,7 @@
 
   /**
    * Response.store()
-   * Store a data value on each elem targeted by a jQuery selector. We use this for storing an 
+   * Store a data value on each elem targeted by a jQuery selector. We use this for storing an
    * elem's orig (no-js) state. This gives us the ability to return the elem to its orig state.
    * The data it stores is either the src attr or the innerHTML based on result of detectMode().
    * @since 0.1.9
@@ -500,13 +499,13 @@
       if (source) valToStore = el.getAttribute(source);
       else if (0 < detectMode(el)) valToStore = el.getAttribute('src');
       else valToStore = el.innerHTML;
-      null == valToStore ? deletes(el, key) : dataset(el, key, valToStore); 
+      null == valToStore ? deletes(el, key) : dataset(el, key, valToStore);
     });
     return Response;
   }
 
   /**
-   * Response.access() Access data-* values for element from an array of data-* keys. 
+   * Response.access() Access data-* values for element from an array of data-* keys.
    * @since 0.1.9 added support for space-separated strings in 0.3.1
    * @param {Object} elem is a native or jQuery element whose values to access.
    * @param {Array|string} keys is an array or SSV string of data keys
@@ -528,26 +527,26 @@
     }
     return Response;
   }
-    
+
   // Prototype object for element sets used in Response.create
-  // Each element in the set inherits this as well, so some of the 
+  // Each element in the set inherits this as well, so some of the
   // methods apply to the set, while others apply to single elements.
   Elemset = (function() {
     var crossover = event.crossover
       //, update = event.update
       , min = Math.min;
 
-    // Techically data attributes names can contain uppercase in HTML, but, The DOM lowercases 
-    // attributes, so they must be lowercase regardless when we target them in jQuery. Force them 
+    // Techically data attributes names can contain uppercase in HTML, but, The DOM lowercases
+    // attributes, so they must be lowercase regardless when we target them in jQuery. Force them
     // lowercase here to prevent issues. Removing all punc marks except for dashes, underscores,
     // and periods so that we don't have to worry about escaping anything crazy.
     // Rules @link dev.w3.org/html5/spec/Overview.html#custom-data-attribute
-    // jQuery selectors @link api.jquery.com/category/selectors/ 
+    // jQuery selectors @link api.jquery.com/category/selectors/
     function sanitize(key) {
       // Allow lowercase alphanumerics, dashes, underscores, and periods:
       return typeof key == 'string' ? key.toLowerCase().replace(regexFunkyPunc, '') : '';
     }
-    
+
     function ascending(a, b) {
       return a - b;
     }
@@ -584,7 +583,7 @@
 
       , configure: function(options) {
           merge(this, options);
-        
+
           var i, points, prefix, aliases, aliasKeys, isNumeric = true, prop = this.prop;
           this.uid = suid++;
           if (null == this.verge) this.verge = min(screenMax, 500);
@@ -593,13 +592,13 @@
           // If we get to here then we know the prop is one one our supported props:
           // 'width', 'height', 'device-width', 'device-height', 'device-pixel-ratio'
           if (null == this.dynamic) this.dynamic = 'device' !== prop.slice(0, 6);
-          
+
           this.custom = isCustom[prop];
           prefix = this.prefix ? sift(map(compact(this.prefix), sanitize)) : ['min-' + prop + '-'];
           aliases = 1 < prefix.length ? prefix.slice(1) : 0;
           this.prefix = prefix[0];
           points = this.breakpoints;
-          
+
           // Sort and validate (#valid8) custom breakpoints if supplied.
           // Must be done before keys are created so that the keys match:
           if (isArray(points)) {
@@ -607,7 +606,7 @@
               if (!v && v !== 0) throw 'invalid breakpoint';
               isNumeric = isNumeric && isFinite(v);
             });
-            
+
             isNumeric && points.sort(ascending);
             if (!points.length) throw new TypeError('.breakpoints');
           } else {
@@ -644,7 +643,7 @@
       , decideValue: function() {
           // Return the first value from the values array that passes the boolean
           // test callback. If none pass the test, then return the fallback value.
-          // this.breakpoints.length === this.values.length + 1  
+          // this.breakpoints.length === this.values.length + 1
           // The extra member in the values array is the initContentKey value.
           var val = null, subjects = this.breakpoints, sL = subjects.length, i = sL;
           while (val == null && i--) this.fn(subjects[i]) && (val = this.values[i]);
@@ -657,7 +656,7 @@
           this.mode = detectMode(elem);
           this.values = access(this.$e, this.keys);
           if (this.aka) {
-            // If there are alias keys then there may be alias values. Merge the values from 
+            // If there are alias keys then there may be alias values. Merge the values from
             // all the aliases into the values array. The merge method only merges in truthy values
             // and prevents falsey values from overwriting truthy ones. (See Response.merge)
             // Each of the this.aka arrays has the same length as the this.values
@@ -673,13 +672,13 @@
           // to single elements. Only update the DOM when the new value is different than the current value.
           if (this.currValue === this.newValue) { return this; }
           this.currValue = this.newValue;
-          if (0 < this.mode) { 
-            this.$e[0].setAttribute('src', this.newValue); 
-          } else if (null == this.newValue) { 
-            this.$e.empty && this.$e.empty(); 
+          if (0 < this.mode) {
+            this.$e[0].setAttribute('src', this.newValue);
+          } else if (null == this.newValue) {
+            this.$e.empty && this.$e.empty();
           } else {
             if (this.$e.html) {
-              this.$e.html(this.newValue); 
+              this.$e.html(this.newValue);
             } else {
               this.$e.empty && this.$e.empty();
               this.$e[0].innerHTML = this.newValue;
@@ -690,7 +689,7 @@
         }
     };
   }());
-  
+
   // The keys are the prop and the values are the method that tests that prop.
   // The props with dashes in them are added via array notation below.
   // Props marked as dynamic change when the viewport is resized:
@@ -732,7 +731,7 @@
     });
     return Response;
   }
-  
+
   /**
    * Create their own Response attribute sets, with custom breakpoints and data-* names.
    * @since 0.1.9
@@ -755,37 +754,37 @@
 
       // Identify the lowest nonzero breakpoint. (They're already sorted low to high by now.)
       lowestNonZeroBP = breakpoints[0] || breakpoints[1] || false;
-    
+
       ready(function() {
         var allLoaded = event.allLoaded, lazy = !!elemset.lazy;
-        
+
         function resizeHandler() {
           elemset.reset();
           each(elemset.$e, function(el, i) {
             elemset[i].decideValue().updateDOM();
           }).trigger(allLoaded);
         }
-        
+
         function scrollHandler() {
           each(elemset.$e, function(el, i) {
             inViewport(elemset[i].$e, verge) && elemset[i].updateDOM();
           });
         }
 
-        // Target elements containing this set's Response data attributes and chain into the 
+        // Target elements containing this set's Response data attributes and chain into the
         // loop that occurs on ready. The selector is cached to elemset.$e for later use.
         each(elemset.target().$e, function(el, i) {
           elemset[i] = procreate(elemset).prepareData(el);// Inherit from elemset
           if (!lazy || inViewport(elemset[i].$e, verge)) {
             // If not lazy update all the elems in the set. If
             // lazy, only update elems in the current viewport.
-            elemset[i].updateDOM(); 
+            elemset[i].updateDOM();
           }
         });
 
         // device-* props are static and only need to be tested once. The others are
         // dynamic, meaning they need to be tested on resize. Also if a device so small
-        // that it doesn't support the lowestNonZeroBP then we don't need to listen for 
+        // that it doesn't support the lowestNonZeroBP then we don't need to listen for
         // resize events b/c we know the device can't resize beyond that breakpoint.
 
         if (elemset.dynamic && (elemset.custom || lowestNonZeroBP < screenMax)) {
@@ -793,11 +792,11 @@
         }
 
         // We don't have to re-decide the content on scrolls because neither the viewport or device
-        // properties change from a scroll. This setup minimizes the operations binded to the scroll 
+        // properties change from a scroll. This setup minimizes the operations binded to the scroll
         // event. Once everything in the set has been swapped once, the scroll handler is deactivated
         // through the use of a custom event.
         if (!lazy) return;
-        
+
         $win.on(scrollName, scrollHandler);
         elemset.$e.one(allLoaded, function() {
           $win.off(scrollName, scrollHandler);
@@ -806,13 +805,13 @@
     });
     return Response;
   }
-  
+
   function noConflict(callback) {
     if (root[name] === Response) root[name] = old;
     if (typeof callback == 'function') callback.call(root, Response);
     return Response;
   }
-  
+
   // Many methods are @deprecated (see issue #51)
   Response = {
       deviceMin: function() { return screenMin; }

@@ -1,24 +1,27 @@
 {
   "name": "response.js",
-  "description": "responsive design toolkit",
+  "description": "Responsive design toolkit",
   "version": "0.9.1",
-  "homepage": "https://github.com/ryanve/response.js",
-  "license": "MIT",
+  "license": "CC0-1.0",
   "author": "Ryan Van Etten",
-  "keywords": [
-    "responsive",
-    "breakpoint",
-    "breakpoints",
-    "browser"
-  ],
-  "main": "./response.js",
+  "main": "response.js",
+  "scripts": {
+    "min": "uglifyjs response.js -o response.min.js --comments",
+    "test": "eslint ."
+  },
+  "homepage": "https://github.com/ryanve/response.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/ryanve/response.js.git"
   },
   "devDependencies": {
-    "grunt-contrib-uglify": "~0.6.0",
-    "grunt-contrib-concat": "~0.4.0",
-    "grunt-contrib-jshint": "~0.10.0"
-  }
+    "eslint": "^4.10.0",
+    "uglify-js": "^3.1.6"
+  },
+  "keywords": [
+    "responsive",
+    "breakpoint",
+    "breakpoints",
+    "browser"
+  ]
 }
