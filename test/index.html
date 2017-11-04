@@ -66,32 +66,32 @@
   <h2 class=section-h><a class=section-a title="breakpoint-based attribute sets" href=#sets>sets</a></h2>
   <p><b class=andup>JavaScript <span class="css-value">/ CSS</span></b> values should correspond at standard zoom.</p>
   <h4 class=section-h>width</h4>
-  <div class="min-width" 
+  <div class="min-width"
      data-min-width-0="<strong>ok</strong> =) viewport width is <span class=andup>0+</span>"
      data-min-width-320="<strong>ok</strong> =) viewport width is <span class=andup>320+</span>"
      data-min-width-481="<strong>ok</strong> =) viewport width is <span class=andup>481+</span>"
      data-min-width-961="<strong>ok</strong> =) viewport width is <span class=andup>961+</span>"
   ><strong class=fail>fallback</strong> content</div>
   <h4 class=section-h>height</h4>
-  <div class="min-height" 
+  <div class="min-height"
      data-min-height-0="<strong>ok</strong> =) viewport height is <span class=andup>0+</span>"
      data-min-height-481="<strong>ok</strong> =) viewport height is <span class=andup>481+</span>"
   ><strong class=fail>fallback</strong> content</div>
   <h4 class=section-h>device-width</h4>
-  <div class="min-device-width" 
+  <div class="min-device-width"
      data-min-device-width-0="<strong>ok</strong> =) device width is <span class=andup>0+</span>"
      data-min-device-width-320="<strong>ok</strong> =) device width is <span class=andup>320+</span>"
      data-min-device-width-481="<strong>ok</strong> =) device width is <span class=andup>481+</span>"
      data-min-device-width-961="<strong>ok</strong> =) device width is <span class=andup>961+</span>"
   ><strong class=fail>fallback</strong> content</div>
   <h4 class=section-h>device-height</h4>
-  <div class="min-device-height" 
+  <div class="min-device-height"
      data-min-device-height-0="<strong>ok</strong> =) device height is <span class=andup>0+</span>"
      data-min-device-height-481="<strong>ok</strong> =) device height is <span class=andup>481+</span>"
-  ><strong class=fail>fallback</strong> content</div>  
+  ><strong class=fail>fallback</strong> content</div>
   <h4 class=section-h>device-pixel-ratio</h4>
   <div class="min-device-pixel-ratio"
-     data-min-device-pixel-ratio-0="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>0+</span>"  
+     data-min-device-pixel-ratio-0="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>0+</span>"
      data-min-device-pixel-ratio-1="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>1+</span>"
      data-min-device-pixel-ratio-1.5="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>1.5+</span>"
      data-min-device-pixel-ratio-2="<strong>ok</strong> =) device-pixel-ratio is <span class=andup>2+</span>"
@@ -115,12 +115,12 @@
 <script src="vendor/ender.min.js"></script>
 <script>
 !function() {
-  var files = ['index.js'], site = location.hostname; 
+  var files = ['index.js'], site = location.hostname;
   if ('responsejs.com' === site) {
     window._gaq = [['_setAccount', 'UA-5731919-22'], ['_trackPageview']];
     files.push('//google-analytics.com/ga.js');
     files.unshift('//airve.github.io/js/response/response.min.js');
-  } else !site && files.unshift('../src/index.js');
+  } else !site && files.unshift('../response.js');
   require('scriptjs')(files);
 }();
 </script>

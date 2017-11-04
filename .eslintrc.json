@@ -1,0 +1,19 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "node": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 5,
+    "sourceType": "script"
+  },
+  "rules": {
+    "indent": ["off", 2],
+    "quotes": ["error", "single"],
+    "no-cond-assign": ["off"],
+    "no-console": ["off"],
+    "no-empty": ["off"]
+  }
+}
