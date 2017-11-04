@@ -188,6 +188,3 @@ define(['jquery'], Response.noConflict);  // define module and destroy global
 - [actual](https://github.com/ryanve/actual) - `@media` detector
 - [dope](https://github.com/ryanve/dope) - dataset abstraction
 - [res](https://github.com/ryanve/res) - resolution utilities
-
-## License
-MIT
