@@ -6,7 +6,7 @@
   "author": "Ryan Van Etten",
   "main": "response.js",
   "scripts": {
-    "min": "uglifyjs response.js -o response.min.js --comments /^!/",
+    "min": "uglifyjs response.js -o response.min.js --comments",
     "test": "eslint ."
   },
   "homepage": "https://github.com/ryanve/response.js",

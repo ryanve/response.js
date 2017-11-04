@@ -1,7 +1,6 @@
-/*!
- * response.js
+/*
  * https://github.com/ryanve/response.js
- * MIT License
+ * @license MIT
  */
 !function(root, name, make) {
   var $ = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
