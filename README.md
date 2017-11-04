@@ -1,14 +1,14 @@
 # Response
 Response is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers tools for building responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes. (<b>npm</b>: [response.js](https://www.npmjs.org/package/response.js))
 
-## API ([0.9](../../releases))
+## API [(0.9)](../../releases)
 ### Breakpoint sets
 
 Response's main feature is its breakpoint sets. They offer the ability to serve different content via breakpoint-based data attributes. They are best applied with a mobile-first approach. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup.
 
 #### [Creating breakpoint sets](../../wiki/how-to-create-breakpoint-sets)
 
-Sets are created either by calling [Response.create(options)](http://responsejs.com/#create) directly, or automatically via JSON stored in a `body[data-responsejs]`. 
+Sets are created either by calling [Response.create(options)](http://responsejs.com/#create) directly, or automatically via JSON stored in a `body[data-responsejs]`.
 The <var>options</var> can be a plain object or an array of them.
 
 ```js
@@ -23,7 +23,7 @@ Response.create({
 #### OR
 
 ```html
-<body data-responsejs='{ 
+<body data-responsejs='{
   "create": [
     { "prop": "width"
     , "prefix": "min-width- r src"
@@ -141,7 +141,7 @@ Response.dataset(document.body, "pulpFiction", 5) // sets <body data-pulp-fictio
 Response.dataset(document.body, "pulpFiction") // -> "5"
 Response.dataset(document.body, ["pulpFiction"]) // -> 5
 
-Response.render(str) // convert stringified primitives to correct value e.g. "true" to true 
+Response.render(str) // convert stringified primitives to correct value e.g. "true" to true
 Response.camelize(str) // convert 'pulp-fiction' or 'data-pulp-fiction' to pulpFiction
 Response.datatize(str) // convert 'pulpFiction' to 'data-pulp-fiction'
 Response.target(keys) // convert keys like "a b c" or ["a","b","c"] to $("[data-a],[data-b],[data-c]")
@@ -188,9 +188,6 @@ define(['jquery'], Response.noConflict);  // define module and destroy global
 - [actual](https://github.com/ryanve/actual) - `@media` detector
 - [dope](https://github.com/ryanve/dope) - dataset abstraction
 - [res](https://github.com/ryanve/res) - resolution utilities
-
-## Fund
-Support this project by [tipping the developer](https://www.gittip.com/ryanve/) <samp><b>=)</b></samp>
 
 ## License
 MIT
