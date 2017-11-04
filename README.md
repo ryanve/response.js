@@ -1,7 +1,7 @@
 # Response
 Response is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers tools for building responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes. (<b>npm</b>: [response.js](https://www.npmjs.org/package/response.js))
 
-## API ([0.9](../../releases))
+## API [(0.9)](../../releases)
 ### Breakpoint sets
 
 Response's main feature is its breakpoint sets. They offer the ability to serve different content via breakpoint-based data attributes. They are best applied with a mobile-first approach. Devs can choose custom breakpoints to create exactly data attributes they need. By default none are setup.
