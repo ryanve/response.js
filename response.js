@@ -1,6 +1,6 @@
 /*
  * https://github.com/ryanve/response.js
- * @license MIT
+ * @license CC0-1.0
  */
 !function(root, name, make) {
   var $ = root.jQuery || root.Zepto || root.ender || root.elo;
