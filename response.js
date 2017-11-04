@@ -3,8 +3,8 @@
  * @license MIT
  */
 !function(root, name, make) {
-  var $ = root['jQuery'] || root['Zepto'] || root['ender'] || root['elo'];
-  if (typeof module != 'undefined' && module['exports']) module['exports'] = make($);
+  var $ = root.jQuery || root.Zepto || root.ender || root.elo;
+  if (typeof module != 'undefined' && module.exports) module.exports = make($);
   else root[name] = make($);
 }(this, 'Response', function($) {
 
