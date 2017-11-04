@@ -6,7 +6,7 @@
   var $ = root.jQuery || root.Zepto || root.ender || root.elo;
   if (typeof module != 'undefined' && module.exports) module.exports = make($);
   else root[name] = make($);
-}(this, 'Response', function($) {
+}(this || window, 'Response', function($) {
 
   if (typeof $ != 'function') {
     try {
