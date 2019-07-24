@@ -16,7 +16,7 @@
 
   var Response
     , Elemset
-    , root = this
+    , root = this || window
     , name = 'Response'
     , old = root[name]
     , initContentKey = 'init' + name
