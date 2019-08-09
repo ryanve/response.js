@@ -164,17 +164,28 @@ Response.sift(stack, fn?, scope|invert?) // like _.compact, [].filter, and jQuer
 
 ### `.noConflict()`
 
+[Re: fetch](../../issues/76)
+
 ```js
-Response.noConflict() // remove the global `Response`
+// Unmodify window
+Response.noConflict()
+```
+
+```js
+// Unmodify window and save reference to our Response
+let R = Response.noConflict()
+```
+
+```js
 Response.noConflict(function(Response) {
-  // Remove the global and get safe reference to `Response` in here
+  // Unmodify window and get safe reference to our Response in here
 })
 ```
 
 ### [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) usage
 
 ```js
-define(['jquery'], Response.noConflict);  // define module and destroy global
+define(['jquery'], Response.noConflict);  // define module and unmodify window
 ```
 
 ## Resources
