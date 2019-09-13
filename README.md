@@ -1,4 +1,6 @@
 # Response
+[![CDNJS version](https://img.shields.io/cdnjs/v/response.js.svg)](https://cdnjs.com/libraries/response.js)
+
 Response is an experimental [jQuery](http://jquery.com)/[Ender](https://github.com/ender-js/Ender)/[Zepto](http://zeptojs.com) plugin that gives web designers tools for building responsive websites. It can dynamically swap content based on [breakpoints](#breakpoint-sets) and data attributes. (<b>npm</b>: [response.js](https://www.npmjs.org/package/response.js))
 
 ## API [(0.10)](../../releases)
